@@ -35,6 +35,9 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.mshtml, Version=7.0.3300.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -48,13 +51,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="core\Controller\BrowserController.cs" />
     <Compile Include="core\Dto\HeadInfo.cs" />
     <Compile Include="core\Servise\DecryptService.cs" />
     <Compile Include="core\Servise\EncryptService.cs" />
+    <Compile Include="core\Servise\SendDataServise.cs" />
     <Compile Include="core\Tools\EncryptDecryptTools.cs" />
     <Compile Include="core\Utils\ByteConverter.cs" />
-    <Compile Include="core\controller\MessageEncryptDecryptController.cs" />
-    <Compile Include="core\controller\HookController.cs" />
+    <Compile Include="core\Controller\MessageEncryptDecryptController.cs" />
+    <Compile Include="core\Controller\HookController.cs" />
     <Compile Include="core\Utils\PublicUtils.cs" />
     <Compile Include="SeerMainWindow.cs">
       <SubType>Form</SubType>

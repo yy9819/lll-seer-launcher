@@ -36,7 +36,7 @@ namespace lll_seer_launcher.core.Servise
         /// </summary>
         /// <param name="targetData">欲解密的字节数组</param>
         /// <returns>解密完成的字节数组</returns>
-        public static byte[] DecryptData(byte[] targetData, IntPtr keyPtr, int keyLen)
+        private static byte[] DecryptData(byte[] targetData, IntPtr keyPtr, int keyLen)
         {
             byte[] encryptedData = targetData;
             int encryptedDataLen = encryptedData.Length;
@@ -64,7 +64,7 @@ namespace lll_seer_launcher.core.Servise
         /// <param name="DecryptedDataLen">欲解密的字节数组</param>
         /// <param name="dataPtr">欲解密的字节数组的指针</param>
         /// <returns></returns>
-        public static void DecryptFunction(int DecryptedDataLen, IntPtr dataPtr)
+        private static void DecryptFunction(int DecryptedDataLen, IntPtr dataPtr)
         {
             int i = 0;
             int dataValue = (int)EncryptDecryptTools.li8(dataPtr);                      //取出原数据 指针 的第一个数据

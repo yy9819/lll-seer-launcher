@@ -35,24 +35,22 @@ namespace lll_seer_launcher.core.Tools
         {
             int i = 0;
             int keyI = 0;                                           //key i 对应的value
-            byte[] decrptedBytes = new byte[DecryptedDataLen];
             while (i < DecryptedDataLen)
             {
                 int dataValue = (int)li8(dataPtr + i);              //取出原数据 指针+i 的数据
                 int ptrKeyI = 0;                                    //临时已取数据数
-                IntPtr tmpValue = keyPtr;                      //取出当前key的指针设为目标取出值
-                if (keyI != keyLen)                            //判断已取数据个数是否等于key的长度
+                IntPtr tmpValue = keyPtr;                           //取出当前key的指针设为目标取出值
+                if (keyI != keyLen)                                 //判断已取数据个数是否等于key的长度
                 {
-                    tmpValue = keyPtr + keyI;                  //已取数据个数不等于key的长度时，将目标取出值设为当前key的指针 + 已取数
+                    tmpValue = keyPtr + keyI;                       //已取数据个数不等于key的长度时，将目标取出值设为当前key的指针 + 已取数
                     ptrKeyI = keyI + 1;                             //更新已取数据数
                 }
                 keyI = (int)li8(tmpValue);                          //取出目标key值
                 dataValue = keyI ^ (int)dataValue;                  //位异或运算  
                 keyI = ptrKeyI;                                     //更新已取数据数
-                decrptedBytes[i] = (byte)dataValue;
+                Marshal.WriteByte(dataPtr, i , (byte)dataValue);
                 i++;
             }
-            Marshal.Copy(decrptedBytes, 0, dataPtr, DecryptedDataLen);//将还原后的值写入内存
         }
 
 
@@ -68,19 +66,19 @@ namespace lll_seer_launcher.core.Tools
         {
             int encryptedDataLen = decryptedDataLen + 1;
             //Console.WriteLine($"this.keyPtr:{this.keyPtr}  this.keyLen:{this.keyLen}");
-            IntPtr result = keyPtr + (decryptedDataLen % keyLen);
-            result = (IntPtr)((int)li8(result) * 13);
-            result = (IntPtr)((int)result % encryptedDataLen);
-            if (result != IntPtr.Zero && (encryptedData != null || encryptedData.Length != 0))
+            int result =(int) keyPtr + (decryptedDataLen % keyLen);
+            result = (int)li8((IntPtr)result) * 13;
+            result = result % encryptedDataLen;
+            if (result != 0 && (encryptedData != null || encryptedData.Length != 0))
             {
                 if (isEncrypt)
                 {
-                    result = (IntPtr)(encryptedDataLen - (int)result);
+                    result = encryptedDataLen  - result;
                 }
-                byte[] tempBytesLeft = ByteConverter.TakeBytes(encryptedData, encryptedDataLen - (int)result, (int)result);
-                byte[] tempBytesRight = ByteConverter.TakeBytes(encryptedData, 0, encryptedDataLen - (int)result);
+                byte[] tempBytesLeft = ByteConverter.TakeBytes(encryptedData, encryptedDataLen - result, result);
+                byte[] tempBytesRight = ByteConverter.TakeBytes(encryptedData, 0, encryptedDataLen - result);
                 encryptedData = ByteConverter.RepalaceBytes(encryptedData, tempBytesLeft, 0);
-                encryptedData = ByteConverter.RepalaceBytes(encryptedData, tempBytesRight, (int)result);
+                encryptedData = ByteConverter.RepalaceBytes(encryptedData, tempBytesRight, result);
             }
 
             return encryptedData;

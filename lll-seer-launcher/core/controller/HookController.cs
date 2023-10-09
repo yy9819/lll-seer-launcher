@@ -6,7 +6,7 @@ using System.Security.Permissions;
 using System.Collections;
 
 
-namespace lll_seer_launcher.core
+namespace lll_seer_launcher.core.Controller
 {
     unsafe public class HookControl
     {
