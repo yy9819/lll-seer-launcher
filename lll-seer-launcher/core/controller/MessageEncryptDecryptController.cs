@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
+using System.Threading;
 using System.Collections;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
+using System.Windows.Forms;
 using lll_seer_launcher.core.Dto;
 using lll_seer_launcher.core.Servise;
 using lll_seer_launcher.core.Tools;
@@ -18,14 +19,8 @@ namespace lll_seer_launcher.core.Controller
         #region 变量表
         private ArrayList tempBuff { get; set; }
         private ArrayList chunkBuff { get; set; }
-        private string keyString { get; set; } = "!crAckmE4nOthIng:-)";
-        public byte[] Key { get; set; }
-        public int keyLen { get; set; }
-        public IntPtr keyPtr { get; set; }
-        private int userId { get; set; }
-        public int seq { get; set; }
-        public bool isLogin { get; set; }
-        private int gameSocket { get; set; }
+
+        private AnalyzeRecvDataController analyzeRecvDataController = new AnalyzeRecvDataController();
         #endregion
 
         #region Api声明
@@ -36,19 +31,15 @@ namespace lll_seer_launcher.core.Controller
         {
             tempBuff = new ArrayList();
             chunkBuff = new ArrayList();
-            isLogin = false;
+            GlobalVariable.isLogin = false;
             this.InitKey();
-        }
-        public void SetGameSocket(int s)
-        {
-            this.gameSocket = s;
         }
         /// <summary>
         /// 设置加密key的字符串
         /// </summary>
         public void SetKey(string key)
         {
-            this.keyString = key;
+            GlobalVariable.keyString = key;
         }
 
         /// <summary>
@@ -59,15 +50,15 @@ namespace lll_seer_launcher.core.Controller
         /// </summary>
         public void InitKey()
         {
-            if (this.keyPtr != IntPtr.Zero)
+            if (GlobalVariable.keyPtr != IntPtr.Zero)
             {
-                Marshal.FreeHGlobal(this.keyPtr);
+                Marshal.FreeHGlobal(GlobalVariable.keyPtr);
             }
-            Console.WriteLine("initKey:" + this.keyString);
-            this.Key = UTF8Encoding.UTF8.GetBytes(keyString);
+            Console.WriteLine("initKey:" + GlobalVariable.keyString);
+            GlobalVariable.Key = UTF8Encoding.UTF8.GetBytes(GlobalVariable.keyString);
             //Console.WriteLine(BitConverter.ToString(this.Key));
-            this.keyLen = this.Key.Length;
-            this.keyPtr = ByteConverter.GetBytesIntPtr(this.Key);
+            GlobalVariable.keyLen = GlobalVariable.Key.Length;
+            GlobalVariable.keyPtr = ByteConverter.GetBytesIntPtr(GlobalVariable.Key);
         }
 
         /// <summary>
@@ -75,8 +66,8 @@ namespace lll_seer_launcher.core.Controller
         /// </summary>
         private void InitSeq(int inputSeq)
         {
-            this.seq = inputSeq;
-            Console.WriteLine($"initSeq:{this.seq}");
+            GlobalVariable.seq = inputSeq;
+            Console.WriteLine($"initSeq:{GlobalVariable.seq}");
         }
 
 
@@ -127,24 +118,27 @@ namespace lll_seer_launcher.core.Controller
                 int crc8Val = 0;
                 if (dataBody.Length != 0)
                 {
+                    //与欲发送的主体数据进行异或异与计算
                     for (int i = 0; i < dataBody.Length; i++)
                     {
                         crc8Val = (crc8Val ^ dataBody[i]) & 255;
                     }
                 }
-                this.seq = EncryptService.MSerial(this.seq, headInfo.packageLen - 1, crc8Val, headInfo.cmdId);
-                string seqHex = ByteConverter.DecimalToHex(this.seq, 4);
+                //获取重新计算后的顺序码
+                GlobalVariable.seq = EncryptService.MSerial(GlobalVariable.seq, headInfo.packageLen - 1, crc8Val, headInfo.cmdId);
+                string seqHex = ByteConverter.DecimalToHex(GlobalVariable.seq, 4);
                 ByteConverter.RepalaceBytes(encryptData, ByteConverter.HexToBytes(seqHex), index);
             }
             else
             {
                 ByteConverter.RepalaceBytes(encryptData, ByteConverter.HexToBytes(ByteConverter.DecimalToHex(0, 4)), index);
             }
-            headInfo.seq = this.seq;
-            //写入解密数据
+            headInfo.seq = GlobalVariable.seq;
+            //写入解密数据，完成组包
             index += 4;
-            encryptData = ByteConverter.RepalaceBytes(encryptData, headInfo.decryptData, index);
+            ByteConverter.RepalaceBytes(encryptData, headInfo.decryptData, index);
 
+            //将组包完成的数据进行加密
             headInfo.encryptData = this.Encrypt(encryptData);
             return headInfo;
         }
@@ -164,7 +158,7 @@ namespace lll_seer_launcher.core.Controller
             int realSize;
             byte[] tmpBytes = new byte[dataSize];
             Marshal.Copy(dataPtr, tmpBytes, 0, dataSize);
-            tempBuff = PublicUtils.CombineArrayList(tempBuff, PublicUtils.BytesToArray(tmpBytes));
+            tempBuff = GlobalUtil.CombineArrayList(tempBuff, GlobalUtil.BytesToArray(tmpBytes));
             //Console.WriteLine(BitConverter.ToString(tmpBytes));
             //return;
 
@@ -213,10 +207,29 @@ namespace lll_seer_launcher.core.Controller
                 HeadInfo headInfo = this.GetHeadInfo(decryptBytes);
                 if (headInfo.cmdId == 1001)
                 {
-                    this.userId = headInfo.userId;
+                    GlobalVariable.userId = headInfo.userId;
                     this.OnLogin(decryptBytes);
                     this.InitSeq(headInfo.seq);
-                    this.isLogin = true;
+                    GlobalVariable.isLogin = true;
+                    Thread onLoginThread = new Thread(() =>
+                    {
+                        Logger.Log("gameLogin",$"user:{GlobalVariable.userId} 登录成功！");
+                    });
+                    onLoginThread.Start();
+                }
+                else if(headInfo.cmdId > 100000)
+                {
+                    Thread onLoginThread = new Thread(() =>
+                    {
+                        Logger.Error($" 当前cmdId‘{headInfo.cmdId}’大于100000，登录加密key初始化失败！");
+                        GlobalVariable.gameReloadFlg = true;
+                        MessageBox.Show("登录加密key初始化失败！将刷新游戏，请重新登录！");
+                    });
+                    onLoginThread.Start();
+                }
+                else
+                {
+                    this.analyzeRecvDataController.RunAnalyzeRecvDataMethod(headInfo);
                 }
             }
 
@@ -233,7 +246,7 @@ namespace lll_seer_launcher.core.Controller
             byte[] keyBytes = ByteConverter.TakeBytes(bytes, bytes.Length - 4, 4);
             string tmpKey = BitConverter.ToString(keyBytes).Replace("-", string.Empty);
             int tmpNum = Convert.ToInt32(tmpKey, 16);
-            tmpNum = tmpNum ^ this.userId;
+            tmpNum = tmpNum ^ GlobalVariable.userId;
             byte[] hashBytes = MD5.Create().ComputeHash(Encoding.UTF8.GetBytes(tmpNum.ToString()));
             tmpKey = BitConverter.ToString(hashBytes).Replace("-", "").ToLower();
             this.SetKey(tmpKey.Substring(0, 10));
@@ -244,33 +257,12 @@ namespace lll_seer_launcher.core.Controller
 
         public byte[] Decrypt(byte[]bytes)
         {
-            return DecryptService.Decrypt(bytes,this.keyPtr,this.keyLen);
+            return DecryptService.Decrypt(bytes);
         }
 
         public byte[] Encrypt(byte[] bytes)
         {
-            return EncryptService.Encrypt(bytes, this.keyPtr, this.keyLen);
-        }
-
-        public void SendHexStringData(string hexStringData)
-        {
-            if ((hexStringData.Length / 2) % 2 != 0) hexStringData = hexStringData + "00";
-            byte[] orgBytes = ByteConverter.HexToBytes(hexStringData);
-            this.SendHexBytesData(orgBytes);
-        }
-        public void SendHexBytesData(byte[] hexBytesData)
-        {
-            hexBytesData = ByteConverter.RepalaceBytes(hexBytesData,ByteConverter.HexToBytes(ByteConverter.DecimalToHex(this.userId, 4)) ,9);
-            if(hexBytesData.Length % 2 != 0)
-            {
-                byte[] newBytes = new byte[hexBytesData.Length + 1];
-                ByteConverter.RepalaceBytes(newBytes,hexBytesData ,0);
-                SendDataServise.SendHexBytesData(newBytes, this.gameSocket, this.keyPtr, this.keyLen);
-            }
-            else
-            {
-                SendDataServise.SendHexBytesData(hexBytesData, this.gameSocket, this.keyPtr, this.keyLen);
-            }
+            return EncryptService.Encrypt(bytes);
         }
     }
 }

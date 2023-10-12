@@ -4,10 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Runtime.InteropServices;
+using System.Diagnostics;
 
 namespace lll_seer_launcher.core.Controller
 {
-    public class BrowserController
+    public class MainFormController
     {
         [DllImport("user32.dll")]
         public static extern int SendMessage(IntPtr hWnd, int Msg, int wParam, int lParam);
@@ -19,5 +20,11 @@ namespace lll_seer_launcher.core.Controller
         {
             SendMessage(browserHandle, WM_APPCOMMAND, browserHandle.ToInt32(), APPCOMMAND_VOLUME_MUTE);
         }
+
+        public static void ProgramInit()
+        {
+
+        }
+
     }
 }

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Runtime.InteropServices;
 using lll_seer_launcher.core.Utils;
 using lll_seer_launcher.core.Tools;
+using lll_seer_launcher.core.Dto;
 
 namespace lll_seer_launcher.core.Servise
 {
@@ -18,25 +19,25 @@ namespace lll_seer_launcher.core.Servise
         /// </summary>
         /// <param name="targetData">欲解密的字节数组</param>
         /// <returns>解密完成的字节数组</returns>
-        public static byte[] Decrypt(byte[] targetData, IntPtr keyPtr, int keyLen)
+        public static byte[] Decrypt(byte[] targetData)
         {
             int encryptedDataLen = targetData.Length - 4;
             int decryptedDataLen = encryptedDataLen + 1;
             byte[] decryptedData = ByteConverter.TakeBytes(targetData, 4, decryptedDataLen);
             if (decryptedData.Length > 4)
             {
-                decryptedData = DecryptData(decryptedData, keyPtr, keyLen);
+                decryptedData = DecryptData(decryptedData);
                 targetData = ByteConverter.RepalaceBytes(targetData, decryptedData, 4);
             }
             return targetData;
         }
 
         /// <summary>
-        /// 解密函数control
+        /// 解密函数controller
         /// </summary>
         /// <param name="targetData">欲解密的字节数组</param>
         /// <returns>解密完成的字节数组</returns>
-        private static byte[] DecryptData(byte[] targetData, IntPtr keyPtr, int keyLen)
+        private static byte[] DecryptData(byte[] targetData)
         {
             byte[] encryptedData = targetData;
             int encryptedDataLen = encryptedData.Length;
@@ -44,12 +45,12 @@ namespace lll_seer_launcher.core.Servise
             byte[] decryptData = new byte[decryptedDataLen];
             if (decryptedDataLen >= 1)
             {
-                encryptedData = EncryptDecryptTools.RevertData(decryptedDataLen, encryptedData, false, keyPtr, keyLen);
+                encryptedData = EncryptDecryptTools.RevertData(decryptedDataLen, encryptedData, false);
                 IntPtr dataPtr = ByteConverter.GetBytesIntPtr(encryptedData);
 
                 DecryptFunction(decryptedDataLen, dataPtr);
 
-                EncryptDecryptTools.KeyXOr(decryptedDataLen, dataPtr, keyPtr, keyLen);
+                EncryptDecryptTools.KeyXOr(decryptedDataLen, dataPtr);
 
                 Marshal.Copy(dataPtr, decryptData, 0, decryptedDataLen);
 

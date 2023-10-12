@@ -7,6 +7,8 @@ using lll_seer_launcher.core.Controller;
 using lll_seer_launcher.core.Dto;
 using lll_seer_launcher.core.Utils;
 using mshtml;
+using System.Diagnostics;
+using System.Threading;
 
 namespace lll_seer_launcher
 {
@@ -19,13 +21,24 @@ namespace lll_seer_launcher
         private SendHandleDelegate recvFunction;
         private MessageEncryptDecryptController messageEncryptControl;
         private HeadInfo sendPkgInfo;
+        private ChangeSuitForm changeSuitForm;
+        private InitJsonController initJsonControl = new InitJsonController();
         public seerMainWindow()
         {
             InitializeComponent();
+            this.IsMdiContainer = true;
+            Thread initJsonThread = new Thread(() =>
+            {
+                this.initJsonControl.InitJson();
+            });
+            initJsonThread.Start();
         }
 
         private void SeerMainWindow_Load(object sender, EventArgs e)
         {
+            Thread getUsedMemory = new Thread(GetUsedMemorySize);
+            getUsedMemory.Start();
+
             this.messageEncryptControl = new MessageEncryptDecryptController();
             this.sendFunction = SendHandle;
             this.sendFunctionPtr = Marshal.GetFunctionPointerForDelegate(sendFunction);
@@ -37,7 +50,8 @@ namespace lll_seer_launcher
             this.hook[1] = new HookControl();
             this.hook[1].Install("WS2_32.DLL", "recv", recvFunctionPtr);
 
-            //BrowserController.SetMute(this.Handle);
+            this.changeSuitForm = new ChangeSuitForm();
+            this.changeSuitForm.Hide();
         }
 
         private void SeerWebBrowser_DocumentCompleted(object sender, WebBrowserDocumentCompletedEventArgs e)
@@ -45,12 +59,12 @@ namespace lll_seer_launcher
         }
         private void SeerWebBrowser_Navigating(object sender, WebBrowserNavigatingEventArgs e)
         {
-            if (this.messageEncryptControl.isLogin)
+            if (GlobalVariable.isLogin)
             {
-                this.messageEncryptControl.isLogin = false;
-                this.messageEncryptControl.SetKey("!crAckmE4nOthIng:-)");
-                this.messageEncryptControl.InitKey();
+                GlobalVariable.isLogin = false;
             }
+            this.messageEncryptControl.SetKey("!crAckmE4nOthIng:-)");
+            this.messageEncryptControl.InitKey();
         }
         private void SeerWebBrowser_Navigated(object sender, WebBrowserNavigatedEventArgs e)
         {
@@ -68,7 +82,7 @@ namespace lll_seer_launcher
             Keys pressedKey = e.KeyCode;
             if (pressedKey == Keys.F5)
             {
-                this.seerWebBrowser.Url = new System.Uri("https://seer.61.com/play.shtml", System.UriKind.Absolute);
+                this.seerWebBrowser.Refresh();
             }
         }
         private void SeerWebBrowser_NewWindow(object sender, System.ComponentModel.CancelEventArgs e)
@@ -87,13 +101,12 @@ namespace lll_seer_launcher
             Marshal.Copy(dataPointer, bytes, 0, dataSize);
             if(ByteConverter.BytesTo10(ByteConverter.TakeBytes(bytes, 0, 2)) == 0)
             {
-                hook[1].gameSocket = s;
-                this.messageEncryptControl.SetGameSocket(s);
+                GlobalVariable.gameSocket = s;
                 //Console.WriteLine("sendEncrypt:" + BitConverter.ToString(bytes));
-                if (this.messageEncryptControl.isLogin)
+                if (GlobalVariable.isLogin)
                 {
                     bytes = this.messageEncryptControl.Decrypt(bytes);
-                    Console.WriteLine("sendDecrypt:" + BitConverter.ToString(bytes));
+                    //Console.WriteLine("sendDecrypt:" + BitConverter.ToString(bytes));
                     byte[] encryptBytes = ByteConverter.TakeBytes(bytes, 0, bytes.Length - 1);
                     this.sendPkgInfo = this.messageEncryptControl.GetHeadInfo(encryptBytes);
                     this.sendPkgInfo = this.messageEncryptControl.PackHeadInfo(this.sendPkgInfo);
@@ -117,7 +130,7 @@ namespace lll_seer_launcher
             int ret = HookControl.recv(s, dataPointer, dataSize, type);
             this.hook[1].Continue();
             if(ret == 0 || ret == -1) return 0;
-            if (hook[1].gameSocket == s) this.messageEncryptControl.LoadBasicMessage(dataPointer, ret);
+            if (GlobalVariable.gameSocket == s) this.messageEncryptControl.LoadBasicMessage(dataPointer, ret);
             return ret;
         }
 
@@ -127,6 +140,20 @@ namespace lll_seer_launcher
             {
                 if(this.hook[i] != null) this.hook[i].Uninstall();
             }
+            GlobalVariable.stopThread = true;
+        }
+
+        private void gameReloadMenu_Click(object sender, EventArgs e)
+        {
+            this.seerWebBrowser.Refresh();
+        }
+
+
+
+        private void changSuitToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            this.changeSuitForm.Show();
+            this.changeSuitForm.InitGroupBoxs();
         }
     }
 }
