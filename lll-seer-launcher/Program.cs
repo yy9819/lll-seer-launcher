@@ -8,6 +8,7 @@ namespace lll_seer_launcher
 {
     internal static class Program
     {
+        public static seerMainWindow MainFormInstance;
         /// <summary>
         /// 应用程序的主入口点。
         /// </summary>
@@ -16,7 +17,8 @@ namespace lll_seer_launcher
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new seerMainWindow());
+            MainFormInstance = new seerMainWindow();
+            Application.Run(MainFormInstance);
         }
 
 

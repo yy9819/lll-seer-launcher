@@ -7,9 +7,13 @@ using System.Collections;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using lll_seer_launcher.core.Utils;
+using lll_seer_launcher.core.Dto;
 
 namespace lll_seer_launcher.core.Tools
 {
+    /// <summary>
+    /// 封包加密解密通用工具
+    /// </summary>
     class EncryptDecryptTools
     {
         /// <summary>
@@ -31,7 +35,7 @@ namespace lll_seer_launcher.core.Tools
         /// <param name="DecryptedDataLen">欲解密的字节数组</param>
         /// <param name="dataPtr">欲解密的字节数组的指针</param>
         /// <returns></returns>
-        public static void KeyXOr(int DecryptedDataLen, IntPtr dataPtr , IntPtr keyPtr ,int keyLen)
+        public static void KeyXOr(int DecryptedDataLen, IntPtr dataPtr)
         {
             int i = 0;
             int keyI = 0;                                           //key i 对应的value
@@ -39,10 +43,10 @@ namespace lll_seer_launcher.core.Tools
             {
                 int dataValue = (int)li8(dataPtr + i);              //取出原数据 指针+i 的数据
                 int ptrKeyI = 0;                                    //临时已取数据数
-                IntPtr tmpValue = keyPtr;                           //取出当前key的指针设为目标取出值
-                if (keyI != keyLen)                                 //判断已取数据个数是否等于key的长度
+                IntPtr tmpValue = GlobalVariable.keyPtr;                           //取出当前key的指针设为目标取出值
+                if (keyI != GlobalVariable.keyLen)                                 //判断已取数据个数是否等于key的长度
                 {
-                    tmpValue = keyPtr + keyI;                       //已取数据个数不等于key的长度时，将目标取出值设为当前key的指针 + 已取数
+                    tmpValue = GlobalVariable.keyPtr + keyI;                       //已取数据个数不等于key的长度时，将目标取出值设为当前key的指针 + 已取数
                     ptrKeyI = keyI + 1;                             //更新已取数据数
                 }
                 keyI = (int)li8(tmpValue);                          //取出目标key值
@@ -53,8 +57,6 @@ namespace lll_seer_launcher.core.Tools
             }
         }
 
-
-
         /// <summary>
         /// 还原数据原始顺序
         /// </summary>
@@ -62,11 +64,11 @@ namespace lll_seer_launcher.core.Tools
         /// <param name="encryptedData">被还原的字节数组</param>
         /// <param name="isEncrypt">是否加密</param>
         /// <returns>还原完成的字节数组</returns>
-        public static byte[] RevertData(int decryptedDataLen, byte[] encryptedData, bool isEncrypt, IntPtr keyPtr, int keyLen)
+        public static byte[] RevertData(int decryptedDataLen, byte[] encryptedData, bool isEncrypt)
         {
             int encryptedDataLen = decryptedDataLen + 1;
             //Console.WriteLine($"this.keyPtr:{this.keyPtr}  this.keyLen:{this.keyLen}");
-            int result =(int) keyPtr + (decryptedDataLen % keyLen);
+            int result =(int)GlobalVariable.keyPtr + (decryptedDataLen % GlobalVariable.keyLen);
             result = (int)li8((IntPtr)result) * 13;
             result = result % encryptedDataLen;
             if (result != 0 && (encryptedData != null || encryptedData.Length != 0))

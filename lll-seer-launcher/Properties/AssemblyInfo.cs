@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // 有关程序集的一般信息由以下
 // 控制。更改这些特性值可修改
 // 与程序集关联的信息。
-[assembly: AssemblyTitle("lll-seer-launcher")]
+[assembly: AssemblyTitle("啦啦啦赛尔号登录器")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("lll-seer-launcher")]
+[assembly: AssemblyCompany("啦啦啦")]
+[assembly: AssemblyProduct("啦啦啦赛尔号登录器")]
 [assembly: AssemblyCopyright("Copyright ©  2023")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

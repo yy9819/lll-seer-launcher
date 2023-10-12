@@ -8,7 +8,7 @@ using System.Security.Cryptography;
 
 namespace lll_seer_launcher.core.Utils
 {
-    public class PublicUtils
+    public class GlobalUtil
     {
         /// <summary>
         /// 将字节数组转化为ArrayList
@@ -44,7 +44,8 @@ namespace lll_seer_launcher.core.Utils
             string str = "";
             for (int i = 0; i < list.Count; i++)
             {
-                str += list[i].ToString() + "-";
+                str += list[i].ToString();
+                if(i != list.Count - 1) str += "-";
             }
             Console.WriteLine(str);
         }

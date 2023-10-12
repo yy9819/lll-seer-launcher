@@ -44,10 +44,6 @@ namespace lll_seer_launcher.core.Controller
         IntPtr hModule
         );
         #endregion
-
-        #region 全局变量定义表
-        public int gameSocket;
-        #endregion
         
         #region 常量定义表
         const int PAGE_EXECUTE_READWRITE = 0x40;

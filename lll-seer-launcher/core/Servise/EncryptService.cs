@@ -9,7 +9,12 @@ namespace lll_seer_launcher.core.Servise
 {
     class EncryptService
     {
-        public static byte[] Encrypt(byte[] targetData, IntPtr keyPtr, int keyLen)
+        /// <summary>
+        /// 加密传入的封包
+        /// </summary>
+        /// <param name="targetData">需要加密的数据</param>
+        /// <returns>加密完成的数据</returns>
+        public static byte[] Encrypt(byte[] targetData)
         {
             int decryptDataLen = targetData.Length - 4;
 
@@ -17,14 +22,19 @@ namespace lll_seer_launcher.core.Servise
             byte[] encryptBytes = new byte[targetData.Length];
             if (encryptData.Length > 4)
             {
-                encryptData = EncryptData(encryptData, keyPtr, keyLen);
+                encryptData = EncryptData(encryptData);
                 encryptBytes = ByteConverter.RepalaceBytes(encryptBytes, ByteConverter.HexToBytes(ByteConverter.DecimalToHex(targetData.Length, 4)), 0);
                 encryptBytes = ByteConverter.RepalaceBytes(encryptBytes, encryptData, 4);
             }
             return encryptBytes;
         }
 
-        private static byte[] EncryptData(byte[] targetData, IntPtr keyPtr, int keyLen)
+        /// <summary>
+        /// 加密方法controller
+        /// </summary>
+        /// <param name="targetData">需加密的数据</param>
+        /// <returns>加密完成的数据</returns>
+        private static byte[] EncryptData(byte[] targetData)
         {
             byte[] encryptData = new byte[targetData.Length];
             encryptData = ByteConverter.RepalaceBytes(encryptData, targetData, 0);
@@ -35,21 +45,24 @@ namespace lll_seer_launcher.core.Servise
             {
                 IntPtr encrptDataPtr = ByteConverter.GetBytesIntPtr(encryptData);
 
-                EncryptDecryptTools.KeyXOr(decrptDataLen, encrptDataPtr, keyPtr, keyLen);
+                EncryptDecryptTools.KeyXOr(decrptDataLen, encrptDataPtr);
                 Marshal.Copy(encrptDataPtr, encryptData, 0, encrptDataLen);
 
                 EncryptFunction(decrptDataLen, encrptDataPtr);
                 Marshal.Copy(encrptDataPtr, encryptData, 0, encrptDataLen);
 
-                encryptData = EncryptDecryptTools.RevertData(decrptDataLen, encryptData, true , keyPtr , keyLen);
+                encryptData = EncryptDecryptTools.RevertData(decrptDataLen, encryptData, true);
                 Marshal.FreeHGlobal(encrptDataPtr);
             }
 
             return encryptData;
         }
 
-
-
+        /// <summary>
+        /// 加密函数
+        /// </summary>
+        /// <param name="dataLen">需加密的数据长度</param>
+        /// <param name="dataPtr">需加密的数据指针</param>
         private static void EncryptFunction(int dataLen, IntPtr dataPtr)
         {
             int i = 0;
@@ -75,6 +88,14 @@ namespace lll_seer_launcher.core.Servise
             dataValue = dataValue | 3;
             Marshal.WriteByte(dataPtr, 0, (byte)dataValue);
         }
+        /// <summary>
+        /// seq计算
+        /// </summary>
+        /// <param name="seq">当前seq</param>
+        /// <param name="pkgLen">数据长度</param>
+        /// <param name="crc8Val">与欲发送包数据进行异或异与计算后的值</param>
+        /// <param name="cmdId">欲发送的cmdId</param>
+        /// <returns>计算完成的顺序码</returns>
         public static int MSerial(int seq, int pkgLen, int crc8Val, int cmdId)
         {
             int result = (int)seq + crc8Val + (int)(seq / -3) + (pkgLen % 17) + (cmdId % 23) + 120;
