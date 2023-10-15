@@ -80,6 +80,10 @@ namespace lll_seer_launcher.core.Controller
             {
                 return DBServise.SuitAndAchieveTitleDbServise.PlanTableSelectData(userId);
             }
+            public static Dictionary<int, SuitAchieveTitlePlan> SearchUserPlan(int userId,string searchWord)
+            {
+                return DBServise.SuitAndAchieveTitleDbServise.PlanTableSearch(userId,searchWord);
+            }
             public static int InsertPlan(SuitAchieveTitlePlan plan)
             {
                 return DBServise.SuitAndAchieveTitleDbServise.PlanTableInsertData(plan);
@@ -87,6 +91,10 @@ namespace lll_seer_launcher.core.Controller
             public static int DeletePlan(int planId)
             {
                 return DBServise.SuitAndAchieveTitleDbServise.PlanTableDeleteData(planId);
+            }
+            public static int DeletePlanByuserId(int userId)
+            {
+                return DBServise.SuitAndAchieveTitleDbServise.PlanTableDeleteDataByUserId(userId);
             }
             public static int UpdatePlan(SuitAchieveTitlePlan plan)
             {

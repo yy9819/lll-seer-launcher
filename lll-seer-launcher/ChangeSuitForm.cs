@@ -465,17 +465,22 @@ namespace lll_seer_launcher
 
         private void deletePlanButton_Click(object sender, EventArgs e)
         {
-            int planId = Convert.ToInt32(this.planDataGridView.Rows[this.GetPlanDataGridViewSelectIndex()].Cells["id"].Value);
-            int result = DBController.SuitAndAchieveTitleDbController.DeletePlan(planId);
-            if (result != 1)
+            DialogResult result = MessageBox.Show("是否确认执行此操作?", "确认框", MessageBoxButtons.OKCancel, MessageBoxIcon.Question);
+            if (result == DialogResult.OK)
             {
-                MessageBox.Show("方案删除失败...");
+                int planId = Convert.ToInt32(this.planDataGridView.Rows[this.GetPlanDataGridViewSelectIndex()].Cells["id"].Value);
+                int deleteResult = DBController.SuitAndAchieveTitleDbController.DeletePlan(planId);
+                if (deleteResult != 1)
+                {
+                    MessageBox.Show("方案删除失败...");
+                }
+                else
+                {
+                    MessageBox.Show("方案删除成功！");
+                    this.InitPlanDataGridView();
+                }
             }
-            else
-            {
-                MessageBox.Show("方案删除成功！");
-                this.InitPlanDataGridView();
-            }
+
         }
 
         private void updatePlanButton_Click(object sender, EventArgs e)
@@ -496,6 +501,71 @@ namespace lll_seer_launcher
             {
                 MessageBox.Show("方案保存成功！");
                 this.InitPlanDataGridView();
+            }
+        }
+
+        private void changePlanButton_Click(object sender, EventArgs e)
+        {
+            SendDataController sendDataController = new SendDataController();
+            int selectIndex = this.GetPlanDataGridViewSelectIndex();
+            int planId = Convert.ToInt32(this.planDataGridView.Rows[selectIndex].Cells["id"].Value);
+            if(this.userPlan.TryGetValue(planId,out SuitAchieveTitlePlan plan))
+            {
+
+                if(plan.achieveTitleId > 0) sendDataController.SendDataByCmdIdAndIntList(CmdId.SETTITLE, new int[1] { plan.achieveTitleId});
+                List<int> suitList = new List<int>();
+                int glassesId = plan.glassesId;
+                if (GlobalVariable.suitDictionary.ContainsKey(plan.suitId)) suitList = GlobalVariable.suitDictionary[plan.suitId].clothIdList;
+                if (suitList.Count < 5 && glassesId > 0)
+                {
+                    suitList.Add(glassesId);
+                }
+                if(suitList.Count > 0)
+                {
+                    int[] sendData = new int[suitList.Count + 1];
+                    sendData[0] = suitList.Count;
+                    int index = 1;
+                    foreach (int i in suitList)
+                    {
+                        sendData[index++] = i;
+                    }
+                    sendDataController.SendDataByCmdIdAndIntList(CmdId.CHANGE_CLOTH, sendData);
+                }
+            }
+            else
+            {
+
+            }
+        }
+
+        private void placnSearchButton_Click(object sender, EventArgs e)
+        {
+            this.userPlan = DBController.SuitAndAchieveTitleDbController.SearchUserPlan(this.selectUserId,this.planSearchTextBox.Text);
+            this.planDataGridView.Rows.Clear();
+            if (this.userPlan != null)
+            {
+                foreach (int key in this.userPlan.Keys)
+                {
+                    SuitAchieveTitlePlan info = this.userPlan[key];
+                    this.planDataGridView.Rows.Add(info.name,
+                        GlobalVariable.suitDictionary.ContainsKey(info.suitId) ? GlobalVariable.suitDictionary[info.suitId].name : "无",
+                        GlobalVariable.glassesDictionary.ContainsKey(info.glassesId) ? GlobalVariable.glassesDictionary[info.glassesId].name : "无",
+                        GlobalVariable.achieveTitleDictionary.ContainsKey(info.achieveTitleId) ? GlobalVariable.achieveTitleDictionary[info.achieveTitleId].title : "无",
+                        info.id);
+                }
+            }
+            this.planDataGridView_CellClick(new object(), new DataGridViewCellEventArgs(0, 0));
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            DialogResult result = MessageBox.Show("是否确认执行此操作?", "确认框", MessageBoxButtons.OKCancel, MessageBoxIcon.Question);
+            if(result == DialogResult.OK)
+            {
+                DBController.SuitAndAchieveTitleDbController.DeletePlanByuserId(this.selectUserId);
+                this.userPlan = new Dictionary<int, SuitAchieveTitlePlan>();
+                this.planDataGridView.Rows.Clear();
+                this.planDataGridView_CellClick(new object(), new DataGridViewCellEventArgs(0, 0));
             }
         }
     }

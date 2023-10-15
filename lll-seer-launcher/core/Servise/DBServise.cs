@@ -465,6 +465,7 @@ namespace lll_seer_launcher.core.Servise
 
             public static Dictionary<int, UserSuitAndAchieveTitleInfo> UserTableSelectDataGetUserList()
             {
+                Dictionary<int, UserSuitAndAchieveTitleInfo> result = new Dictionary<int, UserSuitAndAchieveTitleInfo>();
                 try
                 {
                     using (db)
@@ -472,11 +473,11 @@ namespace lll_seer_launcher.core.Servise
                         db.Open();
                         string countSql = $"SELECT COUNT(user_id) FROM user;";
                         long userLen = (long)new SqliteCommand(countSql, db).ExecuteScalar();
-                        if (userLen == 0) return null;
+                        if (userLen == 0) return result;
                         string selectSql = $"SELECT suit_list,glasses_list,achieve_title_list,user_id FROM user;";
                         SqliteCommand selectCmd = new SqliteCommand(selectSql, db);
                         SqliteDataReader reader = selectCmd.ExecuteReader();
-                        Dictionary<int, UserSuitAndAchieveTitleInfo> result = new Dictionary<int, UserSuitAndAchieveTitleInfo>();
+                        
                         while (reader.Read())
                         {
                             UserSuitAndAchieveTitleInfo info = new UserSuitAndAchieveTitleInfo();
@@ -492,7 +493,7 @@ namespace lll_seer_launcher.core.Servise
                 catch (Exception ex)
                 {
                     Logger.Error($"数据库用户装备持有明细表查询失败！ errorMessage：{ex.Message}");
-                    return null;
+                    return result;
                 }
             }
             #endregion
@@ -557,6 +558,27 @@ namespace lll_seer_launcher.core.Servise
                     return -1;
                 }
             }
+
+            public static int PlanTableDeleteDataByUserId(int userId)
+            {
+                try
+                {
+                    using (db)
+                    {
+                        db.Open();
+                        string deleteSql = $"DELETE FROM plan WHERE user_id = {userId};";
+                        int result = new SqliteCommand(deleteSql, db).ExecuteNonQuery();
+
+                        return result;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error($"数据库方案删除失败！ errorMessage：{ex.Message}");
+                    return -1;
+                }
+            }
+
             public static Dictionary<int, SuitAchieveTitlePlan> PlanTableSelectData(int userId)
             {
                 try
@@ -572,7 +594,6 @@ namespace lll_seer_launcher.core.Servise
                         SqliteCommand selectCmd = new SqliteCommand(selectSql, db);
                         SqliteDataReader reader = selectCmd.ExecuteReader();
                         Dictionary<int, SuitAchieveTitlePlan> suitAchieveTitlePlans = new Dictionary<int, SuitAchieveTitlePlan>();
-                        int index = 0;
                         while (reader.Read())
                         {
                             SuitAchieveTitlePlan result = new SuitAchieveTitlePlan();
@@ -582,11 +603,47 @@ namespace lll_seer_launcher.core.Servise
                             result.achieveTitleId = reader.GetInt32(3);
                             result.id = reader.GetInt32(4);
                             suitAchieveTitlePlans.Add(result.id,result);
-                            index++;
                         }
                         return suitAchieveTitlePlans;
                     }
                 } catch (Exception ex)
+                {
+                    Logger.Error($"数据库方案查询失败！ errorMessage：{ex.Message}");
+                    return null;
+                }
+            }
+
+            public static Dictionary<int, SuitAchieveTitlePlan> PlanTableSearch(int userId,string searchWord)
+            {
+                try
+                {
+                    using (db)
+                    {
+                        db.Open();
+                        string countSql = $"SELECT COUNT(plan_name) FROM plan WHERE user_id = {userId};";
+                        long planLen = (long)new SqliteCommand(countSql, db).ExecuteScalar();
+                        if (planLen == 0) return null;
+                        string selectSql = $"SELECT plan_name,suit_id,glasses_id,achieve_title_id,id " +
+                            $"FROM plan WHERE plan_name LIKE '%{searchWord}%' AND user_id = {userId};";
+                        SqliteCommand selectCmd = new SqliteCommand(selectSql, db);
+                        SqliteDataReader reader = selectCmd.ExecuteReader();
+                        Dictionary<int, SuitAchieveTitlePlan> suitAchieveTitlePlans = new Dictionary<int, SuitAchieveTitlePlan>();
+                        int index = 0;
+                        while (reader.Read())
+                        {
+                            SuitAchieveTitlePlan result = new SuitAchieveTitlePlan();
+                            result.name = reader.GetString(0);
+                            result.suitId = reader.GetInt32(1);
+                            result.glassesId = reader.GetInt32(2);
+                            result.achieveTitleId = reader.GetInt32(3);
+                            result.id = reader.GetInt32(4);
+                            suitAchieveTitlePlans.Add(result.id, result);
+                            index++;
+                        }
+                        return suitAchieveTitlePlans;
+                    }
+                }
+                catch (Exception ex)
                 {
                     Logger.Error($"数据库方案查询失败！ errorMessage：{ex.Message}");
                     return null;

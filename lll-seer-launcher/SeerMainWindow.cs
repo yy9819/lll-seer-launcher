@@ -152,7 +152,7 @@ namespace lll_seer_launcher
                 if (GlobalVariable.isLogin)
                 {
                     bytes = this.messageEncryptControl.Decrypt(bytes);
-                    //Console.WriteLine("sendDecrypt:" + BitConverter.ToString(bytes));
+                    Console.WriteLine("sendDecrypt:" + BitConverter.ToString(bytes));
                     byte[] encryptBytes = ByteConverter.TakeBytes(bytes, 0, bytes.Length - 1);
                     this.sendPkgInfo = this.messageEncryptControl.GetHeadInfo(encryptBytes);
                     this.sendPkgInfo = this.messageEncryptControl.PackHeadInfo(this.sendPkgInfo);
