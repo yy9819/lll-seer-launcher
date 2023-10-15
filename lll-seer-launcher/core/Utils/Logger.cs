@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Threading;
 using System.Text.RegularExpressions;
 
 namespace lll_seer_launcher.core.Utils
@@ -17,8 +18,19 @@ namespace lll_seer_launcher.core.Utils
         private string logPath = null;
         private void Write(string title,string message)
         {
-            string timeStr = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff");
-            File.AppendAllText(logPath,$"[{timeStr}]-[{title}]:{message + Environment.NewLine}");
+            Thread writeLogThread = new Thread(() =>
+            {
+                try
+                {
+                    string timeStr = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff");
+                    File.AppendAllText(logPath, $"[{timeStr}]-[{title}]:{message + Environment.NewLine}");
+                }
+                catch
+                {
+                    Write(title, message);
+                }
+            });
+            writeLogThread.Start();
         }
 
         public static void Log(string title,string msg)

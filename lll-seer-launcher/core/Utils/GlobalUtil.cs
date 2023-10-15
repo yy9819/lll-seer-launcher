@@ -39,7 +39,7 @@ namespace lll_seer_launcher.core.Utils
             }
             return orgArrayList;
         }
-        public static void ArrayListToString(ArrayList list)
+        public static string ArrayListToString(ArrayList list)
         {
             string str = "";
             for (int i = 0; i < list.Count; i++)
@@ -47,7 +47,16 @@ namespace lll_seer_launcher.core.Utils
                 str += list[i].ToString();
                 if(i != list.Count - 1) str += "-";
             }
-            Console.WriteLine(str);
+            return str;
+        }
+        public static string IntListToString(List<int> intList)
+        {
+            return string.Join(",", intList);
+        }
+        public static List<int> StringToIntList(string intListString)
+        {
+            string[] stringList = intListString.Split(',');
+            return stringList.Select(int.Parse).ToList();
         }
     }
 }

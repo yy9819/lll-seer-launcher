@@ -117,15 +117,6 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <metadata name="suitGroupBox.Locked" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-    <value>True</value>
-  </metadata>
-  <metadata name="suitAbTextGroupBox.Locked" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-    <value>True</value>
-  </metadata>
-  <metadata name="suitTextBox.Locked" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-    <value>True</value>
-  </metadata>
   <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
   <data name="suitTextBox.Font" type="System.Drawing.Font, System.Drawing">
     <value>宋体, 9pt</value>
@@ -186,9 +177,6 @@
   <data name="&gt;&gt;suitAbTextGroupBox.ZOrder" xml:space="preserve">
     <value>0</value>
   </data>
-  <metadata name="suitListBox.Locked" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-    <value>True</value>
-  </metadata>
   <data name="suitListBox.Font" type="System.Drawing.Font, System.Drawing">
     <value>宋体, 9.5pt</value>
   </data>
@@ -243,15 +231,6 @@
   <data name="&gt;&gt;suitGroupBox.ZOrder" xml:space="preserve">
     <value>3</value>
   </data>
-  <metadata name="glassesGroupBox.Locked" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-    <value>True</value>
-  </metadata>
-  <metadata name="glassesAbTextGroupBox.Locked" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-    <value>True</value>
-  </metadata>
-  <metadata name="glassesTextBox.Locked" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-    <value>True</value>
-  </metadata>
   <data name="glassesTextBox.Font" type="System.Drawing.Font, System.Drawing">
     <value>宋体, 9pt</value>
   </data>
@@ -309,9 +288,6 @@
   <data name="&gt;&gt;glassesAbTextGroupBox.ZOrder" xml:space="preserve">
     <value>0</value>
   </data>
-  <metadata name="glassesListBox.Locked" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-    <value>True</value>
-  </metadata>
   <data name="glassesListBox.Font" type="System.Drawing.Font, System.Drawing">
     <value>宋体, 9.5pt</value>
   </data>
@@ -363,15 +339,6 @@
   <data name="&gt;&gt;glassesGroupBox.ZOrder" xml:space="preserve">
     <value>2</value>
   </data>
-  <metadata name="achieveTitleGroupBox.Locked" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-    <value>True</value>
-  </metadata>
-  <metadata name="titelAbTextGroupBox.Locked" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-    <value>True</value>
-  </metadata>
-  <metadata name="achieveTittleTextBox.Locked" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-    <value>True</value>
-  </metadata>
   <data name="achieveTittleTextBox.Font" type="System.Drawing.Font, System.Drawing">
     <value>宋体, 9pt</value>
   </data>
@@ -429,9 +396,6 @@
   <data name="&gt;&gt;titelAbTextGroupBox.ZOrder" xml:space="preserve">
     <value>0</value>
   </data>
-  <metadata name="achieveTitleListBox.Locked" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-    <value>True</value>
-  </metadata>
   <data name="achieveTitleListBox.Font" type="System.Drawing.Font, System.Drawing">
     <value>宋体, 9.5pt</value>
   </data>
@@ -483,12 +447,243 @@
   <data name="&gt;&gt;achieveTitleGroupBox.ZOrder" xml:space="preserve">
     <value>1</value>
   </data>
-  <metadata name="totalGroupBox.Locked" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+  <data name="button1.Font" type="System.Drawing.Font, System.Drawing">
+    <value>宋体, 9pt</value>
+  </data>
+  <data name="button1.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>NoControl</value>
+  </data>
+  <data name="button1.Location" type="System.Drawing.Point, System.Drawing">
+    <value>497, 24</value>
+  </data>
+  <data name="button1.Size" type="System.Drawing.Size, System.Drawing">
+    <value>45, 21</value>
+  </data>
+  <data name="button1.TabIndex" type="System.Int32, mscorlib">
+    <value>9</value>
+  </data>
+  <data name="button1.Text" xml:space="preserve">
+    <value>删除</value>
+  </data>
+  <data name="&gt;&gt;button1.Name" xml:space="preserve">
+    <value>button1</value>
+  </data>
+  <data name="&gt;&gt;button1.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Button, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;button1.Parent" xml:space="preserve">
+    <value>totalGroupBox</value>
+  </data>
+  <data name="&gt;&gt;button1.ZOrder" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="updatePlanButton.Font" type="System.Drawing.Font, System.Drawing">
+    <value>宋体, 9pt</value>
+  </data>
+  <data name="updatePlanButton.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>NoControl</value>
+  </data>
+  <data name="updatePlanButton.Location" type="System.Drawing.Point, System.Drawing">
+    <value>475, 97</value>
+  </data>
+  <data name="updatePlanButton.Size" type="System.Drawing.Size, System.Drawing">
+    <value>68, 41</value>
+  </data>
+  <data name="updatePlanButton.TabIndex" type="System.Int32, mscorlib">
+    <value>8</value>
+  </data>
+  <data name="updatePlanButton.Text" xml:space="preserve">
+    <value>保存方案</value>
+  </data>
+  <data name="&gt;&gt;updatePlanButton.Name" xml:space="preserve">
+    <value>updatePlanButton</value>
+  </data>
+  <data name="&gt;&gt;updatePlanButton.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Button, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;updatePlanButton.Parent" xml:space="preserve">
+    <value>totalGroupBox</value>
+  </data>
+  <data name="&gt;&gt;updatePlanButton.ZOrder" xml:space="preserve">
+    <value>1</value>
+  </data>
+  <data name="changePlanButton.Font" type="System.Drawing.Font, System.Drawing">
+    <value>宋体, 9pt</value>
+  </data>
+  <data name="changePlanButton.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>NoControl</value>
+  </data>
+  <data name="changePlanButton.Location" type="System.Drawing.Point, System.Drawing">
+    <value>475, 51</value>
+  </data>
+  <data name="changePlanButton.Size" type="System.Drawing.Size, System.Drawing">
+    <value>68, 41</value>
+  </data>
+  <data name="changePlanButton.TabIndex" type="System.Int32, mscorlib">
+    <value>7</value>
+  </data>
+  <data name="changePlanButton.Text" xml:space="preserve">
+    <value>切换方案</value>
+  </data>
+  <data name="&gt;&gt;changePlanButton.Name" xml:space="preserve">
+    <value>changePlanButton</value>
+  </data>
+  <data name="&gt;&gt;changePlanButton.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Button, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;changePlanButton.Parent" xml:space="preserve">
+    <value>totalGroupBox</value>
+  </data>
+  <data name="&gt;&gt;changePlanButton.ZOrder" xml:space="preserve">
+    <value>2</value>
+  </data>
+  <data name="deletePlanButton.Font" type="System.Drawing.Font, System.Drawing">
+    <value>宋体, 9pt</value>
+  </data>
+  <data name="deletePlanButton.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>NoControl</value>
+  </data>
+  <data name="deletePlanButton.Location" type="System.Drawing.Point, System.Drawing">
+    <value>405, 97</value>
+  </data>
+  <data name="deletePlanButton.Size" type="System.Drawing.Size, System.Drawing">
+    <value>68, 41</value>
+  </data>
+  <data name="deletePlanButton.TabIndex" type="System.Int32, mscorlib">
+    <value>6</value>
+  </data>
+  <data name="deletePlanButton.Text" xml:space="preserve">
+    <value>删除方案</value>
+  </data>
+  <data name="&gt;&gt;deletePlanButton.Name" xml:space="preserve">
+    <value>deletePlanButton</value>
+  </data>
+  <data name="&gt;&gt;deletePlanButton.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Button, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;deletePlanButton.Parent" xml:space="preserve">
+    <value>totalGroupBox</value>
+  </data>
+  <data name="&gt;&gt;deletePlanButton.ZOrder" xml:space="preserve">
+    <value>3</value>
+  </data>
+  <data name="addPlanButton.Font" type="System.Drawing.Font, System.Drawing">
+    <value>宋体, 9pt</value>
+  </data>
+  <data name="addPlanButton.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>NoControl</value>
+  </data>
+  <data name="addPlanButton.Location" type="System.Drawing.Point, System.Drawing">
+    <value>405, 51</value>
+  </data>
+  <data name="addPlanButton.Size" type="System.Drawing.Size, System.Drawing">
+    <value>68, 41</value>
+  </data>
+  <data name="addPlanButton.TabIndex" type="System.Int32, mscorlib">
+    <value>5</value>
+  </data>
+  <data name="addPlanButton.Text" xml:space="preserve">
+    <value>添加方案</value>
+  </data>
+  <data name="&gt;&gt;addPlanButton.Name" xml:space="preserve">
+    <value>addPlanButton</value>
+  </data>
+  <data name="&gt;&gt;addPlanButton.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Button, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;addPlanButton.Parent" xml:space="preserve">
+    <value>totalGroupBox</value>
+  </data>
+  <data name="&gt;&gt;addPlanButton.ZOrder" xml:space="preserve">
+    <value>4</value>
+  </data>
+  <data name="userListComboBox.Location" type="System.Drawing.Point, System.Drawing">
+    <value>405, 24</value>
+  </data>
+  <data name="userListComboBox.Size" type="System.Drawing.Size, System.Drawing">
+    <value>89, 21</value>
+  </data>
+  <data name="userListComboBox.TabIndex" type="System.Int32, mscorlib">
+    <value>4</value>
+  </data>
+  <data name="&gt;&gt;userListComboBox.Name" xml:space="preserve">
+    <value>userListComboBox</value>
+  </data>
+  <data name="&gt;&gt;userListComboBox.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ComboBox, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;userListComboBox.Parent" xml:space="preserve">
+    <value>totalGroupBox</value>
+  </data>
+  <data name="&gt;&gt;userListComboBox.ZOrder" xml:space="preserve">
+    <value>5</value>
+  </data>
+  <metadata name="name.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
-  <metadata name="getUserSuitGlassesTittleInfoButton.Locked" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+  <data name="name.HeaderText" xml:space="preserve">
+    <value>方案名(双击编辑)</value>
+  </data>
+  <data name="name.Width" type="System.Int32, mscorlib">
+    <value>90</value>
+  </data>
+  <metadata name="suit.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
+  <data name="suit.HeaderText" xml:space="preserve">
+    <value>套装</value>
+  </data>
+  <data name="suit.Width" type="System.Int32, mscorlib">
+    <value>90</value>
+  </data>
+  <metadata name="glasses.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <data name="glasses.HeaderText" xml:space="preserve">
+    <value>目镜</value>
+  </data>
+  <data name="glasses.Width" type="System.Int32, mscorlib">
+    <value>90</value>
+  </data>
+  <metadata name="achieveTitle.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <data name="achieveTitle.HeaderText" xml:space="preserve">
+    <value>称号</value>
+  </data>
+  <data name="achieveTitle.Width" type="System.Int32, mscorlib">
+    <value>90</value>
+  </data>
+  <metadata name="id.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <data name="id.HeaderText" xml:space="preserve">
+    <value>id</value>
+  </data>
+  <data name="id.Visible" type="System.Boolean, mscorlib">
+    <value>False</value>
+  </data>
+  <data name="planDataGridView.Location" type="System.Drawing.Point, System.Drawing">
+    <value>10, 22</value>
+  </data>
+  <data name="planDataGridView.Size" type="System.Drawing.Size, System.Drawing">
+    <value>387, 162</value>
+  </data>
+  <data name="planDataGridView.TabIndex" type="System.Int32, mscorlib">
+    <value>3</value>
+  </data>
+  <data name="&gt;&gt;planDataGridView.Name" xml:space="preserve">
+    <value>planDataGridView</value>
+  </data>
+  <data name="&gt;&gt;planDataGridView.Type" xml:space="preserve">
+    <value>System.Windows.Forms.DataGridView, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;planDataGridView.Parent" xml:space="preserve">
+    <value>totalGroupBox</value>
+  </data>
+  <data name="&gt;&gt;planDataGridView.ZOrder" xml:space="preserve">
+    <value>6</value>
+  </data>
   <data name="getUserSuitGlassesTittleInfoButton.Font" type="System.Drawing.Font, System.Drawing">
     <value>宋体, 9pt</value>
   </data>
@@ -505,7 +700,7 @@
     <value>2</value>
   </data>
   <data name="getUserSuitGlassesTittleInfoButton.Text" xml:space="preserve">
-    <value>重新读取当前账号信息</value>
+    <value>读取当前登录账号信息</value>
   </data>
   <data name="&gt;&gt;getUserSuitGlassesTittleInfoButton.Name" xml:space="preserve">
     <value>getUserSuitGlassesTittleInfoButton</value>
@@ -517,7 +712,7 @@
     <value>totalGroupBox</value>
   </data>
   <data name="&gt;&gt;getUserSuitGlassesTittleInfoButton.ZOrder" xml:space="preserve">
-    <value>0</value>
+    <value>7</value>
   </data>
   <data name="totalGroupBox.Font" type="System.Drawing.Font, System.Drawing">
     <value>宋体, 9.75pt</value>
@@ -547,9 +742,6 @@
     <value>0</value>
   </data>
   <metadata name="$this.Localizable" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-    <value>True</value>
-  </metadata>
-  <metadata name="$this.Locked" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
   <data name="$this.AutoScaleDimensions" type="System.Drawing.SizeF, System.Drawing">
@@ -634,11 +826,44 @@
         AB/wAAAf8AAAP+AAAH/gAAD/4AAB/+AAA/8=
 </value>
   </data>
+  <data name="$this.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>NoControl</value>
+  </data>
   <data name="$this.StartPosition" type="System.Windows.Forms.FormStartPosition, System.Windows.Forms">
     <value>CenterScreen</value>
   </data>
   <data name="$this.Text" xml:space="preserve">
     <value>更换装备・称号</value>
+  </data>
+  <data name="&gt;&gt;name.Name" xml:space="preserve">
+    <value>name</value>
+  </data>
+  <data name="&gt;&gt;name.Type" xml:space="preserve">
+    <value>System.Windows.Forms.DataGridViewTextBoxColumn, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;suit.Name" xml:space="preserve">
+    <value>suit</value>
+  </data>
+  <data name="&gt;&gt;suit.Type" xml:space="preserve">
+    <value>System.Windows.Forms.DataGridViewTextBoxColumn, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;glasses.Name" xml:space="preserve">
+    <value>glasses</value>
+  </data>
+  <data name="&gt;&gt;glasses.Type" xml:space="preserve">
+    <value>System.Windows.Forms.DataGridViewTextBoxColumn, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;achieveTitle.Name" xml:space="preserve">
+    <value>achieveTitle</value>
+  </data>
+  <data name="&gt;&gt;achieveTitle.Type" xml:space="preserve">
+    <value>System.Windows.Forms.DataGridViewTextBoxColumn, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;id.Name" xml:space="preserve">
+    <value>id</value>
+  </data>
+  <data name="&gt;&gt;id.Type" xml:space="preserve">
+    <value>System.Windows.Forms.DataGridViewTextBoxColumn, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;$this.Name" xml:space="preserve">
     <value>ChangeSuitForm</value>

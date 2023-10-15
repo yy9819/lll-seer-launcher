@@ -27,8 +27,8 @@ namespace lll_seer_launcher.core.Controller
         {
             methodDictionary = new Dictionary<int, AnalyzeRecvDataMethod>
             {
-                { 3403,(param) => AnalyzeAchieveTitleList(param) },
-                { 4475,(param) =>  AnalyzeItemList(param) }
+                { CmdId.ACHIEVETITLELIST, (param) => AnalyzeAchieveTitleList(param) },
+                { CmdId.ITEM_LIST, (param) =>  AnalyzeItemList(param) }
             };
         }
 
@@ -68,7 +68,11 @@ namespace lll_seer_launcher.core.Controller
         /// <param name="recvDataHeadInfo">带有物品list的封包</param>
         private void AnalyzeItemList(HeadInfo recvDataHeadInfo)
         {
-            if (recvDataHeadInfo.decryptData.Length < 8) return;
+            if (!GlobalVariable.userSuitClothDictionary.ContainsKey(GlobalVariable.userId))
+            {
+                GlobalVariable.userSuitClothDictionary.Add(GlobalVariable.userId, new Dictionary<int, int>());
+            }
+            if (recvDataHeadInfo.decryptData.Length <= 4) return;
             int fristItemId = ByteConverter.BytesTo10(ByteConverter.TakeBytes(recvDataHeadInfo.decryptData, 4, 4));
             if(fristItemId >= 1300083 & fristItemId < 1400000)
             {

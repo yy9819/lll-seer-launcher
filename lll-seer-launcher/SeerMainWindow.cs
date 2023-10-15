@@ -23,19 +23,62 @@ namespace lll_seer_launcher
         private HeadInfo sendPkgInfo;
         private ChangeSuitForm changeSuitForm;
         private InitJsonController initJsonControl = new InitJsonController();
+        private LoadingForm loadingForm = new LoadingForm();
         public seerMainWindow()
         {
+            loadingForm.Show();
+            this.Hide();
             InitializeComponent();
             this.IsMdiContainer = true;
-            Thread initJsonThread = new Thread(() =>
-            {
-                this.initJsonControl.InitJson();
-            });
-            initJsonThread.Start();
+           
+
         }
 
         private void SeerMainWindow_Load(object sender, EventArgs e)
         {
+            Thread initJsonThread = new Thread(() =>
+            {
+                if (DBController.SuitAndAchieveTitleDbController.CheckAndInitDB())
+                {
+                    this.initJsonControl.InitJson();
+                    if (GlobalVariable.shoudUpdateJsonDic["suit"])
+                    {
+                        Logger.Log("updateData", "装备信息更新！更新装备信息中...");
+                        this.initJsonControl.InitSuitDictionary();
+                        DBController.SuitAndAchieveTitleDbController.InitSuitTable();
+                        Logger.Log("updateData", "装备信息更新完成！");
+                    }
+                    else
+                    {
+                        DBController.SuitAndAchieveTitleDbController.SetSuitTitleDic();
+                    }
+                    if (GlobalVariable.shoudUpdateJsonDic["glasses"])
+                    {
+                        Logger.Log("updateData", "目镜信息更新！更新目镜信息中...");
+                        this.initJsonControl.InitGlassesDictionary();
+                        DBController.SuitAndAchieveTitleDbController.InitGlassesTable();
+                        Logger.Log("updateData", "目镜信息更新完成！");
+                    }
+                    else
+                    {
+                        DBController.SuitAndAchieveTitleDbController.SetGlassesTitleDic();
+                    }
+                    if (GlobalVariable.shoudUpdateJsonDic["achieveTitle"])
+                    {
+                        Logger.Log("updateData", "称号信息更新！更新称号信息中...");
+                        this.initJsonControl.InitAchieveTitleDictionary();
+                        DBController.SuitAndAchieveTitleDbController.InitAchieveTitleTable();
+                        Logger.Log("updateData", "称号信息更新完成！");
+                    }
+                    else
+                    {
+                        DBController.SuitAndAchieveTitleDbController.SetAchieveTitleDic();
+                    }
+
+                }
+            });
+            initJsonThread.Start();
+
             Thread getUsedMemory = new Thread(GetUsedMemorySize);
             getUsedMemory.Start();
 
@@ -52,6 +95,9 @@ namespace lll_seer_launcher
 
             this.changeSuitForm = new ChangeSuitForm();
             this.changeSuitForm.Hide();
+
+            this.loadingForm.Dispose();
+            this.Show();
         }
 
         private void SeerWebBrowser_DocumentCompleted(object sender, WebBrowserDocumentCompletedEventArgs e)
@@ -141,6 +187,7 @@ namespace lll_seer_launcher
                 if(this.hook[i] != null) this.hook[i].Uninstall();
             }
             GlobalVariable.stopThread = true;
+            Logger.Log("CloseProgram", "关闭登录器。");
         }
 
         private void gameReloadMenu_Click(object sender, EventArgs e)
@@ -153,7 +200,7 @@ namespace lll_seer_launcher
         private void changSuitToolStripMenuItem_Click(object sender, EventArgs e)
         {
             this.changeSuitForm.Show();
-            this.changeSuitForm.InitGroupBoxs();
+            if(GlobalVariable.isLogin)this.changeSuitForm.InitGroupBoxs();
         }
     }
 }
