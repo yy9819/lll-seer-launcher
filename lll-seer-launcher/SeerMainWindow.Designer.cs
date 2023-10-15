@@ -40,7 +40,6 @@ namespace lll_seer_launcher
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.toolStripMenuItemSetting = new System.Windows.Forms.ToolStripMenuItem();
             this.gameReloadMenu = new System.Windows.Forms.ToolStripMenuItem();
-            this.tstToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.seerUtilsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.changSuitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.mainFormStatusStrip.SuspendLayout();
@@ -91,8 +90,7 @@ namespace lll_seer_launcher
             // toolStripMenuItemSetting
             // 
             this.toolStripMenuItemSetting.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.gameReloadMenu,
-            this.tstToolStripMenuItem});
+            this.gameReloadMenu});
             this.toolStripMenuItemSetting.Name = "toolStripMenuItemSetting";
             this.toolStripMenuItemSetting.Size = new System.Drawing.Size(44, 21);
             this.toolStripMenuItemSetting.Text = "设置";
@@ -103,11 +101,6 @@ namespace lll_seer_launcher
             this.gameReloadMenu.Size = new System.Drawing.Size(180, 22);
             this.gameReloadMenu.Text = "刷新";
             this.gameReloadMenu.Click += new System.EventHandler(this.gameReloadMenu_Click);
-            // 
-            // tstToolStripMenuItem
-            // 
-            this.tstToolStripMenuItem.Name = "tstToolStripMenuItem";
-            this.tstToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             // 
             // seerUtilsToolStripMenuItem
             // 
@@ -179,7 +172,6 @@ namespace lll_seer_launcher
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItemSetting;
         private System.Windows.Forms.ToolStripMenuItem gameReloadMenu;
         private System.Windows.Forms.ToolStripStatusLabel usedRamToolStripStatusLabel;
-        private System.Windows.Forms.ToolStripMenuItem tstToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem seerUtilsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem changSuitToolStripMenuItem;
     }

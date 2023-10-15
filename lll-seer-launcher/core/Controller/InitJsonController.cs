@@ -1,17 +1,26 @@
 ﻿using System;
 using lll_seer_launcher.core.Servise;
+using lll_seer_launcher.core.Dto;
 
 namespace lll_seer_launcher.core.Controller
 {
     class InitJsonController
     {
-        public bool InitJson()
+        public void InitJson()
         {
-            return InitAchieveTitleDictionary();
+            InitJsonServise.LoadConfigJsonFile();
         }
-        private bool InitAchieveTitleDictionary()
+        public bool InitAchieveTitleDictionary()
         {
-            return InitJsonServise.InitAchieveTitleDictionary() && InitJsonServise.InitSuitDictionary() && InitJsonServise.InitGlassesDictionary();
+            return InitJsonServise.InitAchieveTitleDictionary(GlobalVariable.jsonPathDic["achieveTitle"]);
+        }
+        public bool InitSuitDictionary()
+        {
+            return InitJsonServise.InitSuitDictionary(GlobalVariable.jsonPathDic["suit"]);
+        }
+        public bool InitGlassesDictionary()
+        {
+            return InitJsonServise.InitGlassesDictionary(GlobalVariable.jsonPathDic["glasses"]);
         }
     }
 }

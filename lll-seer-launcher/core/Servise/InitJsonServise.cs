@@ -9,10 +9,48 @@ namespace lll_seer_launcher.core.Servise
 {
     public static class InitJsonServise
     {
-        public static bool InitAchieveTitleDictionary()
+        private static string folderPath = Directory.GetCurrentDirectory() + "\\resource\\json\\";
+
+        public static void LoadConfigJsonFile()
         {
-            string folder = Directory.GetCurrentDirectory();
-            string path = folder + "\\resource\\json\\achieveTitleList.json";
+            string serverVersionPath = folderPath + "serverversion.json";
+            string loaclVersionPath = folderPath + "loaclversion.json";
+            try
+            {
+                string serverJsonString = File.ReadAllText(serverVersionPath);
+                VersionJsonObject serverJsonInfo = JsonConvert.DeserializeObject<VersionJsonObject>(serverJsonString);
+                Dictionary<string, bool> shoudUpdataJsonDic = new Dictionary<string, bool>();
+                Dictionary<string, string> jsonPathDic = new Dictionary<string, string>();
+                if (File.Exists(loaclVersionPath))
+                {
+                    string localJsonString = File.ReadAllText(loaclVersionPath);
+                    VersionJsonObject localJsonInfo = JsonConvert.DeserializeObject<VersionJsonObject>(localJsonString);
+                    shoudUpdataJsonDic.Add("suit", !(serverJsonInfo.suitVersion == localJsonInfo.suitVersion));
+                    shoudUpdataJsonDic.Add("glasses", !(serverJsonInfo.glassesVersion == localJsonInfo.glassesVersion));
+                    shoudUpdataJsonDic.Add("achieveTitle", !(serverJsonInfo.achieveTitleVersion == localJsonInfo.achieveTitleVersion));
+                }
+                else
+                {
+                    shoudUpdataJsonDic.Add("suit", true);
+                    shoudUpdataJsonDic.Add("glasses", true);
+                    shoudUpdataJsonDic.Add("achieveTitle", true);
+                }
+                jsonPathDic.Add("suit", serverJsonInfo.suitVersion);
+                jsonPathDic.Add("glasses", serverJsonInfo.glassesVersion);
+                jsonPathDic.Add("achieveTitle", serverJsonInfo.achieveTitleVersion);
+                File.WriteAllText(loaclVersionPath, serverJsonString);
+                GlobalVariable.shoudUpdateJsonDic = shoudUpdataJsonDic;
+                GlobalVariable.jsonPathDic = jsonPathDic;
+            }
+            catch (Exception ex)
+            {
+
+            }
+        }
+
+        public static bool InitAchieveTitleDictionary(string jsonName)
+        {
+            string path = folderPath + jsonName;
             try
             {
                 string jsonString = File.ReadAllText(path);
@@ -32,10 +70,9 @@ namespace lll_seer_launcher.core.Servise
                 return false;
             }
         }
-        public static bool InitSuitDictionary()
+        public static bool InitSuitDictionary(string jsonName)
         {
-            string folder = Directory.GetCurrentDirectory();
-            string path = folder + "\\resource\\json\\suitList.json";
+            string path = folderPath + jsonName;
             try
             {
                 string jsonString = File.ReadAllText(path);
@@ -56,10 +93,10 @@ namespace lll_seer_launcher.core.Servise
             }
         }
 
-        public static bool InitGlassesDictionary()
+        public static bool InitGlassesDictionary(string jsonName)
         {
-            string folder = Directory.GetCurrentDirectory();
-            string path = folder + "\\resource\\json\\glassesList.json";
+            //string path = folderPath + "glassesList.json";
+            string path = folderPath + jsonName;
             try
             {
                 string jsonString = File.ReadAllText(path);

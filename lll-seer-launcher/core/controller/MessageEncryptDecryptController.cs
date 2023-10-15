@@ -205,25 +205,22 @@ namespace lll_seer_launcher.core.Controller
                 byte[] decryptBytes = ByteConverter.TakeBytes(bytes, 0, bytes.Length - 1);
                 //Console.WriteLine("decryptedRecv:" + BitConverter.ToString(decryptBytes));
                 HeadInfo headInfo = this.GetHeadInfo(decryptBytes);
-                if (headInfo.cmdId == 1001)
+                if (headInfo.cmdId == CmdId.LOGIN_IN)
                 {
                     GlobalVariable.userId = headInfo.userId;
                     this.OnLogin(decryptBytes);
                     this.InitSeq(headInfo.seq);
                     GlobalVariable.isLogin = true;
-                    Thread onLoginThread = new Thread(() =>
-                    {
-                        Logger.Log("gameLogin",$"user:{GlobalVariable.userId} 登录成功！");
-                    });
-                    onLoginThread.Start();
+                    Logger.Log("gameLogin", $"user:{GlobalVariable.userId} 登录成功！");
+
                 }
-                else if(headInfo.cmdId > 100000)
+                else if(headInfo.cmdId > 100000 && !GlobalVariable.gameReloadFlg)
                 {
                     Thread onLoginThread = new Thread(() =>
                     {
                         Logger.Error($" 当前cmdId‘{headInfo.cmdId}’大于100000，登录加密key初始化失败！");
                         GlobalVariable.gameReloadFlg = true;
-                        MessageBox.Show("登录加密key初始化失败！将刷新游戏，请重新登录！");
+                        MessageBox.Show("游戏掉线/登录加密key初始化失败！将刷新游戏，请重新登录！");
                     });
                     onLoginThread.Start();
                 }

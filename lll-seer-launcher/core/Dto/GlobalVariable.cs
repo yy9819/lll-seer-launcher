@@ -6,6 +6,7 @@ namespace lll_seer_launcher.core.Dto
 {
     public static class GlobalVariable
     {
+        #region
         /*===========================================游戏账号信息用全局变量=================================================*/
         /// <summary>
         /// 称号字典
@@ -33,7 +34,8 @@ namespace lll_seer_launcher.core.Dto
         /// value;对应游戏账号所持有的套装
         /// </summary>
         public static Dictionary<int, Dictionary<int, int>> userSuitClothDictionary { get; set; } = new Dictionary<int, Dictionary<int, int>>();
-
+        #endregion
+        #region
         /*=============================================窗口UI相关全局变量===================================================*/
         /// <summary>
         /// 主窗口线程控制flag
@@ -44,8 +46,8 @@ namespace lll_seer_launcher.core.Dto
         /// 套装・称号信息加载完成flag
         /// </summary>
         public static bool[] initSuitGroupBoxsCompleteFlg { get; set; } = new bool[2] { true, true };
-
-
+        #endregion
+        #region
         /*=============================================封包相关用全局变量================================================*/
         /// <summary>
         /// 当前是否处于登录状态
@@ -88,5 +90,11 @@ namespace lll_seer_launcher.core.Dto
         /// 在登录时，解密key初始化失败时刷新游戏的flag。
         /// </summary>
         public static bool gameReloadFlg { get; set; } = false;
+        #endregion
+        #region
+        /*=============================================json相关用全局变量================================================*/
+        public static Dictionary<string,bool> shoudUpdateJsonDic { get; set; }
+        public static Dictionary<string,string> jsonPathDic { get; set; }
+        #endregion
     }
 }
