@@ -7,6 +7,11 @@ namespace lll_seer_launcher.core.Dto
     public static class GlobalVariable
     {
         #region
+        /*================================================窗口组件用全局变量=====================================================*/
+        public static seerMainWindow mainForm;
+        public const string seerFiddlerTitle = "seerFiddler";
+        #endregion
+        #region
         /*===========================================游戏账号信息用全局变量=================================================*/
         /// <summary>
         /// 称号字典
@@ -44,6 +49,8 @@ namespace lll_seer_launcher.core.Dto
 
         /// <summary>
         /// 套装・称号信息加载完成flag
+        /// 0:称号
+        /// 1:装备
         /// </summary>
         public static bool[] initSuitGroupBoxsCompleteFlg { get; set; } = new bool[2] { true, true };
         #endregion
@@ -53,6 +60,8 @@ namespace lll_seer_launcher.core.Dto
         /// 当前是否处于登录状态
         /// </summary>
         public static bool isLogin { get; set; }
+
+        public static bool isLoginSend { get; set; }
 
         /// <summary>
         /// 当前游戏的套接字

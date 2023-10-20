@@ -42,7 +42,7 @@ namespace lll_seer_launcher.core.Servise
                 GlobalVariable.shoudUpdateJsonDic = shoudUpdataJsonDic;
                 GlobalVariable.jsonPathDic = jsonPathDic;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
 
             }

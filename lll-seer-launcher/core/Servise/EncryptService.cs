@@ -23,8 +23,8 @@ namespace lll_seer_launcher.core.Servise
             if (encryptData.Length > 4)
             {
                 encryptData = EncryptData(encryptData);
-                encryptBytes = ByteConverter.RepalaceBytes(encryptBytes, ByteConverter.HexToBytes(ByteConverter.DecimalToHex(targetData.Length, 4)), 0);
-                encryptBytes = ByteConverter.RepalaceBytes(encryptBytes, encryptData, 4);
+                ByteConverter.HexToBytes(ByteConverter.DecimalToHex(targetData.Length, 4)).CopyTo(encryptBytes, 0);
+                encryptData.CopyTo(encryptBytes, 4);
             }
             return encryptBytes;
         }
@@ -37,7 +37,7 @@ namespace lll_seer_launcher.core.Servise
         private static byte[] EncryptData(byte[] targetData)
         {
             byte[] encryptData = new byte[targetData.Length];
-            encryptData = ByteConverter.RepalaceBytes(encryptData, targetData, 0);
+            targetData.CopyTo(encryptData, 0);
             int encrptDataLen = encryptData.Length;
             int decrptDataLen = encrptDataLen - 1;
 

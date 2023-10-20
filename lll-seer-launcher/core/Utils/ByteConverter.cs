@@ -33,22 +33,6 @@ namespace lll_seer_launcher.core.Utils
             return bytesPtr;
         }
 
-        /// <summary>
-        /// 将一个字节数组替换到另一个字节数组的指定位置中
-        /// </summary>
-        /// <param name="orgBytes">被替换的原字节数组</param>
-        /// <param name="replacedBytes">替换原字节数组的字节数组</param>
-        /// <param name="index">插入起始位置</param>
-        /// <returns>替换后的字节数组</returns>
-        public static byte[] RepalaceBytes(byte[] orgBytes , byte[] replacedBytes , int index)
-        {
-            for(int i = 0; i < replacedBytes.Length; i++)
-            {
-                if (i + index >= orgBytes.Length) break;
-                orgBytes[i + index] = replacedBytes[i];
-            }
-            return orgBytes;
-        }
 
         /// <summary>
         /// 获取指定字节数组对应的10进制Int32数字
@@ -57,7 +41,7 @@ namespace lll_seer_launcher.core.Utils
         /// <returns>10进制Int32数字</returns>
         public static int BytesTo10(byte[] bytes)
         {
-            return Convert.ToInt32(BitConverter.ToString(bytes).Replace("-", string.Empty), 16);
+            return Convert.ToInt32(BitConverter.ToString(bytes).Replace("-", ""), 16);
         }
 
         /// <summary>

@@ -66,9 +66,13 @@ namespace lll_seer_launcher.core.Controller
             {
                 return DBServise.SuitAndAchieveTitleDbServise.UserTableInsertData(insertData);
             } 
-            public static int UserTableUpadateData(UserSuitAndAchieveTitleInfo insertData)
+            public static int UserTableUpadateClothData(UserSuitAndAchieveTitleInfo insertData)
             {
-                return DBServise.SuitAndAchieveTitleDbServise.UserTableUpdateData(insertData);
+                return DBServise.SuitAndAchieveTitleDbServise.UserTableUpdateClothData(insertData);
+            }
+            public static int UserTableUpadateAchieveTitleData(UserSuitAndAchieveTitleInfo insertData)
+            {
+                return DBServise.SuitAndAchieveTitleDbServise.UserTableUpdateAchieveTitleData(insertData);
             }
             public static Dictionary<int, UserSuitAndAchieveTitleInfo> UserTableSelectDataGetUserClothDic()
             {

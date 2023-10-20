@@ -31,6 +31,7 @@ namespace lll_seer_launcher
         private delegate void initGlassesListGroupBoxsCallback();
         private delegate void InitUserListComboBoxCallback();
         private delegate void initPlanDataGridViewCallback();
+        private delegate void InitUserClothCallback();
         #endregion
 
         public ChangeSuitForm()
@@ -100,38 +101,58 @@ namespace lll_seer_launcher
         private void InitGroupBoxsTimer(object sender, ElapsedEventArgs e)
         {
             this.initGroupBoxsTimerRetryTimes += 1;
-            if ((GlobalVariable.initSuitGroupBoxsCompleteFlg[0] & GlobalVariable.initSuitGroupBoxsCompleteFlg[1]) | this.initGroupBoxsTimerRetryTimes >= 5 | !GlobalVariable.isLogin)
+            if ((GlobalVariable.initSuitGroupBoxsCompleteFlg[0] && GlobalVariable.initSuitGroupBoxsCompleteFlg[1]) || this.initGroupBoxsTimerRetryTimes >= 5 || !GlobalVariable.isLogin)
             {
                 this.initGroupBoxsTimer.Elapsed -= this.InitGroupBoxsTimer;
                 this.initGroupBoxsTimer.Stop();
-                if (!this.userCanUseClothDic.ContainsKey(GlobalVariable.userId)) this.userCanUseClothDic.Add(GlobalVariable.userId, new UserSuitAndAchieveTitleInfo());
-                this.InitAchieveListBox();
-                this.InitSuitListBox();
-                this.InitGlassesListBox();
-                if (GlobalVariable.isLogin)
+                //
+
+                if (GlobalVariable.isLogin && (GlobalVariable.initSuitGroupBoxsCompleteFlg[0] || GlobalVariable.initSuitGroupBoxsCompleteFlg[1]))
                 {
+                    if (!this.userCanUseClothDic.ContainsKey(GlobalVariable.userId)) this.userCanUseClothDic.Add(GlobalVariable.userId, new UserSuitAndAchieveTitleInfo());
                     List<int> achieveTitleList = new List<int>();
-                    for (int i = 0; i < this.canUseAchieveList.Count; i++)
-                    {
-                        achieveTitleList.Add(this.canUseAchieveList[i].id);
-                    }
                     List<int> glassesList = new List<int>();
-                    for (int i = 0; i < canUseGlassesList.Count; i++)
-                    {
-                        glassesList.Add(this.canUseGlassesList[i].glassesId);
-                    }
                     List<int> suitList = new List<int>();
-                    for (int i = 0; i < this.canUseSuitList.Count; i++)
+                    //有称号封包返回时生成称号持有状况List，并更新选择框
+                    if (GlobalVariable.initSuitGroupBoxsCompleteFlg[0])
                     {
-                        suitList.Add(this.canUseSuitList[i].suitId);
+                        this.InitAchieveListBox();
+                        for (int i = 0; i < this.canUseAchieveList.Count; i++)
+                        {
+                            achieveTitleList.Add(this.canUseAchieveList[i].id);
+                        }
                     }
+                    //有装备封包返回时生成装备持有状况List，并更新选择框
+                    if (GlobalVariable.initSuitGroupBoxsCompleteFlg[1])
+                    {
+                        this.InitSuitListBox();
+                        this.InitGlassesListBox();
+                        for (int i = 0; i < canUseGlassesList.Count; i++)
+                        {
+                            glassesList.Add(this.canUseGlassesList[i].glassesId);
+                        }
+                        for (int i = 0; i < this.canUseSuitList.Count; i++)
+                        {
+                            suitList.Add(this.canUseSuitList[i].suitId);
+                        }
+                    }
+
+                    //尝试向数据库插入当前账号的装备持有状况
                     UserSuitAndAchieveTitleInfo info = new UserSuitAndAchieveTitleInfo(GlobalVariable.userId, suitList, glassesList, achieveTitleList);
                     int result = DBController.SuitAndAchieveTitleDbController.UserTableInsertData(info);
-                    if (result != 1) DBController.SuitAndAchieveTitleDbController.UserTableUpadateData(info);
+                    //插入失败时，更新对应用户的信息
+                    if (result != 1)
+                    {
+                        //有称号封包返回时更新称号持有状况
+                        if(GlobalVariable.initSuitGroupBoxsCompleteFlg[0]) DBController.SuitAndAchieveTitleDbController.UserTableUpadateAchieveTitleData(info);
+                        //有装备封包返回时更新装备持有状况
+                        if (GlobalVariable.initSuitGroupBoxsCompleteFlg[1]) DBController.SuitAndAchieveTitleDbController.UserTableUpadateClothData(info);
+                    }
                     this.InitUserListComboBox();
                     this.InitPlanDataGridView();
                 }
-                else
+                //如果有称号/装备其中一个封包未返回 或者还未登录，尝试从数据库获取当前账号的装备持有情况
+                if (this.initGroupBoxsTimerRetryTimes >= 5 || !GlobalVariable.isLogin)
                 {
                     this.userListComboBox_SelectedIndexChanged(sender, e);
                 }
@@ -304,52 +325,60 @@ namespace lll_seer_launcher
         /*========================================从数据库获取当前所有保存账号的装备信息================================================*/
         private void userListComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
-            this.suitTextBox.Text = this.glassesTextBox.Text = this.achieveTittleTextBox.Text = "";
-            this.suitTextBox.Enabled = this.glassesTextBox.Enabled = this.achieveTittleTextBox.Enabled = true;
-            this.selectUserId = Convert.ToInt32(this.userListComboBox.SelectedItem.ToString());
-            if(this.userCanUseClothDic.TryGetValue(this.selectUserId, out var clothDic))
+            InitUserClothCallback callback = delegate ()
             {
-                this.suitListBox.Items.Clear();
-                this.canUseSuitList.Clear();
-                this.suitListBox.Items.Add("---不穿戴任何套装---");
-                this.canUseSuitList.Add(new SuitInfo());
-                foreach (int key in clothDic.suitIdList)
+                if (!this.getUserSuitGlassesTittleInfoButton.Enabled) this.getUserSuitGlassesTittleInfoButton.Enabled =true;
+                this.suitTextBox.Text = this.glassesTextBox.Text = this.achieveTittleTextBox.Text = "";
+                this.suitTextBox.Enabled = this.glassesTextBox.Enabled = this.achieveTittleTextBox.Enabled = true;
+                if (this.userListComboBox.SelectedItem != null)
                 {
-                    if (GlobalVariable.suitDictionary.ContainsKey(key))
+                    this.selectUserId = Convert.ToInt32(this.userListComboBox.SelectedItem.ToString());
+                    if (this.userCanUseClothDic.TryGetValue(this.selectUserId, out var clothDic))
                     {
-                        SuitInfo suitInfo = GlobalVariable.suitDictionary[key];
-                        this.suitListBox.Items.Add(suitInfo.name);
-                        this.canUseSuitList.Add(suitInfo);
+                        this.suitListBox.Items.Clear();
+                        this.canUseSuitList.Clear();
+                        this.suitListBox.Items.Add("---不穿戴任何套装---");
+                        this.canUseSuitList.Add(new SuitInfo());
+                        foreach (int key in clothDic.suitIdList)
+                        {
+                            if (GlobalVariable.suitDictionary.ContainsKey(key))
+                            {
+                                SuitInfo suitInfo = GlobalVariable.suitDictionary[key];
+                                this.suitListBox.Items.Add(suitInfo.name);
+                                this.canUseSuitList.Add(suitInfo);
+                            }
+                        }
+                        this.glassesListBox.Items.Clear();
+                        this.canUseGlassesList.Clear();
+                        this.glassesListBox.Items.Add("---不佩戴独立目镜---");
+                        this.canUseGlassesList.Add(new GlassesInfo());
+                        foreach (int key in clothDic.glassesIdList)
+                        {
+                            if (GlobalVariable.glassesDictionary.ContainsKey(key))
+                            {
+                                GlassesInfo glassesInfo = GlobalVariable.glassesDictionary[key];
+                                this.glassesListBox.Items.Add(glassesInfo.name);
+                                this.canUseGlassesList.Add(glassesInfo);
+                            }
+                        }
+                        this.achieveTitleListBox.Items.Clear();
+                        this.canUseAchieveList.Clear();
+                        this.achieveTitleListBox.Items.Add("---不佩戴称号---");
+                        this.canUseAchieveList.Add(new AchieveTitleInfo());
+                        foreach (int key in clothDic.achieveTitleIdList)
+                        {
+                            if (GlobalVariable.achieveTitleDictionary.ContainsKey(key))
+                            {
+                                AchieveTitleInfo achievetitleInfo = GlobalVariable.achieveTitleDictionary[key];
+                                this.achieveTitleListBox.Items.Add(achievetitleInfo.title);
+                                this.canUseAchieveList.Add(achievetitleInfo);
+                            }
+                        }
+                        this.InitPlanDataGridView();
                     }
                 }
-                this.glassesListBox.Items.Clear();
-                this.canUseGlassesList.Clear();
-                this.glassesListBox.Items.Add("---不佩戴独立目镜---");
-                this.canUseGlassesList.Add(new GlassesInfo());
-                foreach (int key in clothDic.glassesIdList)
-                {
-                    if (GlobalVariable.glassesDictionary.ContainsKey(key))
-                    {
-                        GlassesInfo glassesInfo = GlobalVariable.glassesDictionary[key];
-                        this.glassesListBox.Items.Add(glassesInfo.name);
-                        this.canUseGlassesList.Add(glassesInfo);
-                    }
-                }
-                this.achieveTitleListBox.Items.Clear();
-                this.canUseAchieveList.Clear();
-                this.achieveTitleListBox.Items.Add("---不佩戴称号---");
-                this.canUseAchieveList.Add(new AchieveTitleInfo());
-                foreach (int key in clothDic.achieveTitleIdList)
-                {
-                    if (GlobalVariable.achieveTitleDictionary.ContainsKey(key))
-                    {
-                        AchieveTitleInfo achievetitleInfo = GlobalVariable.achieveTitleDictionary[key];
-                        this.achieveTitleListBox.Items.Add(achievetitleInfo.title);
-                        this.canUseAchieveList.Add(achievetitleInfo);
-                    }
-                }
-                this.InitPlanDataGridView();
-            }
+            };
+            this.Invoke(callback);
         }
         #endregion
 
@@ -506,6 +535,16 @@ namespace lll_seer_launcher
 
         private void changePlanButton_Click(object sender, EventArgs e)
         {
+            if (!GlobalVariable.isLogin)
+            {
+                MessageBox.Show("当前还未登录游戏！");
+                return;
+            }
+            else if (this.selectUserId != GlobalVariable.userId)
+            {
+                MessageBox.Show("当前方案非登录账号方案！");
+                return;
+            }
             SendDataController sendDataController = new SendDataController();
             int selectIndex = this.GetPlanDataGridViewSelectIndex();
             int planId = Convert.ToInt32(this.planDataGridView.Rows[selectIndex].Cells["id"].Value);

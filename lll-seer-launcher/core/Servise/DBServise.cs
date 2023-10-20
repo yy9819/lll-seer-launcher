@@ -37,22 +37,19 @@ namespace lll_seer_launcher.core.Servise
                         using (db = new SqliteConnection($"Filename={suitDBPath}"))
                         {
                             db.Open();
-                            createTableSql[] createTableCmds = new createTableSql[5];
-                            //称号表
-                            createTableCmds[0] = new createTableSql("achieve_title", "称号表", "CREATE TABLE achieve_title (id INTEGER PRIMARY KEY AUTOINCREMENT,title_name CHAR(32) NOT NULL," +
-                                "title_abtext_text TEXT NOT NULL,title_id INT UNIQUE NOT NULL);");
-                            //套装表
-                            createTableCmds[1] = new createTableSql("suit", "套装表", "CREATE TABLE suit (id INTEGER PRIMARY KEY AUTOINCREMENT,suit_name CHAR(32) NOT NULL," +
-                                "suit_desc_text TEXT NOT NULL,suit_id INT UNIQUE NOT NULL,suit_cloth_id TEXT NOT NULL);");
-                            //目镜表
-                            createTableCmds[2] = new createTableSql("glasses", "目镜表", "CREATE TABLE glasses (id INTEGER PRIMARY KEY AUTOINCREMENT,glasses_name CHAR(32) NOT NULL," +
-                                "glasses_desc_text TEXT NOT NULL,glasses_id INT UNIQUE NOT NULL);");
-                            //账号装备明细表
-                            createTableCmds[3] = new createTableSql("user", "用户装备持有明细表", "CREATE TABLE user (id INTEGER PRIMARY KEY AUTOINCREMENT,user_id INT UNIQUE NOT NULL,suit_list TEXT NOT NULL," +
-                                "glasses_list TEXT NOT NULL,achieve_title_list TEXT NOT NULL);");
-                            //方案表
-                            createTableCmds[4] = new createTableSql("plan", "方案表", "CREATE TABLE plan (id INTEGER PRIMARY KEY AUTOINCREMENT,plan_name CHAR(32) NOT NULL," +
-                                "user_id INT NOT NULL,suit_id INT NOT NULL,glasses_id INT NOT NULL,achieve_title_id INT NOT NULL);");
+                            createTableSql[] createTableCmds = new createTableSql[5]
+                            {
+                                new createTableSql("achieve_title", "称号表", "CREATE TABLE achieve_title (id INTEGER PRIMARY KEY AUTOINCREMENT,title_name CHAR(32) NOT NULL," +
+                                "title_abtext_text TEXT NOT NULL,title_id INT UNIQUE NOT NULL);"),
+                                new createTableSql("suit", "套装表", "CREATE TABLE suit (id INTEGER PRIMARY KEY AUTOINCREMENT,suit_name CHAR(32) NOT NULL," +
+                                "suit_desc_text TEXT NOT NULL,suit_id INT UNIQUE NOT NULL,suit_cloth_id TEXT NOT NULL);"),
+                                new createTableSql("glasses", "目镜表", "CREATE TABLE glasses (id INTEGER PRIMARY KEY AUTOINCREMENT,glasses_name CHAR(32) NOT NULL," +
+                                "glasses_desc_text TEXT NOT NULL,glasses_id INT UNIQUE NOT NULL);"),
+                                new createTableSql("user", "用户装备持有明细表", "CREATE TABLE user (id INTEGER PRIMARY KEY AUTOINCREMENT,user_id INT UNIQUE NOT NULL,suit_list TEXT NOT NULL," +
+                                "glasses_list TEXT NOT NULL,achieve_title_list TEXT NOT NULL);"),
+                                new createTableSql("plan", "方案表", "CREATE TABLE plan (id INTEGER PRIMARY KEY AUTOINCREMENT,plan_name CHAR(32) NOT NULL," +
+                                "user_id INT NOT NULL,suit_id INT NOT NULL,glasses_id INT NOT NULL,achieve_title_id INT NOT NULL);")
+                            };
                             foreach (var cmd in createTableCmds)
                             {
                                 try
@@ -404,24 +401,23 @@ namespace lll_seer_launcher.core.Servise
                     }
                 }catch (Exception ex)
                 {
-                    Logger.Error($"数据库新用户装备持有明细表插入失败！ errorMessage：{ex.Message}");
+                    Logger.Error($"数据库新用户持有[装备・称号]明细表插入失败！ errorMessage：{ex.Message}");
                     return -1;
                 }
             }
 
-            public static int UserTableUpdateData(UserSuitAndAchieveTitleInfo updateData)
+            public static int UserTableUpdateClothData(UserSuitAndAchieveTitleInfo updateData)
             {
                 try
                 {
                     using (db)
                     {
                         db.Open();
-                        string achieveTitleListString = GlobalUtil.IntListToString(updateData.achieveTitleIdList);
                         string suitListString = GlobalUtil.IntListToString(updateData.suitIdList);
                         string glassesListString = GlobalUtil.IntListToString(updateData.glassesIdList);
 
                         string updateSql = $"UPDATE user " +
-                            $"SET suit_list = '{suitListString}',glasses_list = '{glassesListString}',achieve_title_list = '{achieveTitleListString}' ,user_id = {updateData.userId} " +
+                            $"SET suit_list = '{suitListString}',glasses_list = '{glassesListString}' " +
                             $"WHERE user_id = {updateData.userId};";
                         SqliteCommand updateCmd = new SqliteCommand(updateSql, db);
                         int value = updateCmd.ExecuteNonQuery();
@@ -429,7 +425,30 @@ namespace lll_seer_launcher.core.Servise
                     }
                 } catch (Exception ex)
                 {
-                    Logger.Error($"数据库用户装备持有明细表更新失败！ errorMessage：{ex.Message}");
+                    Logger.Error($"数据库用户持有装备明细表更新失败！ errorMessage：{ex.Message}");
+                    return -1;
+                }
+            }
+            public static int UserTableUpdateAchieveTitleData(UserSuitAndAchieveTitleInfo updateData)
+            {
+                try
+                {
+                    using (db)
+                    {
+                        db.Open();
+                        string achieveTitleListString = GlobalUtil.IntListToString(updateData.achieveTitleIdList);
+
+                        string updateSql = $"UPDATE user " +
+                            $"SET achieve_title_list = '{achieveTitleListString}' " +
+                            $"WHERE user_id = {updateData.userId};";
+                        SqliteCommand updateCmd = new SqliteCommand(updateSql, db);
+                        int value = updateCmd.ExecuteNonQuery();
+                        return value;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error($"数据库用户持有称号明细表更新失败！ errorMessage：{ex.Message}");
                     return -1;
                 }
             }

@@ -36,7 +36,7 @@ namespace lll_seer_launcher.core.Controller
         /// <param name="hexBytesData"></param>
         public void SendHexBytesData(byte[] hexBytesData)
         {
-            hexBytesData = ByteConverter.RepalaceBytes(hexBytesData, ByteConverter.HexToBytes(ByteConverter.DecimalToHex(GlobalVariable.userId, 4)), 9);
+            ByteConverter.HexToBytes(ByteConverter.DecimalToHex(GlobalVariable.userId, 4)).CopyTo(hexBytesData,9);
             sendDataService.SendHexBytesData(hexBytesData);
         }
         /// <summary>

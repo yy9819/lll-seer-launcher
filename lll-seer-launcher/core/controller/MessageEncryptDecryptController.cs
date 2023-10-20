@@ -17,8 +17,8 @@ namespace lll_seer_launcher.core.Controller
     class MessageEncryptDecryptController
     {
         #region 变量表
-        private ArrayList tempBuff { get; set; }
-        private ArrayList chunkBuff { get; set; }
+        private List<byte> tempBuff { get; set; } = new List<byte>();
+        private List<byte> chunkBuff { get; set; } = new List<byte>();
 
         private AnalyzeRecvDataController analyzeRecvDataController = new AnalyzeRecvDataController();
         #endregion
@@ -29,8 +29,6 @@ namespace lll_seer_launcher.core.Controller
         #endregion
         public MessageEncryptDecryptController()
         {
-            tempBuff = new ArrayList();
-            chunkBuff = new ArrayList();
             GlobalVariable.isLogin = false;
             this.InitKey();
         }
@@ -100,16 +98,16 @@ namespace lll_seer_launcher.core.Controller
             byte[] encryptData = new byte[headInfo.packageLen];
             //写入包长
             int index = 0;
-            ByteConverter.RepalaceBytes(encryptData, ByteConverter.HexToBytes(ByteConverter.DecimalToHex(headInfo.packageLen, 4)), index);
+            ByteConverter.HexToBytes(ByteConverter.DecimalToHex(headInfo.packageLen, 4)).CopyTo(encryptData, index);
             //写入version
             index += 4;
-            ByteConverter.RepalaceBytes(encryptData, ByteConverter.HexToBytes(ByteConverter.DecimalToHex(headInfo.version, 1)), index);
+            ByteConverter.HexToBytes(ByteConverter.DecimalToHex(headInfo.version, 1)).CopyTo(encryptData, index);
             //写入cmdId
             index += 1;
-            ByteConverter.RepalaceBytes(encryptData, ByteConverter.HexToBytes(ByteConverter.DecimalToHex(headInfo.cmdId, 4)), index);
+            ByteConverter.HexToBytes(ByteConverter.DecimalToHex(headInfo.cmdId, 4)).CopyTo(encryptData,index);
             //写入userid
             index += 4;
-            ByteConverter.RepalaceBytes(encryptData, ByteConverter.HexToBytes(ByteConverter.DecimalToHex(headInfo.userId, 4)), index);
+            ByteConverter.HexToBytes(ByteConverter.DecimalToHex(headInfo.userId, 4)).CopyTo(encryptData, index);
             //写入seq顺序码
             index += 4;
             if (headInfo.cmdId > 1000)
@@ -127,16 +125,16 @@ namespace lll_seer_launcher.core.Controller
                 //获取重新计算后的顺序码
                 GlobalVariable.seq = EncryptService.MSerial(GlobalVariable.seq, headInfo.packageLen - 1, crc8Val, headInfo.cmdId);
                 string seqHex = ByteConverter.DecimalToHex(GlobalVariable.seq, 4);
-                ByteConverter.RepalaceBytes(encryptData, ByteConverter.HexToBytes(seqHex), index);
+                ByteConverter.HexToBytes(seqHex).CopyTo(encryptData, index);
             }
             else
             {
-                ByteConverter.RepalaceBytes(encryptData, ByteConverter.HexToBytes(ByteConverter.DecimalToHex(0, 4)), index);
+                ByteConverter.HexToBytes(ByteConverter.DecimalToHex(0, 4)).CopyTo(encryptData, index);
             }
             headInfo.seq = GlobalVariable.seq;
             //写入解密数据，完成组包
             index += 4;
-            ByteConverter.RepalaceBytes(encryptData, headInfo.decryptData, index);
+            headInfo.decryptData.CopyTo(encryptData, index);
 
             //将组包完成的数据进行加密
             headInfo.encryptData = this.Encrypt(encryptData);
@@ -154,28 +152,28 @@ namespace lll_seer_launcher.core.Controller
         /// <param name="dataSize">长度</param>
         public void LoadBasicMessage(IntPtr dataPtr, int dataSize)
         {
+
             int tmpBuffSize;
             int realSize;
             byte[] tmpBytes = new byte[dataSize];
             Marshal.Copy(dataPtr, tmpBytes, 0, dataSize);
-            tempBuff = GlobalUtil.CombineArrayList(tempBuff, GlobalUtil.BytesToArray(tmpBytes));
-            //Console.WriteLine(BitConverter.ToString(tmpBytes));
-            //return;
-
+            foreach (byte b in tmpBytes)
+            {
+                tempBuff.Add(b);
+            }
             while (true)
             {
+
                 tmpBuffSize = tempBuff.Count;
                 if (tmpBuffSize >= 4)
                 {
-                    byte[] realBytes = new byte[tmpBuffSize];
-                    realBytes = (byte[])tempBuff.ToArray(typeof(byte));
-                    realSize = ByteConverter.BytesTo10(ByteConverter.TakeBytes(realBytes, 0, 4));
+                    realSize = ByteConverter.BytesTo10(tempBuff.GetRange(0, 4).ToArray());
 
                     if (realSize <= tmpBuffSize)
                     {
                         chunkBuff = tempBuff.GetRange(0, realSize);
                         tempBuff = tempBuff.GetRange(realSize, tmpBuffSize - realSize);
-                        realBytes = (byte[])chunkBuff.ToArray(typeof(byte));
+                        byte[] realBytes = chunkBuff.ToArray();
                         this.RecvHandle(realBytes);
                     }
                     else
@@ -188,6 +186,7 @@ namespace lll_seer_launcher.core.Controller
                     break;
                 }
             }
+
         }
 
         /// <summary>
@@ -197,40 +196,44 @@ namespace lll_seer_launcher.core.Controller
         /// <returns></returns>
         private void RecvHandle(byte[] bytes)
         {
-            int packVer = (int)bytes[4];
-            //Console.WriteLine("recvBefore:" + BitConverter.ToString(bytes));
-            if (packVer != 0 && packVer != 62)
+            if(bytes.Length > 4)
             {
-                bytes = this.Decrypt(bytes);
-                byte[] decryptBytes = ByteConverter.TakeBytes(bytes, 0, bytes.Length - 1);
-                //Console.WriteLine("decryptedRecv:" + BitConverter.ToString(decryptBytes));
-                HeadInfo headInfo = this.GetHeadInfo(decryptBytes);
-                if (headInfo.cmdId == CmdId.LOGIN_IN)
+                int packVer = (int)bytes[4];
+                //Console.WriteLine("recvBefore:" + BitConverter.ToString(bytes));
+                if (packVer != 0 && packVer != 62)
                 {
-                    GlobalVariable.userId = headInfo.userId;
-                    this.OnLogin(decryptBytes);
-                    this.InitSeq(headInfo.seq);
-                    GlobalVariable.isLogin = true;
-                    Logger.Log("gameLogin", $"user:{GlobalVariable.userId} 登录成功！");
-
-                }
-                else if(headInfo.cmdId > 100000 && !GlobalVariable.gameReloadFlg)
-                {
-                    Thread onLoginThread = new Thread(() =>
+                    bytes = this.Decrypt(bytes);
+                    byte[] decryptBytes = ByteConverter.TakeBytes(bytes, 0, bytes.Length - 1);
+                    //Console.WriteLine("decryptedRecv:" + BitConverter.ToString(decryptBytes));
+                    HeadInfo headInfo = this.GetHeadInfo(decryptBytes);
+                    if (headInfo.cmdId == CmdId.LOGIN_IN)
                     {
-                        Logger.Error($" 当前cmdId‘{headInfo.cmdId}’大于100000，登录加密key初始化失败！");
-                        GlobalVariable.gameReloadFlg = true;
-                        MessageBox.Show("游戏掉线/登录加密key初始化失败！将刷新游戏，请重新登录！");
-                    });
-                    onLoginThread.Start();
-                }
-                else
-                {
-                    this.analyzeRecvDataController.RunAnalyzeRecvDataMethod(headInfo);
+                        GlobalVariable.userId = headInfo.userId;
+                        this.OnLogin(decryptBytes);
+                        this.InitSeq(headInfo.seq);
+                        Logger.Log("gameLogin", $"user:{GlobalVariable.userId} 登录成功！");
+                        GlobalVariable.isLogin = true;
+                    }
+                    //else if (headInfo.cmdId == CmdId.SYSTEM_MESSAGE)
+                    //{
+                    //    //GlobalVariable.isLogin = true;
+                    //}
+                    //else if(headInfo.cmdId > 100000 && !GlobalVariable.gameReloadFlg)
+                    //{
+                    //    Thread onLoginThread = new Thread(() =>
+                    //    {
+                    //        Logger.Error($" 当前cmdId‘{headInfo.cmdId}’大于100000，登录加密key初始化失败！");
+                    //        GlobalVariable.gameReloadFlg = true;
+                    //        MessageBox.Show("游戏掉线/登录加密key初始化失败！将刷新游戏，请重新登录！");
+                    //    });
+                    //    onLoginThread.Start();
+                    //}
+                    else
+                    {
+                        this.analyzeRecvDataController.RunAnalyzeRecvDataMethod(headInfo);
+                    }
                 }
             }
-
-
         }
 
         /// <summary>

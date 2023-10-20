@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 using System.Linq;
 using System.Windows.Forms;
 using System.Runtime.InteropServices;
@@ -22,81 +23,40 @@ namespace lll_seer_launcher
         private MessageEncryptDecryptController messageEncryptControl;
         private HeadInfo sendPkgInfo;
         private ChangeSuitForm changeSuitForm;
-        private InitJsonController initJsonControl = new InitJsonController();
-        private LoadingForm loadingForm = new LoadingForm();
+        //private FiddlerController fiddlerController = new FiddlerController();
+        //private Process fiddlerProcess;
         public seerMainWindow()
         {
-            loadingForm.Show();
-            this.Hide();
             InitializeComponent();
             this.IsMdiContainer = true;
-           
-
+            GlobalVariable.mainForm = this;
         }
 
         private void SeerMainWindow_Load(object sender, EventArgs e)
         {
-            Thread initJsonThread = new Thread(() =>
-            {
-                if (DBController.SuitAndAchieveTitleDbController.CheckAndInitDB())
-                {
-                    this.initJsonControl.InitJson();
-                    if (GlobalVariable.shoudUpdateJsonDic["suit"])
-                    {
-                        Logger.Log("updateData", "装备信息更新！更新装备信息中...");
-                        this.initJsonControl.InitSuitDictionary();
-                        DBController.SuitAndAchieveTitleDbController.InitSuitTable();
-                        Logger.Log("updateData", "装备信息更新完成！");
-                    }
-                    else
-                    {
-                        DBController.SuitAndAchieveTitleDbController.SetSuitTitleDic();
-                    }
-                    if (GlobalVariable.shoudUpdateJsonDic["glasses"])
-                    {
-                        Logger.Log("updateData", "目镜信息更新！更新目镜信息中...");
-                        this.initJsonControl.InitGlassesDictionary();
-                        DBController.SuitAndAchieveTitleDbController.InitGlassesTable();
-                        Logger.Log("updateData", "目镜信息更新完成！");
-                    }
-                    else
-                    {
-                        DBController.SuitAndAchieveTitleDbController.SetGlassesTitleDic();
-                    }
-                    if (GlobalVariable.shoudUpdateJsonDic["achieveTitle"])
-                    {
-                        Logger.Log("updateData", "称号信息更新！更新称号信息中...");
-                        this.initJsonControl.InitAchieveTitleDictionary();
-                        DBController.SuitAndAchieveTitleDbController.InitAchieveTitleTable();
-                        Logger.Log("updateData", "称号信息更新完成！");
-                    }
-                    else
-                    {
-                        DBController.SuitAndAchieveTitleDbController.SetAchieveTitleDic();
-                    }
+            
+            //Thread initJsonThread = new Thread(() =>
+            //{
 
-                }
-            });
-            initJsonThread.Start();
+            //});
+            //initJsonThread.Start();
 
             Thread getUsedMemory = new Thread(GetUsedMemorySize);
             getUsedMemory.Start();
+
+
 
             this.messageEncryptControl = new MessageEncryptDecryptController();
             this.sendFunction = SendHandle;
             this.sendFunctionPtr = Marshal.GetFunctionPointerForDelegate(sendFunction);
             this.recvFunction = RecvHandle;
             this.recvFunctionPtr = Marshal.GetFunctionPointerForDelegate(recvFunction);
-            this.hook = new HookControl[2];
-            this.hook[0] = new HookControl();
+            this.hook = new HookControl[2] { new HookControl() , new HookControl() };
             this.hook[0].Install("WS2_32.DLL", "send", sendFunctionPtr);
-            this.hook[1] = new HookControl();
             this.hook[1].Install("WS2_32.DLL", "recv", recvFunctionPtr);
 
             this.changeSuitForm = new ChangeSuitForm();
             this.changeSuitForm.Hide();
-
-            this.loadingForm.Dispose();
             this.Show();
         }
 
@@ -105,23 +65,14 @@ namespace lll_seer_launcher
         }
         private void SeerWebBrowser_Navigating(object sender, WebBrowserNavigatingEventArgs e)
         {
-            if (GlobalVariable.isLogin)
-            {
-                GlobalVariable.isLogin = false;
-            }
+            if (GlobalVariable.isLogin) GlobalVariable.isLogin = false;
+            if(GlobalVariable.isLoginSend) GlobalVariable.isLoginSend = false;
             this.messageEncryptControl.SetKey("!crAckmE4nOthIng:-)");
             this.messageEncryptControl.InitKey();
         }
         private void SeerWebBrowser_Navigated(object sender, WebBrowserNavigatedEventArgs e)
         {
-            HtmlElement head = this.seerWebBrowser.Document.GetElementsByTagName("head")[0];
-            HtmlElement scriptEl = this.seerWebBrowser.Document.CreateElement("script");
-            mshtml.IHTMLScriptElement element = (mshtml.IHTMLScriptElement)scriptEl.DomElement;
-            string alertBlocker = "window.alert = function () { };" +
-                "window.confirm = function () { return true; }";
-            element.text = alertBlocker;
-            head.AppendChild(scriptEl);
-            this.seerWebBrowser.ScriptErrorsSuppressed = true;
+
         }
         private void SeerWebBrowser_KeyDown(object sender, PreviewKeyDownEventArgs e)
         {
@@ -129,6 +80,7 @@ namespace lll_seer_launcher
             if (pressedKey == Keys.F5)
             {
                 this.seerWebBrowser.Refresh();
+                //this.seerWebBrowser.Navigate("https://seer.61.com/play.shtml?micro=1");
             }
         }
         private void SeerWebBrowser_NewWindow(object sender, System.ComponentModel.CancelEventArgs e)
@@ -145,26 +97,30 @@ namespace lll_seer_launcher
         {
             byte[] bytes = new byte[dataSize];
             Marshal.Copy(dataPointer, bytes, 0, dataSize);
-            if(ByteConverter.BytesTo10(ByteConverter.TakeBytes(bytes, 0, 2)) == 0)
+            if(s == GlobalVariable.gameSocket && GlobalVariable.isLogin)
             {
-                GlobalVariable.gameSocket = s;
-                //Console.WriteLine("sendEncrypt:" + BitConverter.ToString(bytes));
-                if (GlobalVariable.isLogin)
-                {
-                    bytes = this.messageEncryptControl.Decrypt(bytes);
-                    Console.WriteLine("sendDecrypt:" + BitConverter.ToString(bytes));
-                    byte[] encryptBytes = ByteConverter.TakeBytes(bytes, 0, bytes.Length - 1);
-                    this.sendPkgInfo = this.messageEncryptControl.GetHeadInfo(encryptBytes);
-                    this.sendPkgInfo = this.messageEncryptControl.PackHeadInfo(this.sendPkgInfo);
-                    bytes = this.sendPkgInfo.encryptData;
-                    //Console.WriteLine("sendEncrypt:" + BitConverter.ToString(bytes));
-                }
+                byte[] decryptBytes = this.messageEncryptControl.Decrypt(bytes);
+                byte[] encryptBytes = ByteConverter.TakeBytes(decryptBytes, 0, decryptBytes.Length - 1);
+                this.sendPkgInfo = this.messageEncryptControl.GetHeadInfo(encryptBytes);
+                this.sendPkgInfo = this.messageEncryptControl.PackHeadInfo(this.sendPkgInfo);
+                bytes = this.sendPkgInfo.encryptData;
             }
+
+
             dataPointer = ByteConverter.GetBytesIntPtr(bytes);
             dataSize  = bytes.Length;
             this.hook[0].Suspend();
             HookControl.send(s, dataPointer, dataSize, type);
             this.hook[0].Continue();
+            if (!GlobalVariable.isLoginSend)
+            {
+                GlobalVariable.gameSocket = s;
+                byte[] decrptByte = this.messageEncryptControl.Decrypt(bytes);
+                if (decrptByte.Length > 8 && ByteConverter.BytesTo10(ByteConverter.TakeBytes(decrptByte, 5, 4)) == CmdId.LOGIN_IN)
+                {
+                    GlobalVariable.isLoginSend = true;
+                }
+            }
             return dataSize;
         }
 
@@ -176,7 +132,7 @@ namespace lll_seer_launcher
             int ret = HookControl.recv(s, dataPointer, dataSize, type);
             this.hook[1].Continue();
             if(ret == 0 || ret == -1) return 0;
-            if (GlobalVariable.gameSocket == s) this.messageEncryptControl.LoadBasicMessage(dataPointer, ret);
+            if (GlobalVariable.gameSocket == s && GlobalVariable.isLoginSend) this.messageEncryptControl.LoadBasicMessage(dataPointer, ret);
             return ret;
         }
 
@@ -187,12 +143,14 @@ namespace lll_seer_launcher
                 if(this.hook[i] != null) this.hook[i].Uninstall();
             }
             GlobalVariable.stopThread = true;
+            //this.fiddlerProcess.Dispose();
             Logger.Log("CloseProgram", "关闭登录器。");
         }
 
         private void gameReloadMenu_Click(object sender, EventArgs e)
         {
             this.seerWebBrowser.Refresh();
+            //this.seerWebBrowser.Navigate("https://seer.61.com/play.shtml?micro=1");
         }
 
 
@@ -202,5 +160,23 @@ namespace lll_seer_launcher
             this.changeSuitForm.Show();
             if(GlobalVariable.isLogin)this.changeSuitForm.InitGroupBoxs();
         }
+
+        private void testToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+            //MainFormController.SendMessage(seerFiddlerIntPtr, MainFormController.WM_SETTEXT, 0, "1");
+        }
+
+        private void openSeerFiddlerWindowToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            FormController.SendMessageToSeerFiddler("1");
+        }
+
+        private void hideSkillToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            this.hideSkillToolStripMenuItem.Checked = !this.hideSkillToolStripMenuItem.Checked;
+            FormController.SendMessageToSeerFiddler("2");
+        }
+
     }
 }
