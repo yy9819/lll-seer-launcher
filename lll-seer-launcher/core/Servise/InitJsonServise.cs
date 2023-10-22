@@ -4,6 +4,7 @@ using Newtonsoft.Json;
 using System.IO;
 using lll_seer_launcher.core.Dto;
 using lll_seer_launcher.core.Utils;
+using lll_seer_launcher.core.Controller;
 
 namespace lll_seer_launcher.core.Servise
 {
@@ -28,16 +29,22 @@ namespace lll_seer_launcher.core.Servise
                     shoudUpdataJsonDic.Add("suit", !(serverJsonInfo.suitVersion == localJsonInfo.suitVersion));
                     shoudUpdataJsonDic.Add("glasses", !(serverJsonInfo.glassesVersion == localJsonInfo.glassesVersion));
                     shoudUpdataJsonDic.Add("achieveTitle", !(serverJsonInfo.achieveTitleVersion == localJsonInfo.achieveTitleVersion));
+                    shoudUpdataJsonDic.Add("pet", !(serverJsonInfo.petVersion == localJsonInfo.petVersion));
+                    shoudUpdataJsonDic.Add("petSkins", !(serverJsonInfo.petSkinsVersion == localJsonInfo.petSkinsVersion));
                 }
                 else
                 {
                     shoudUpdataJsonDic.Add("suit", true);
                     shoudUpdataJsonDic.Add("glasses", true);
                     shoudUpdataJsonDic.Add("achieveTitle", true);
+                    shoudUpdataJsonDic.Add("pet", true);
+                    shoudUpdataJsonDic.Add("petSkins", true);
                 }
                 jsonPathDic.Add("suit", serverJsonInfo.suitVersion);
                 jsonPathDic.Add("glasses", serverJsonInfo.glassesVersion);
                 jsonPathDic.Add("achieveTitle", serverJsonInfo.achieveTitleVersion);
+                jsonPathDic.Add("pet", serverJsonInfo.petVersion);
+                jsonPathDic.Add("petSkins", serverJsonInfo.petSkinsVersion);
                 File.WriteAllText(loaclVersionPath, serverJsonString);
                 GlobalVariable.shoudUpdateJsonDic = shoudUpdataJsonDic;
                 GlobalVariable.jsonPathDic = jsonPathDic;
@@ -113,6 +120,49 @@ namespace lll_seer_launcher.core.Servise
             catch (Exception ex)
             {
                 Logger.Error($"目镜json加载失败！！！errorMessage{ex.Message}");
+                return false;
+            }
+        }
+
+        public static bool InitPetDB(string jsonName)
+        {
+            //string path = folderPath + "glassesList.json";
+            string path = folderPath + jsonName;
+            try
+            {
+                string jsonString = File.ReadAllText(path);
+                PetJsonObject info = JsonConvert.DeserializeObject<PetJsonObject>(jsonString);
+                foreach (var item in info.data)
+                {
+                    DBController.PetDBController.InsertPetData(item);
+                }
+                Logger.Log("jsonFileInit", "精灵json加载完成。");
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Logger.Error($"精灵json加载失败！！！errorMessage{ex.Message}");
+                return false;
+            }
+        }
+        public static bool InitPetSkinsDB(string jsonName)
+        {
+            //string path = folderPath + "glassesList.json";
+            string path = folderPath + jsonName;
+            try
+            {
+                string jsonString = File.ReadAllText(path);
+                PetSkinsJsonObject info = JsonConvert.DeserializeObject<PetSkinsJsonObject>(jsonString);
+                foreach (var item in info.data)
+                {
+                    DBController.PetDBController.InsertPetSkinsData(item);
+                }
+                Logger.Log("jsonFileInit", "精灵皮肤json加载完成。");
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Logger.Error($"精灵json加载失败！！！errorMessage{ex.Message}");
                 return false;
             }
         }

@@ -44,16 +44,16 @@ namespace lll_seer_launcher.core.Controller
         public static IntPtr FindWindow(string lpWindowName)
         {
             IntPtr targetWindowHandle = FindWindow(null, lpWindowName);
-            Console.WriteLine(targetWindowHandle);
+            //Console.WriteLine(targetWindowHandle);
             return targetWindowHandle;
         } 
         public static IntPtr FindWindowEx(IntPtr hwndParent, string lpWindowName)
         {
             IntPtr childHwnd = FindWindowEx(hwndParent , IntPtr.Zero , null, lpWindowName);
-            Console.WriteLine(childHwnd);
+            //Console.WriteLine(childHwnd);
             return childHwnd;
         }
-        public static void SendMessage(IntPtr targetHwnd , string msg)
+        private static void SendMessage(IntPtr targetHwnd , string msg)
         {
             SendMessage(targetHwnd , WM_SETTEXT , 0 , msg);
         }

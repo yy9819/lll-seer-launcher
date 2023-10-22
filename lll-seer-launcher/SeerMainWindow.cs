@@ -8,8 +8,9 @@ using lll_seer_launcher.core.Controller;
 using lll_seer_launcher.core.Dto;
 using lll_seer_launcher.core.Utils;
 using mshtml;
-using System.Diagnostics;
+using System.IO;
 using System.Threading;
+using Fiddler;
 
 namespace lll_seer_launcher
 {
@@ -23,6 +24,8 @@ namespace lll_seer_launcher
         private MessageEncryptDecryptController messageEncryptControl;
         private HeadInfo sendPkgInfo;
         private ChangeSuitForm changeSuitForm;
+        private EditPetResourceForm editPetResourceForm;
+        private string iniFilePath = Directory.GetCurrentDirectory() + "\\bin\\ini\\";
         //private FiddlerController fiddlerController = new FiddlerController();
         //private Process fiddlerProcess;
         public seerMainWindow()
@@ -44,7 +47,7 @@ namespace lll_seer_launcher
             Thread getUsedMemory = new Thread(GetUsedMemorySize);
             getUsedMemory.Start();
 
-
+            this.InitIniFile();
 
             this.messageEncryptControl = new MessageEncryptDecryptController();
             this.sendFunction = SendHandle;
@@ -57,7 +60,37 @@ namespace lll_seer_launcher
 
             this.changeSuitForm = new ChangeSuitForm();
             this.changeSuitForm.Hide();
+            this.editPetResourceForm = new EditPetResourceForm();
+
             this.Show();
+        }
+        private void InitIniFile()
+        {
+            if (!Directory.Exists(iniFilePath)) Directory.CreateDirectory(iniFilePath);
+            string filePath = iniFilePath + "config.ini";
+            if (!File.Exists(filePath)) File.Create(filePath).Close();
+            IniFile iniFile = new IniFile(filePath);
+            string result = iniFile.Read("config", "transparentPet");
+            if (result == null  || (result != "0" && result != "1"))
+            {
+                iniFile.Write("config", "transparentPet", "1");
+                this.hidePetToolStripMenuItem.Checked = true;
+            }
+            else
+            {
+                this.hidePetToolStripMenuItem.Checked = result == "1";
+            }
+            iniFile = new IniFile(filePath);
+            result = iniFile.Read("config", "transparentSkill");
+            if (result == null  || (result != "0" && result != "1"))
+            {
+                iniFile.Write("config", "transparentSkill", "1");
+                this.hideSkillToolStripMenuItem.Checked = true;
+            }
+            else
+            {
+                this.hideSkillToolStripMenuItem.Checked = result == "1";
+            }
         }
 
         private void SeerWebBrowser_DocumentCompleted(object sender, WebBrowserDocumentCompletedEventArgs e)
@@ -144,7 +177,7 @@ namespace lll_seer_launcher
             }
             GlobalVariable.stopThread = true;
             //this.fiddlerProcess.Dispose();
-            Logger.Log("CloseProgram", "关闭登录器。");
+            core.Utils.Logger.Log("CloseProgram", "关闭登录器。");
         }
 
         private void gameReloadMenu_Click(object sender, EventArgs e)
@@ -175,8 +208,31 @@ namespace lll_seer_launcher
         private void hideSkillToolStripMenuItem_Click(object sender, EventArgs e)
         {
             this.hideSkillToolStripMenuItem.Checked = !this.hideSkillToolStripMenuItem.Checked;
+            new IniFile(this.iniFilePath + "config.ini").Write("config", "transparentSkill", this.hideSkillToolStripMenuItem.Checked ? "1" :"0");
             FormController.SendMessageToSeerFiddler("2");
         }
 
+        private void showEditFormToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            this.editPetResourceForm.Show();
+        }
+
+        private void reloadToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            DialogResult result = MessageBox.Show("是否确认执行此操作?", "确认框", MessageBoxButtons.OKCancel, MessageBoxIcon.Question);
+            if (result == DialogResult.OK)
+            {
+                FormController.SendMessageToSeerFiddler("4");
+                MessageBox.Show("已重置，即将重启登录器~");
+                this.Dispose();
+            }
+        }
+
+        private void hidePetToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            this.hidePetToolStripMenuItem.Checked = !this.hidePetToolStripMenuItem.Checked;
+            new IniFile(this.iniFilePath + "config.ini").Write("config", "transparentPet", this.hidePetToolStripMenuItem.Checked ? "1" : "0");
+            FormController.SendMessageToSeerFiddler("2");
+        }
     }
 }

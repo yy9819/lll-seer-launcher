@@ -48,7 +48,7 @@ namespace lll_seer_launcher
             InitUserListComboBoxCallback callback = delegate ()
             {
                 this.userListComboBox.Items.Clear();
-                this.userCanUseClothDic = DBController.SuitAndAchieveTitleDbController.UserTableSelectDataGetUserClothDic();
+                this.userCanUseClothDic = DBController.SuitAndAchieveTitleDBController.UserTableSelectDataGetUserClothDic();
                 if (this.userCanUseClothDic != null && this.userCanUseClothDic.Count > 0)
                 {
                     int index = 0;
@@ -79,6 +79,11 @@ namespace lll_seer_launcher
         }
         #region
         /*========================================通过封包形式获取当前登录账号最新装备信息================================================*/
+        /// <summary>
+        /// 初始化当前登录账号所持装备信息
+        /// -1发送装备查询封包
+        /// -2启动Timer，监测服务器返回的数据
+        /// </summary>
         public void InitGroupBoxs()
         {
             this.getUserSuitGlassesTittleInfoButton.Enabled = false;
@@ -90,14 +95,21 @@ namespace lll_seer_launcher
                 }
                 if (!GlobalVariable.isLogin) return;
                 this.sendDataController.SendDataByCmdIdAndHexString(CmdId.ACHIEVETITLELIST, "");
-                this.sendDataController.SendDataByCmdIdAndIntList(CmdId.ITEM_LIST, new int[3] { 1300083, 1300998, 2 });
+                this.sendDataController.SendDataByCmdIdAndIntList(CmdId.ITEM_LIST, new int[3] { 1300083, 1310000, 2 });
             });
             thread.Start();
             this.initGroupBoxsTimer.Elapsed += this.InitGroupBoxsTimer;
             this.initGroupBoxsTimerRetryTimes = 0;
             this.initGroupBoxsTimer.Start();
         }
-
+        /// <summary>
+        /// 封包查询当前账号所持装备Timer
+        /// -1 称号和装备信息均处理完毕时立即执行信息初始化
+        /// -2 5s内(initGroupBoxsTimerRetryTimes >= 5) 即使称号和装备信息有任意一个还未收到recv包，也立即进行初始化
+        /// -3 未登录游戏时，尝试从数据库内查询已保存的信息
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void InitGroupBoxsTimer(object sender, ElapsedEventArgs e)
         {
             this.initGroupBoxsTimerRetryTimes += 1;
@@ -138,15 +150,18 @@ namespace lll_seer_launcher
                     }
 
                     //尝试向数据库插入当前账号的装备持有状况
-                    UserSuitAndAchieveTitleInfo info = new UserSuitAndAchieveTitleInfo(GlobalVariable.userId, suitList, glassesList, achieveTitleList);
-                    int result = DBController.SuitAndAchieveTitleDbController.UserTableInsertData(info);
-                    //插入失败时，更新对应用户的信息
-                    if (result != 1)
+                    if(GlobalVariable.userId != 0)
                     {
-                        //有称号封包返回时更新称号持有状况
-                        if(GlobalVariable.initSuitGroupBoxsCompleteFlg[0]) DBController.SuitAndAchieveTitleDbController.UserTableUpadateAchieveTitleData(info);
-                        //有装备封包返回时更新装备持有状况
-                        if (GlobalVariable.initSuitGroupBoxsCompleteFlg[1]) DBController.SuitAndAchieveTitleDbController.UserTableUpadateClothData(info);
+                        UserSuitAndAchieveTitleInfo info = new UserSuitAndAchieveTitleInfo(GlobalVariable.userId, suitList, glassesList, achieveTitleList);
+                        int result = DBController.SuitAndAchieveTitleDBController.UserTableInsertData(info);
+                        //插入失败时，更新对应用户的信息
+                        if (result != 1)
+                        {
+                            //有称号封包返回时更新称号持有状况
+                            if (GlobalVariable.initSuitGroupBoxsCompleteFlg[0]) DBController.SuitAndAchieveTitleDBController.UserTableUpadateAchieveTitleData(info);
+                            //有装备封包返回时更新装备持有状况
+                            if (GlobalVariable.initSuitGroupBoxsCompleteFlg[1]) DBController.SuitAndAchieveTitleDBController.UserTableUpadateClothData(info);
+                        }
                     }
                     this.InitUserListComboBox();
                     this.InitPlanDataGridView();
@@ -158,7 +173,9 @@ namespace lll_seer_launcher
                 }
             }
         }
-
+        /// <summary>
+        /// 初始化当前所选择账号的称号信息一览
+        /// </summary>
         private void InitAchieveListBox()
         {
             initAchieveListGroupBoxsCallback callback = delegate ()
@@ -197,7 +214,9 @@ namespace lll_seer_launcher
             };
             this.Invoke(callback);
         }
-
+        /// <summary>
+        /// 初始化当前所选账号的套装所持状况
+        /// </summary>
         private void InitSuitListBox()
         {
             initSuitListGroupBoxsCallback callback = delegate ()
@@ -240,7 +259,9 @@ namespace lll_seer_launcher
             };
             this.Invoke(callback);
         }
-
+        /// <summary>
+        /// 初始化当前所选账号，目镜所持情况
+        /// </summary>
         private void InitGlassesListBox()
         {
             initGlassesListGroupBoxsCallback callback = delegate ()
@@ -278,20 +299,41 @@ namespace lll_seer_launcher
         #endregion
         #region
         /*========================================当装备/目镜/称号被选中时，展示相应效果================================================*/
+        /// <summary>
+        /// 当称号被选中时，展示对应效果
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void achieveTitleListBox_SelectedIndexChanged(object sender, EventArgs e)
         {
+            //未被选中时，不执行操作
             if(this.achieveTitleListBox.SelectedIndex < 0) return;
+            //当某项被选中时，将称号效果展示
             this.achieveTittleTextBox.Text = this.canUseAchieveList[this.achieveTitleListBox.SelectedIndex].abtext;
+            //将所选称号名添加到方案表当前所选列中
             this.planDataGridView.Rows[GetPlanDataGridViewSelectIndex()].Cells["achieveTitle"].Value = this.canUseAchieveList[this.achieveTitleListBox.SelectedIndex].title;
         }
 
+        /// <summary>
+        /// 当目镜被选中时，展示对应效果
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void glassesListBox_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (this.glassesListBox.SelectedIndex < 0) return;
             this.glassesTextBox.Text = this.canUseGlassesList[this.glassesListBox.SelectedIndex].desc;
+            //将所选目镜名添加到方案表当前所选列中
+            //如当前所选套装为5件套，将对应行数的方案内的目镜设为无
             this.planDataGridView.Rows[GetPlanDataGridViewSelectIndex()].Cells["glasses"].Value = this.glassesTextBox.Enabled ? 
                 this.canUseGlassesList[this.glassesListBox.SelectedIndex].name : "无";
         }
+
+        /// <summary>
+        /// 当套装选中时，展示对应效果
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void suitListBox_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (this.suitListBox.SelectedIndex < 0)
@@ -307,6 +349,7 @@ namespace lll_seer_launcher
             {
                 this.planDataGridView.Rows[GetPlanDataGridViewSelectIndex()].Cells["suit"].Value = this.canUseSuitList[this.suitListBox.SelectedIndex].name;
                 this.suitTextBox.Text = this.canUseSuitList[this.suitListBox.SelectedIndex].desc;
+                // 根据当前所选套装的零件数判断，是否可单独配搭目镜
                 if (this.canUseSuitList[this.suitListBox.SelectedIndex].clothIdList.Count > 4)
                 {
                     this.glassesListBox.Enabled = false;
@@ -381,13 +424,16 @@ namespace lll_seer_launcher
             this.Invoke(callback);
         }
         #endregion
-
+        /// <summary>
+        /// 初始化方案表格
+        /// </summary>
         public void InitPlanDataGridView()
         {
             initPlanDataGridViewCallback callback = delegate ()
             {
                 this.planDataGridView.Rows.Clear();
-                this.userPlan = DBController.SuitAndAchieveTitleDbController.GetUserPlan(this.selectUserId);
+                // 从数据库拉取所保存方案
+                this.userPlan = DBController.SuitAndAchieveTitleDBController.GetUserPlan(this.selectUserId);
                 if(this.userPlan != null)
                 {
                     foreach(int key in this.userPlan.Keys)
@@ -405,6 +451,10 @@ namespace lll_seer_launcher
             this.Invoke(callback);
         }
 
+        /// <summary>
+        /// 获取当前所选方案的index
+        /// </summary>
+        /// <returns></returns>
         private int GetPlanDataGridViewSelectIndex()
         {
 
@@ -420,6 +470,13 @@ namespace lll_seer_launcher
             return selectIndex;
         }
 
+        /// <summary>
+        /// 当方案表格被点击时，
+        /// -1 设置「新建」「修改」「删除」按钮是否可按
+        /// -2 根据所选方案，将套装，目镜，称号的index设为对应方案的内容
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void planDataGridView_CellClick(object sender, DataGridViewCellEventArgs e)
         {
             int selectIndex = this.GetPlanDataGridViewSelectIndex();
@@ -470,6 +527,11 @@ namespace lll_seer_launcher
             }
         }
 
+        /// <summary>
+        /// 新建方案
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void addPlanButton_Click(object sender, EventArgs e)
         {
 
@@ -480,25 +542,34 @@ namespace lll_seer_launcher
             insertPlan.achieveTitleId = this.achieveTitleListBox.SelectedIndex > -1 ? this.canUseAchieveList[this.achieveTitleListBox.SelectedIndex].id : 0;
             insertPlan.userId = this.selectUserId;
             insertPlan.name = inputText;
-            int result = DBController.SuitAndAchieveTitleDbController.InsertPlan(insertPlan);
-            if (result != 1)
+            if(insertPlan.userId != 0)
             {
-                MessageBox.Show("方案新建失败...");
-            }
-            else
-            {
-                MessageBox.Show("方案新建成功！");
-                this.InitPlanDataGridView();
+                int result = DBController.SuitAndAchieveTitleDBController.InsertPlan(insertPlan);
+                if (result != 1)
+                {
+                    MessageBox.Show("方案新建失败...");
+                }
+                else
+                {
+                    MessageBox.Show("方案新建成功！");
+                    this.InitPlanDataGridView();
+
+                }
             }
         }
 
+        /// <summary>
+        /// 删除方案
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void deletePlanButton_Click(object sender, EventArgs e)
         {
             DialogResult result = MessageBox.Show("是否确认执行此操作?", "确认框", MessageBoxButtons.OKCancel, MessageBoxIcon.Question);
             if (result == DialogResult.OK)
             {
                 int planId = Convert.ToInt32(this.planDataGridView.Rows[this.GetPlanDataGridViewSelectIndex()].Cells["id"].Value);
-                int deleteResult = DBController.SuitAndAchieveTitleDbController.DeletePlan(planId);
+                int deleteResult = DBController.SuitAndAchieveTitleDBController.DeletePlan(planId);
                 if (deleteResult != 1)
                 {
                     MessageBox.Show("方案删除失败...");
@@ -512,6 +583,11 @@ namespace lll_seer_launcher
 
         }
 
+        /// <summary>
+        /// 修改方案
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void updatePlanButton_Click(object sender, EventArgs e)
         {
             int selectIndex = this.GetPlanDataGridViewSelectIndex();
@@ -521,7 +597,7 @@ namespace lll_seer_launcher
             plan.suitId = this.suitListBox.Enabled ? this.canUseSuitList[this.suitListBox.SelectedIndex].suitId : 0;
             plan.glassesId = this.glassesListBox.Enabled ? this.canUseGlassesList[this.glassesListBox.SelectedIndex].glassesId : 0;
             plan.achieveTitleId = this.achieveTitleListBox.Enabled ? this.canUseAchieveList[this.achieveTitleListBox.SelectedIndex].id : 0;
-            int result = DBController.SuitAndAchieveTitleDbController.UpdatePlan(plan);
+            int result = DBController.SuitAndAchieveTitleDBController.UpdatePlan(plan);
             if (result != 1)
             {
                 MessageBox.Show("方案保存失败...");
@@ -533,6 +609,11 @@ namespace lll_seer_launcher
             }
         }
 
+        /// <summary>
+        /// 切换要编辑的账号
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void changePlanButton_Click(object sender, EventArgs e)
         {
             if (!GlobalVariable.isLogin)
@@ -577,9 +658,14 @@ namespace lll_seer_launcher
             }
         }
 
+        /// <summary>
+        /// 搜索方案
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void placnSearchButton_Click(object sender, EventArgs e)
         {
-            this.userPlan = DBController.SuitAndAchieveTitleDbController.SearchUserPlan(this.selectUserId,this.planSearchTextBox.Text);
+            this.userPlan = DBController.SuitAndAchieveTitleDBController.SearchUserPlan(this.selectUserId,this.planSearchTextBox.Text);
             this.planDataGridView.Rows.Clear();
             if (this.userPlan != null)
             {
@@ -596,15 +682,30 @@ namespace lll_seer_launcher
             this.planDataGridView_CellClick(new object(), new DataGridViewCellEventArgs(0, 0));
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        /// <summary>
+        /// 删除用户的方案及所持装备信息
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void deleteUserButton_Click(object sender, EventArgs e)
         {
             DialogResult result = MessageBox.Show("是否确认执行此操作?", "确认框", MessageBoxButtons.OKCancel, MessageBoxIcon.Question);
             if(result == DialogResult.OK)
             {
-                DBController.SuitAndAchieveTitleDbController.DeletePlanByuserId(this.selectUserId);
-                this.userPlan = new Dictionary<int, SuitAchieveTitlePlan>();
-                this.planDataGridView.Rows.Clear();
-                this.planDataGridView_CellClick(new object(), new DataGridViewCellEventArgs(0, 0));
+                DBController.SuitAndAchieveTitleDBController.DeletePlanByuserId(this.selectUserId);
+                DBController.SuitAndAchieveTitleDBController.UserTableDeleteUser(this.selectUserId);
+                //this.userPlan = new Dictionary<int, SuitAchieveTitlePlan>();
+                //this.planDataGridView.Rows.Clear();
+                //this.planDataGridView_CellClick(new object(), new DataGridViewCellEventArgs(0, 0));
+                this.InitUserListComboBox();
+            }
+        }
+
+        private void planSearchTextBox_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if(e.KeyChar == (char)Keys.Enter)
+            {
+                this.placnSearchButton_Click(sender, e);
             }
         }
     }

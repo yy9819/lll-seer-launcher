@@ -22,5 +22,13 @@ namespace lll_seer_launcher.core.Controller
         {
             return InitJsonServise.InitGlassesDictionary(GlobalVariable.jsonPathDic["glasses"]);
         }
+        public bool InitPetDB()
+        {
+            return InitJsonServise.InitPetDB(GlobalVariable.jsonPathDic["pet"]);
+        }
+        public bool InitPetSkinsDB()
+        {
+            return InitJsonServise.InitPetSkinsDB(GlobalVariable.jsonPathDic["petSkins"]);
+        }
     }
 }

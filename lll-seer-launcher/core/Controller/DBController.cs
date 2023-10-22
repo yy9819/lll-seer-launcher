@@ -11,27 +11,30 @@ namespace lll_seer_launcher.core.Controller
 {
     public class DBController
     {
-        public static class SuitAndAchieveTitleDbController
+        /*==========================================装备相关controller============================================*/
+        #region
+        public static class SuitAndAchieveTitleDBController
         {
             public static bool CheckAndInitDB()
             {
                 return DBServise.SuitAndAchieveTitleDbServise.CheckAndInitDB();
             }
-
+            /*==========================================称号明细表============================================*/
             #region
             public static void InitAchieveTitleTable()
             {
-                foreach(AchieveTitleInfo info in GlobalVariable.achieveTitleDictionary.Values)
+                foreach (AchieveTitleInfo info in GlobalVariable.achieveTitleDictionary.Values)
                 {
                     DBServise.SuitAndAchieveTitleDbServise.AchieveTitleTableInsertData(info);
                 }
-                Logger.Log("InitTableData","称号表更新完成!");
+                Logger.Log("InitTableData", "称号表更新完成!");
             }
             public static bool SetAchieveTitleDic()
             {
                 return DBServise.SuitAndAchieveTitleDbServise.AchieveTitleTableAllDataAndSetAchieveTitleDic();
             }
             #endregion
+            /*==========================================套装明细表============================================*/
             #region
             public static void InitSuitTable()
             {
@@ -46,6 +49,7 @@ namespace lll_seer_launcher.core.Controller
                 return DBServise.SuitAndAchieveTitleDbServise.SuitTableSelectAllDataAndSetSuitDic();
             }
             #endregion
+            /*==========================================目镜明细表============================================*/
             #region
             public static void InitGlassesTable()
             {
@@ -65,7 +69,7 @@ namespace lll_seer_launcher.core.Controller
             public static int UserTableInsertData(UserSuitAndAchieveTitleInfo insertData)
             {
                 return DBServise.SuitAndAchieveTitleDbServise.UserTableInsertData(insertData);
-            } 
+            }
             public static int UserTableUpadateClothData(UserSuitAndAchieveTitleInfo insertData)
             {
                 return DBServise.SuitAndAchieveTitleDbServise.UserTableUpdateClothData(insertData);
@@ -78,15 +82,20 @@ namespace lll_seer_launcher.core.Controller
             {
                 return DBServise.SuitAndAchieveTitleDbServise.UserTableSelectDataGetUserList();
             }
+            public static int UserTableDeleteUser(int userId)
+            {
+                return DBServise.SuitAndAchieveTitleDbServise.UserTableDeleteDataByUserId(userId);
+            }
             #endregion
+            /*==========================================方案明细表============================================*/
             #region
-            public static Dictionary<int,SuitAchieveTitlePlan> GetUserPlan(int userId)
+            public static Dictionary<int, SuitAchieveTitlePlan> GetUserPlan(int userId)
             {
                 return DBServise.SuitAndAchieveTitleDbServise.PlanTableSelectData(userId);
             }
-            public static Dictionary<int, SuitAchieveTitlePlan> SearchUserPlan(int userId,string searchWord)
+            public static Dictionary<int, SuitAchieveTitlePlan> SearchUserPlan(int userId, string searchWord)
             {
-                return DBServise.SuitAndAchieveTitleDbServise.PlanTableSearch(userId,searchWord);
+                return DBServise.SuitAndAchieveTitleDbServise.PlanTableSearch(userId, searchWord);
             }
             public static int InsertPlan(SuitAchieveTitlePlan plan)
             {
@@ -105,6 +114,55 @@ namespace lll_seer_launcher.core.Controller
                 return DBServise.SuitAndAchieveTitleDbServise.PlanTableUpdateData(plan);
             }
             #endregion
+        }
+        #endregion
+        public static class PetDBController
+        {
+            public static bool CheckAndInitDB()
+            {
+                return DBServise.PetDBServise.CheckAndInitDB();
+            }
+            public static int InsertPetData(Pet petInfo)
+            {
+                return DBServise.PetDBServise.PetTableInsertData(petInfo);
+            }
+
+            public static List<Pet> LikeSearchPetByPetId(int petId)
+            {
+                return DBServise.PetDBServise.PetTableLikeSelectDataByPetId(petId);
+            }
+            public static List<Pet> LikeSearchPetByPetName(string petName)
+            {
+                return DBServise.PetDBServise.PetTableSelectDataByPetName(petName);
+            }
+            public static int InsertPetSkinsData(PetSkins petSkinsInfo)
+            {
+                return DBServise.PetDBServise.PetSkinsTableInsertData(petSkinsInfo);
+            }
+            public static List<PetSkins> LikeSearchPetSkinsByPetId(int skinsId)
+            {
+                return DBServise.PetDBServise.PetSkinsTableLikeSelectDataBySkinsId(skinsId);
+            }
+            public static List<PetSkins> LikeSearchPetSkinsByPetName(string skinsName)
+            {
+                return DBServise.PetDBServise.PetSkinsTableSelectDataBySkinsName(skinsName);
+            }
+            public static int AddPlan(PetSkinsReplacePlan planInfo)
+            {
+                return DBServise.PetDBServise.PetSkinsPlanTableInsertData(planInfo);
+            }
+            public static int UpdatePlan(PetSkinsReplacePlan planInfo)
+            {
+                return DBServise.PetDBServise.PetSkinsPlanTableUpdateData(planInfo);
+            }
+            public static int DeletePlan(int petId)
+            {
+                return DBServise.PetDBServise.PetSkinsPlanTableDeleteData(petId);
+            }
+            public static List<PetSkinsReplacePlan> SearchPlan(string petName)
+            {
+                return DBServise.PetDBServise.PetSkinsPlanTableSelectData(petName);
+            }
         }
     }
 }

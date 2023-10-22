@@ -39,6 +39,7 @@ namespace lll_seer_launcher
             this.seerWebBrowser = new System.Windows.Forms.WebBrowser();
             this.mainFormStatusStrip = new System.Windows.Forms.StatusStrip();
             this.usedRamToolStripStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
+            this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
             this.mainFormMenuStrip = new System.Windows.Forms.MenuStrip();
             this.toolStripMenuItemSetting = new System.Windows.Forms.ToolStripMenuItem();
             this.gameReloadMenu = new System.Windows.Forms.ToolStripMenuItem();
@@ -48,6 +49,8 @@ namespace lll_seer_launcher
             this.openSeerFiddlerWindowToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.hideSkillToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.hidePetToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.showEditFormToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.reloadToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.mainFormStatusStrip.SuspendLayout();
             this.mainFormMenuStrip.SuspendLayout();
             this.SuspendLayout();
@@ -70,7 +73,8 @@ namespace lll_seer_launcher
             // mainFormStatusStrip
             // 
             this.mainFormStatusStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.usedRamToolStripStatusLabel});
+            this.usedRamToolStripStatusLabel,
+            this.toolStripStatusLabel1});
             this.mainFormStatusStrip.Location = new System.Drawing.Point(0, 589);
             this.mainFormStatusStrip.Name = "mainFormStatusStrip";
             this.mainFormStatusStrip.Size = new System.Drawing.Size(960, 22);
@@ -82,6 +86,12 @@ namespace lll_seer_launcher
             this.usedRamToolStripStatusLabel.Name = "usedRamToolStripStatusLabel";
             this.usedRamToolStripStatusLabel.Size = new System.Drawing.Size(68, 17);
             this.usedRamToolStripStatusLabel.Text = "运行内存：";
+            // 
+            // toolStripStatusLabel1
+            // 
+            this.toolStripStatusLabel1.Name = "toolStripStatusLabel1";
+            this.toolStripStatusLabel1.Size = new System.Drawing.Size(59, 17);
+            this.toolStripStatusLabel1.Text = "登录账号:";
             // 
             // mainFormMenuStrip
             // 
@@ -106,7 +116,7 @@ namespace lll_seer_launcher
             // gameReloadMenu
             // 
             this.gameReloadMenu.Name = "gameReloadMenu";
-            this.gameReloadMenu.Size = new System.Drawing.Size(180, 22);
+            this.gameReloadMenu.Size = new System.Drawing.Size(100, 22);
             this.gameReloadMenu.Text = "刷新";
             this.gameReloadMenu.Click += new System.EventHandler(this.gameReloadMenu_Click);
             // 
@@ -130,7 +140,9 @@ namespace lll_seer_launcher
             this.精灵换肤ToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.openSeerFiddlerWindowToolStripMenuItem,
             this.hideSkillToolStripMenuItem,
-            this.hidePetToolStripMenuItem});
+            this.hidePetToolStripMenuItem,
+            this.showEditFormToolStripMenuItem,
+            this.reloadToolStripMenuItem});
             this.精灵换肤ToolStripMenuItem.Name = "精灵换肤ToolStripMenuItem";
             this.精灵换肤ToolStripMenuItem.Size = new System.Drawing.Size(68, 21);
             this.精灵换肤ToolStripMenuItem.Text = "精灵换肤";
@@ -154,6 +166,21 @@ namespace lll_seer_launcher
             this.hidePetToolStripMenuItem.Name = "hidePetToolStripMenuItem";
             this.hidePetToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.hidePetToolStripMenuItem.Text = "精灵透明";
+            this.hidePetToolStripMenuItem.Click += new System.EventHandler(this.hidePetToolStripMenuItem_Click);
+            // 
+            // showEditFormToolStripMenuItem
+            // 
+            this.showEditFormToolStripMenuItem.Name = "showEditFormToolStripMenuItem";
+            this.showEditFormToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.showEditFormToolStripMenuItem.Text = "精灵换肤编辑窗口";
+            this.showEditFormToolStripMenuItem.Click += new System.EventHandler(this.showEditFormToolStripMenuItem_Click);
+            // 
+            // reloadToolStripMenuItem
+            // 
+            this.reloadToolStripMenuItem.Name = "reloadToolStripMenuItem";
+            this.reloadToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.reloadToolStripMenuItem.Text = "修复并重启登录器";
+            this.reloadToolStripMenuItem.Click += new System.EventHandler(this.reloadToolStripMenuItem_Click);
             // 
             // seerMainWindow
             // 
@@ -195,6 +222,7 @@ namespace lll_seer_launcher
                     GetUsedMemoryCallBack callBack = delegate ()
                     {
                         this.usedRamToolStripStatusLabel.Text = $"运行内存：{currentProcess.PrivateMemorySize64 / 1024 / 1024}MB";
+                        this.toolStripStatusLabel1.Text = $"当前登录账号：{GlobalVariable.userId}";
                     };
                     this.Invoke(callBack);
                 }
@@ -219,6 +247,9 @@ namespace lll_seer_launcher
         private System.Windows.Forms.ToolStripMenuItem openSeerFiddlerWindowToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem hideSkillToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem hidePetToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem showEditFormToolStripMenuItem;
+        private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel1;
+        private System.Windows.Forms.ToolStripMenuItem reloadToolStripMenuItem;
     }
 }
 

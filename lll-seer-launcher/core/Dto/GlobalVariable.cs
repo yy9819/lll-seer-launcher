@@ -10,6 +10,7 @@ namespace lll_seer_launcher.core.Dto
         /*================================================窗口组件用全局变量=====================================================*/
         public static seerMainWindow mainForm;
         public const string seerFiddlerTitle = "seerFiddler";
+        public static bool loadingComplate = false;
         #endregion
         #region
         /*===========================================游戏账号信息用全局变量=================================================*/

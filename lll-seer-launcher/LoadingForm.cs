@@ -11,7 +11,7 @@ namespace lll_seer_launcher
 {
     public partial class LoadingForm : Form
     {
-        private string swfPath = Directory.GetCurrentDirectory() + "\\bin\\loading\\bibiloading.swf";
+        private delegate void LoadingFormCallBack();
         public LoadingForm()
         {
             InitializeComponent();
@@ -22,49 +22,83 @@ namespace lll_seer_launcher
 
         private void LoadingForm_Load(object sender, EventArgs e)
         {
-            
+            new Thread(() => 
+            {
+                bool result = InitData();
+                LoadingFormCallBack callBack = delegate ()
+                {
+                    if (result) this.Close();
+                };
+                this.Invoke(callBack);
+            }).Start();
         }
         public bool InitData()
         {
             InitJsonController initJsonControl = new InitJsonController();
-            if (DBController.SuitAndAchieveTitleDbController.CheckAndInitDB())
+            this.UpdateInitState("检查装备称号是否有更新中");
+            if (DBController.SuitAndAchieveTitleDBController.CheckAndInitDB())
             {
                 initJsonControl.InitJson();
                 if (GlobalVariable.shoudUpdateJsonDic["suit"])
                 {
+                    this.UpdateInitState("加载装备信息中");
                     Logger.Log("updateData", "装备信息更新！更新装备信息中...");
                     initJsonControl.InitSuitDictionary();
-                    DBController.SuitAndAchieveTitleDbController.InitSuitTable();
+                    DBController.SuitAndAchieveTitleDBController.InitSuitTable();
                     Logger.Log("updateData", "装备信息更新完成！");
                 }
                 else
                 {
-                    DBController.SuitAndAchieveTitleDbController.SetSuitTitleDic();
+                    DBController.SuitAndAchieveTitleDBController.SetSuitTitleDic();
                 }
                 if (GlobalVariable.shoudUpdateJsonDic["glasses"])
                 {
+                    this.UpdateInitState("加载目镜信息中");
                     Logger.Log("updateData", "目镜信息更新！更新目镜信息中...");
                     initJsonControl.InitGlassesDictionary();
-                    DBController.SuitAndAchieveTitleDbController.InitGlassesTable();
+                    DBController.SuitAndAchieveTitleDBController.InitGlassesTable();
                     Logger.Log("updateData", "目镜信息更新完成！");
                 }
                 else
                 {
-                    DBController.SuitAndAchieveTitleDbController.SetGlassesTitleDic();
+                    DBController.SuitAndAchieveTitleDBController.SetGlassesTitleDic();
                 }
                 if (GlobalVariable.shoudUpdateJsonDic["achieveTitle"])
                 {
+                    this.UpdateInitState("加载称号信息中");
                     Logger.Log("updateData", "称号信息更新！更新称号信息中...");
                     initJsonControl.InitAchieveTitleDictionary();
-                    DBController.SuitAndAchieveTitleDbController.InitAchieveTitleTable();
+                    DBController.SuitAndAchieveTitleDBController.InitAchieveTitleTable();
                     Logger.Log("updateData", "称号信息更新完成！");
                 }
                 else
                 {
-                    DBController.SuitAndAchieveTitleDbController.SetAchieveTitleDic();
+                    DBController.SuitAndAchieveTitleDBController.SetAchieveTitleDic();
                 }
 
             }
+            this.UpdateInitState("检查精灵信息是否有更新");
+            if (DBController.PetDBController.CheckAndInitDB())
+            {
+                if (GlobalVariable.shoudUpdateJsonDic["pet"])
+                {
+                    this.UpdateInitState("加载精灵信息中");
+                    Logger.Log("updateData", "精灵信息更新！更新精灵信息中...");
+                    initJsonControl.InitPetDB();
+                    Logger.Log("updateData", "精灵信息更新完成！");
+                    this.UpdateInitState("精灵信息更新完成");
+                }
+                if (GlobalVariable.shoudUpdateJsonDic["petSkins"])
+                {
+                    this.UpdateInitState("加载精灵皮肤信息中");
+                    Logger.Log("updateData", "精灵皮肤信息更新！更新精灵皮肤信息中...");
+                    initJsonControl.InitPetSkinsDB();
+                    Logger.Log("updateData", "精灵皮肤信息更新完成！");
+                    this.UpdateInitState("精灵皮肤信息更新完成");
+                }
+            }
+            this.UpdateInitState("登录器启动中");
+            GlobalVariable.loadingComplate = true;
             return true;
         }
         public bool StartFiddler()
@@ -84,6 +118,14 @@ namespace lll_seer_launcher
                 Thread.Sleep(100);
             }
             return count <= 100;
+        }
+        private void UpdateInitState(string msg)
+        {
+            LoadingFormCallBack callBack = delegate ()
+            {
+                this.loadingLabel.Text = msg ;
+            };
+            this.Invoke(callBack);
         }
     }
 }

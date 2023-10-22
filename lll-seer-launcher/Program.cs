@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using lll_seer_launcher.core.Dto;
+using lll_seer_launcher.core.Utils;
 using System.Windows.Forms;
 using Fiddler;
 
@@ -23,11 +24,9 @@ namespace lll_seer_launcher
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             loadingForm = new LoadingForm();
-            loadingForm.Show();
-            loadingForm.InitData();
+            Application.Run(loadingForm);
             MainFormInstance = new seerMainWindow();
-            loadingForm.Hide();
-            if (loadingForm.StartFiddler())
+            if (GlobalUtil.StartFiddler())
             {
                 new Thread(() => 
                 {
