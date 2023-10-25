@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections;
+using System.Threading;
+using lll_seer_launcher.core.Controller;
 
 namespace lll_seer_launcher.core.Dto
 {
@@ -11,6 +13,30 @@ namespace lll_seer_launcher.core.Dto
         public static seerMainWindow mainForm;
         public const string seerFiddlerTitle = "seerFiddler";
         public static bool loadingComplate = false;
+        #endregion
+        #region
+        /*================================================游戏用全局变量=====================================================*/
+        public static GameConfigFlag gameConfigFlag = new GameConfigFlag();
+        public class GameConfigFlag
+        {
+            public bool batterySwitch = false;
+            public bool disableRecv = false;
+            public bool shouldDisableRecv = false;
+            public bool autoChargeFlag = true;
+            public bool disableVipAutoChargeFlag = false;
+            public bool lowerHpFlag = false;
+            public int lowerHpPetLen = 0;
+        }
+        public static SendDataController sendDataController = new SendDataController();
+        public static FireBuff fireBuffCopyObj = new FireBuff();
+        public class FireBuff
+        {
+            public int copyFireBuffType = 0;
+            public Dictionary<int, int> greenFireBuffDic = new Dictionary<int, int>();
+            public bool[] copyGreenBuff = new bool[3] { false, false, false };
+            public int copyGreenBuffUserId = 0;
+            public int greenFireUserId = 949386603;
+        }
         #endregion
         #region
         /*===========================================游戏账号信息用全局变量=================================================*/
@@ -40,6 +66,9 @@ namespace lll_seer_launcher.core.Dto
         /// value;对应游戏账号所持有的套装
         /// </summary>
         public static Dictionary<int, Dictionary<int, int>> userSuitClothDictionary { get; set; } = new Dictionary<int, Dictionary<int, int>>();
+
+        public static List<PetInfo> pets { get; set; } = new List<PetInfo>();
+        public static List<PetInfo> awaitPets { get; set; } = new List<PetInfo>();
         #endregion
         #region
         /*=============================================窗口UI相关全局变量===================================================*/
@@ -47,6 +76,7 @@ namespace lll_seer_launcher.core.Dto
         /// 主窗口线程控制flag
         /// </summary>
         public static bool stopThread { get; set; } = false;
+        public static Thread fireCountThread { get; set; }
 
         /// <summary>
         /// 套装・称号信息加载完成flag
@@ -72,7 +102,7 @@ namespace lll_seer_launcher.core.Dto
         /// <summary>
         /// 当前所登录账号
         /// </summary>
-        public static int userId { get; set; }
+        public static UserInfo loginUserInfo { get; set; } = new UserInfo();
 
         /// <summary>
         /// 封包加密key字符串

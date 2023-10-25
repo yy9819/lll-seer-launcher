@@ -81,7 +81,7 @@ namespace lll_seer_launcher.core.Dto
     /// </summary>
     public class UserSuitAndAchieveTitleInfo
     {
-        public int userId { get; set; } = GlobalVariable.userId;
+        public int userId { get; set; } = GlobalVariable.loginUserInfo.userId;
         public List<int> suitIdList { get; set; }
         public List<int> glassesIdList { get; set; }
         public List<int> achieveTitleIdList { get; set; }

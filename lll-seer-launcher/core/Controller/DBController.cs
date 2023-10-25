@@ -118,6 +118,7 @@ namespace lll_seer_launcher.core.Controller
         #endregion
         public static class PetDBController
         {
+            /*==========================================精灵明细表============================================*/
             public static bool CheckAndInitDB()
             {
                 return DBServise.PetDBServise.CheckAndInitDB();
@@ -134,7 +135,13 @@ namespace lll_seer_launcher.core.Controller
             public static List<Pet> LikeSearchPetByPetName(string petName)
             {
                 return DBServise.PetDBServise.PetTableSelectDataByPetName(petName);
+            }            
+            public static string SearchPetNameByPetId(int petId)
+            {
+                return DBServise.PetDBServise.PetTableSearchPetNameByPetId(petId);
             }
+
+            /*==========================================皮肤明细表============================================*/
             public static int InsertPetSkinsData(PetSkins petSkinsInfo)
             {
                 return DBServise.PetDBServise.PetSkinsTableInsertData(petSkinsInfo);
@@ -147,6 +154,8 @@ namespace lll_seer_launcher.core.Controller
             {
                 return DBServise.PetDBServise.PetSkinsTableSelectDataBySkinsName(skinsName);
             }
+
+            /*==========================================方案明细表============================================*/
             public static int AddPlan(PetSkinsReplacePlan planInfo)
             {
                 return DBServise.PetDBServise.PetSkinsPlanTableInsertData(planInfo);

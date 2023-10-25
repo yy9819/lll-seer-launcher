@@ -37,28 +37,28 @@
             this.petSkinsId = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.petSkinsName = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.searchGroupBox = new System.Windows.Forms.GroupBox();
+            this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.searchIdRadioButton = new System.Windows.Forms.RadioButton();
+            this.searchNameRadioButton = new System.Windows.Forms.RadioButton();
             this.searchButton = new System.Windows.Forms.Button();
             this.searchTextBox = new System.Windows.Forms.TextBox();
-            this.searchSkinsRadioButton = new System.Windows.Forms.RadioButton();
-            this.searchPetRadioButton = new System.Windows.Forms.RadioButton();
             this.previewDataGridView = new System.Windows.Forms.DataGridView();
-            this.searchPetId = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.searchPetName = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.searchPetRadioButton = new System.Windows.Forms.RadioButton();
+            this.searchSkinsRadioButton = new System.Windows.Forms.RadioButton();
             this.addPlanButton = new System.Windows.Forms.Button();
             this.updatePlanButton = new System.Windows.Forms.Button();
             this.deletePlanButton = new System.Windows.Forms.Button();
             this.setPetButton = new System.Windows.Forms.Button();
             this.setSkinsButton = new System.Windows.Forms.Button();
-            this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.groupBox2 = new System.Windows.Forms.GroupBox();
-            this.searchIdRadioButton = new System.Windows.Forms.RadioButton();
-            this.searchNameRadioButton = new System.Windows.Forms.RadioButton();
+            this.searchPetId = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.searchPetName = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.planGroupBox.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.planDataGridView)).BeginInit();
             this.searchGroupBox.SuspendLayout();
+            this.groupBox2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.previewDataGridView)).BeginInit();
             this.groupBox1.SuspendLayout();
-            this.groupBox2.SuspendLayout();
             this.SuspendLayout();
             // 
             // petSwfPreviewWebBrowser
@@ -144,6 +144,40 @@
             this.searchGroupBox.TabStop = false;
             this.searchGroupBox.Text = "精灵・皮肤预览(右击可放大)";
             // 
+            // groupBox2
+            // 
+            this.groupBox2.Controls.Add(this.searchIdRadioButton);
+            this.groupBox2.Controls.Add(this.searchNameRadioButton);
+            this.groupBox2.Location = new System.Drawing.Point(95, 15);
+            this.groupBox2.Name = "groupBox2";
+            this.groupBox2.Size = new System.Drawing.Size(87, 55);
+            this.groupBox2.TabIndex = 7;
+            this.groupBox2.TabStop = false;
+            // 
+            // searchIdRadioButton
+            // 
+            this.searchIdRadioButton.AutoSize = true;
+            this.searchIdRadioButton.Location = new System.Drawing.Point(6, 13);
+            this.searchIdRadioButton.Name = "searchIdRadioButton";
+            this.searchIdRadioButton.Size = new System.Drawing.Size(59, 16);
+            this.searchIdRadioButton.TabIndex = 2;
+            this.searchIdRadioButton.Text = "搜索Id";
+            this.searchIdRadioButton.UseVisualStyleBackColor = true;
+            this.searchIdRadioButton.Click += new System.EventHandler(this.ClearTextBoxText);
+            // 
+            // searchNameRadioButton
+            // 
+            this.searchNameRadioButton.AutoSize = true;
+            this.searchNameRadioButton.Checked = true;
+            this.searchNameRadioButton.Location = new System.Drawing.Point(6, 32);
+            this.searchNameRadioButton.Name = "searchNameRadioButton";
+            this.searchNameRadioButton.Size = new System.Drawing.Size(71, 16);
+            this.searchNameRadioButton.TabIndex = 3;
+            this.searchNameRadioButton.TabStop = true;
+            this.searchNameRadioButton.Text = "搜索名字";
+            this.searchNameRadioButton.UseVisualStyleBackColor = true;
+            this.searchNameRadioButton.Click += new System.EventHandler(this.ClearTextBoxText);
+            // 
             // searchButton
             // 
             this.searchButton.Location = new System.Drawing.Point(219, 47);
@@ -162,16 +196,30 @@
             this.searchTextBox.TabIndex = 4;
             this.searchTextBox.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.searchTextBox_KeyPress);
             // 
-            // searchSkinsRadioButton
+            // previewDataGridView
             // 
-            this.searchSkinsRadioButton.AutoSize = true;
-            this.searchSkinsRadioButton.Location = new System.Drawing.Point(6, 32);
-            this.searchSkinsRadioButton.Name = "searchSkinsRadioButton";
-            this.searchSkinsRadioButton.Size = new System.Drawing.Size(71, 16);
-            this.searchSkinsRadioButton.TabIndex = 3;
-            this.searchSkinsRadioButton.Text = "搜索皮肤";
-            this.searchSkinsRadioButton.UseVisualStyleBackColor = true;
-            this.searchSkinsRadioButton.Click += new System.EventHandler(this.ClearTextBoxText);
+            this.previewDataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.previewDataGridView.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.searchPetId,
+            this.searchPetName});
+            this.previewDataGridView.Location = new System.Drawing.Point(4, 72);
+            this.previewDataGridView.MultiSelect = false;
+            this.previewDataGridView.Name = "previewDataGridView";
+            this.previewDataGridView.RowHeadersVisible = false;
+            this.previewDataGridView.RowTemplate.Height = 23;
+            this.previewDataGridView.Size = new System.Drawing.Size(290, 197);
+            this.previewDataGridView.TabIndex = 1;
+            this.previewDataGridView.Click += new System.EventHandler(this.ChangePreviewSwf);
+            // 
+            // groupBox1
+            // 
+            this.groupBox1.Controls.Add(this.searchPetRadioButton);
+            this.groupBox1.Controls.Add(this.searchSkinsRadioButton);
+            this.groupBox1.Location = new System.Drawing.Point(6, 15);
+            this.groupBox1.Name = "groupBox1";
+            this.groupBox1.Size = new System.Drawing.Size(83, 55);
+            this.groupBox1.TabIndex = 6;
+            this.groupBox1.TabStop = false;
             // 
             // searchPetRadioButton
             // 
@@ -186,34 +234,16 @@
             this.searchPetRadioButton.UseVisualStyleBackColor = true;
             this.searchPetRadioButton.Click += new System.EventHandler(this.ClearTextBoxText);
             // 
-            // previewDataGridView
+            // searchSkinsRadioButton
             // 
-            this.previewDataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.previewDataGridView.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
-            this.searchPetId,
-            this.searchPetName});
-            this.previewDataGridView.Location = new System.Drawing.Point(4, 72);
-            this.previewDataGridView.MultiSelect = false;
-            this.previewDataGridView.Name = "previewDataGridView";
-            this.previewDataGridView.RowTemplate.Height = 23;
-            this.previewDataGridView.Size = new System.Drawing.Size(290, 197);
-            this.previewDataGridView.TabIndex = 1;
-            this.previewDataGridView.Click += new System.EventHandler(this.ChangePreviewSwf);
-            // 
-            // searchPetId
-            // 
-            this.searchPetId.Frozen = true;
-            this.searchPetId.HeaderText = "id";
-            this.searchPetId.Name = "searchPetId";
-            this.searchPetId.ReadOnly = true;
-            // 
-            // searchPetName
-            // 
-            this.searchPetName.Frozen = true;
-            this.searchPetName.HeaderText = "精灵・皮肤名字";
-            this.searchPetName.Name = "searchPetName";
-            this.searchPetName.ReadOnly = true;
-            this.searchPetName.Width = 150;
+            this.searchSkinsRadioButton.AutoSize = true;
+            this.searchSkinsRadioButton.Location = new System.Drawing.Point(6, 32);
+            this.searchSkinsRadioButton.Name = "searchSkinsRadioButton";
+            this.searchSkinsRadioButton.Size = new System.Drawing.Size(71, 16);
+            this.searchSkinsRadioButton.TabIndex = 3;
+            this.searchSkinsRadioButton.Text = "搜索皮肤";
+            this.searchSkinsRadioButton.UseVisualStyleBackColor = true;
+            this.searchSkinsRadioButton.Click += new System.EventHandler(this.ClearTextBoxText);
             // 
             // addPlanButton
             // 
@@ -265,49 +295,20 @@
             this.setSkinsButton.UseVisualStyleBackColor = true;
             this.setSkinsButton.Click += new System.EventHandler(this.setSkinsButton_Click);
             // 
-            // groupBox1
+            // searchPetId
             // 
-            this.groupBox1.Controls.Add(this.searchPetRadioButton);
-            this.groupBox1.Controls.Add(this.searchSkinsRadioButton);
-            this.groupBox1.Location = new System.Drawing.Point(6, 15);
-            this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(83, 55);
-            this.groupBox1.TabIndex = 6;
-            this.groupBox1.TabStop = false;
+            this.searchPetId.Frozen = true;
+            this.searchPetId.HeaderText = "id";
+            this.searchPetId.Name = "searchPetId";
+            this.searchPetId.ReadOnly = true;
             // 
-            // groupBox2
+            // searchPetName
             // 
-            this.groupBox2.Controls.Add(this.searchIdRadioButton);
-            this.groupBox2.Controls.Add(this.searchNameRadioButton);
-            this.groupBox2.Location = new System.Drawing.Point(95, 15);
-            this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(87, 55);
-            this.groupBox2.TabIndex = 7;
-            this.groupBox2.TabStop = false;
-            // 
-            // searchIdRadioButton
-            // 
-            this.searchIdRadioButton.AutoSize = true;
-            this.searchIdRadioButton.Location = new System.Drawing.Point(6, 13);
-            this.searchIdRadioButton.Name = "searchIdRadioButton";
-            this.searchIdRadioButton.Size = new System.Drawing.Size(59, 16);
-            this.searchIdRadioButton.TabIndex = 2;
-            this.searchIdRadioButton.Text = "搜索Id";
-            this.searchIdRadioButton.UseVisualStyleBackColor = true;
-            this.searchIdRadioButton.Click += new System.EventHandler(this.ClearTextBoxText);
-            // 
-            // searchNameRadioButton
-            // 
-            this.searchNameRadioButton.AutoSize = true;
-            this.searchNameRadioButton.Checked = true;
-            this.searchNameRadioButton.Location = new System.Drawing.Point(6, 32);
-            this.searchNameRadioButton.Name = "searchNameRadioButton";
-            this.searchNameRadioButton.Size = new System.Drawing.Size(71, 16);
-            this.searchNameRadioButton.TabIndex = 3;
-            this.searchNameRadioButton.TabStop = true;
-            this.searchNameRadioButton.Text = "搜索名字";
-            this.searchNameRadioButton.UseVisualStyleBackColor = true;
-            this.searchNameRadioButton.Click += new System.EventHandler(this.ClearTextBoxText);
+            this.searchPetName.Frozen = true;
+            this.searchPetName.HeaderText = "精灵・皮肤名字";
+            this.searchPetName.Name = "searchPetName";
+            this.searchPetName.ReadOnly = true;
+            this.searchPetName.Width = 200;
             // 
             // EditPetResourceForm
             // 
@@ -333,11 +334,11 @@
             ((System.ComponentModel.ISupportInitialize)(this.planDataGridView)).EndInit();
             this.searchGroupBox.ResumeLayout(false);
             this.searchGroupBox.PerformLayout();
+            this.groupBox2.ResumeLayout(false);
+            this.groupBox2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.previewDataGridView)).EndInit();
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
-            this.groupBox2.ResumeLayout(false);
-            this.groupBox2.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -362,11 +363,11 @@
         private System.Windows.Forms.RadioButton searchSkinsRadioButton;
         private System.Windows.Forms.RadioButton searchPetRadioButton;
         private System.Windows.Forms.DataGridView previewDataGridView;
-        private System.Windows.Forms.DataGridViewTextBoxColumn searchPetId;
-        private System.Windows.Forms.DataGridViewTextBoxColumn searchPetName;
         private System.Windows.Forms.GroupBox groupBox2;
         private System.Windows.Forms.RadioButton searchIdRadioButton;
         private System.Windows.Forms.RadioButton searchNameRadioButton;
         private System.Windows.Forms.GroupBox groupBox1;
+        private System.Windows.Forms.DataGridViewTextBoxColumn searchPetId;
+        private System.Windows.Forms.DataGridViewTextBoxColumn searchPetName;
     }
 }

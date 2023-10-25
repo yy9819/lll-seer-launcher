@@ -107,7 +107,7 @@ namespace lll_seer_launcher.core.Servise
             ByteConverter.HexToBytes(ByteConverter.DecimalToHex(cmdId, 4)).CopyTo(dataBytes,index);
 
             index += 4;
-            ByteConverter.HexToBytes(ByteConverter.DecimalToHex(GlobalVariable.userId, 4)).CopyTo(dataBytes, index);
+            ByteConverter.HexToBytes(ByteConverter.DecimalToHex(GlobalVariable.loginUserInfo.userId, 4)).CopyTo(dataBytes, index);
 
             index += 4;
             ByteConverter.HexToBytes(ByteConverter.DecimalToHex(0, 4)).CopyTo(dataBytes, index);

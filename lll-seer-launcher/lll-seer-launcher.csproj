@@ -147,10 +147,26 @@
     <Compile Include="core\Controller\InitJsonController.cs" />
     <Compile Include="core\Controller\FormController.cs" />
     <Compile Include="core\Controller\SendDataController.cs" />
+    <Compile Include="core\Dto\AttackValueInfo.cs" />
+    <Compile Include="core\Dto\CmdDic.cs" />
     <Compile Include="core\Dto\CmdId.cs" />
+    <Compile Include="core\Dto\FightInfo.cs" />
     <Compile Include="core\Dto\GlobalObject.cs" />
     <Compile Include="core\Dto\GlobalVariable.cs" />
     <Compile Include="core\Dto\HeadInfo.cs" />
+    <Compile Include="core\Dto\UserInfo.cs" />
+    <Compile Include="core\Forms\FightMapBossForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="core\Forms\FightMapBossForm.Designer.cs">
+      <DependentUpon>FightMapBossForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="core\Forms\SeerTcpCaptureForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="core\Forms\SeerTcpCaptureForm.Designer.cs">
+      <DependentUpon>SeerTcpCaptureForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="core\Servise\AnalyzeRecvDataServise.cs" />
     <Compile Include="core\Servise\DBServise.cs" />
     <Compile Include="core\Servise\DecryptService.cs" />
@@ -195,6 +211,12 @@
     <EmbeddedResource Include="ChangeSuitForm.zu-ZA.resx">
       <DependentUpon>ChangeSuitForm.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="core\Forms\FightMapBossForm.resx">
+      <DependentUpon>FightMapBossForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="core\Forms\SeerTcpCaptureForm.resx">
+      <DependentUpon>SeerTcpCaptureForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="EditPetResourceForm.resx">
       <DependentUpon>EditPetResourceForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -234,6 +256,7 @@
   <ItemGroup>
     <None Include="Resources\skill.swf" />
     <None Include="Resources\pet.swf" />
+    <None Include="Resources\8.png" />
     <Content Include="Resources\bibiIcon.ico" />
     <None Include="Resources\bibiLoading.gif" />
     <Content Include="Resources\bibiloading.swf" />

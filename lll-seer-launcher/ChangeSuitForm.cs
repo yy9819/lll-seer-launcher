@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows.Forms;
 using System.Timers;
-using System.Threading;
+using System.Threading.Tasks;
 using System.Collections;
 using System.Collections.Generic;
 using lll_seer_launcher.core.Dto;
@@ -14,7 +14,6 @@ namespace lll_seer_launcher
     public partial class ChangeSuitForm : Form
     {
         #region
-        private SendDataController sendDataController = new SendDataController();
         private System.Timers.Timer initGroupBoxsTimer = new System.Timers.Timer(1000);
         private int initGroupBoxsTimerRetryTimes = 0;
         private int selectUserId = 0;
@@ -55,7 +54,7 @@ namespace lll_seer_launcher
                     foreach (int userId in this.userCanUseClothDic.Keys)
                     {
                         this.userListComboBox.Items.Add(userId);
-                        if(userId == GlobalVariable.userId)
+                        if(userId == GlobalVariable.loginUserInfo.userId)
                         {
                             this.userListComboBox.SelectedIndex = index;
                         }
@@ -87,17 +86,16 @@ namespace lll_seer_launcher
         public void InitGroupBoxs()
         {
             this.getUserSuitGlassesTittleInfoButton.Enabled = false;
-            Thread thread = new Thread(() =>
+            new Task(() =>
             {
                 for (int i = 0; i < GlobalVariable.initSuitGroupBoxsCompleteFlg.Length; i++)
                 {
                     GlobalVariable.initSuitGroupBoxsCompleteFlg[i] = false;
                 }
                 if (!GlobalVariable.isLogin) return;
-                this.sendDataController.SendDataByCmdIdAndHexString(CmdId.ACHIEVETITLELIST, "");
-                this.sendDataController.SendDataByCmdIdAndIntList(CmdId.ITEM_LIST, new int[3] { 1300083, 1310000, 2 });
-            });
-            thread.Start();
+                GlobalVariable.sendDataController.SendDataByCmdIdAndHexString(CmdId.ACHIEVETITLELIST, "");
+                GlobalVariable.sendDataController.SendDataByCmdIdAndIntList(CmdId.ITEM_LIST, new int[3] { 1300083, 1310000, 2 });
+            }).Start();
             this.initGroupBoxsTimer.Elapsed += this.InitGroupBoxsTimer;
             this.initGroupBoxsTimerRetryTimes = 0;
             this.initGroupBoxsTimer.Start();
@@ -121,7 +119,7 @@ namespace lll_seer_launcher
 
                 if (GlobalVariable.isLogin && (GlobalVariable.initSuitGroupBoxsCompleteFlg[0] || GlobalVariable.initSuitGroupBoxsCompleteFlg[1]))
                 {
-                    if (!this.userCanUseClothDic.ContainsKey(GlobalVariable.userId)) this.userCanUseClothDic.Add(GlobalVariable.userId, new UserSuitAndAchieveTitleInfo());
+                    if (!this.userCanUseClothDic.ContainsKey(GlobalVariable.loginUserInfo.userId)) this.userCanUseClothDic.Add(GlobalVariable.loginUserInfo.userId, new UserSuitAndAchieveTitleInfo());
                     List<int> achieveTitleList = new List<int>();
                     List<int> glassesList = new List<int>();
                     List<int> suitList = new List<int>();
@@ -150,9 +148,9 @@ namespace lll_seer_launcher
                     }
 
                     //尝试向数据库插入当前账号的装备持有状况
-                    if(GlobalVariable.userId != 0)
+                    if(GlobalVariable.loginUserInfo.userId != 0)
                     {
-                        UserSuitAndAchieveTitleInfo info = new UserSuitAndAchieveTitleInfo(GlobalVariable.userId, suitList, glassesList, achieveTitleList);
+                        UserSuitAndAchieveTitleInfo info = new UserSuitAndAchieveTitleInfo(GlobalVariable.loginUserInfo.userId, suitList, glassesList, achieveTitleList);
                         int result = DBController.SuitAndAchieveTitleDBController.UserTableInsertData(info);
                         //插入失败时，更新对应用户的信息
                         if (result != 1)
@@ -182,7 +180,7 @@ namespace lll_seer_launcher
             {
                 this.achieveTitleListBox.Items.Clear();
                 this.canUseAchieveList.Clear();
-                if (GlobalVariable.userAchieveTitleDictionary.TryGetValue(GlobalVariable.userId, out ArrayList userAchieveTitles))
+                if (GlobalVariable.userAchieveTitleDictionary.TryGetValue(GlobalVariable.loginUserInfo.userId, out ArrayList userAchieveTitles))
                 {
                     this.achieveTitleListBox.Items.Add("---不佩戴称号---");
                     //GlobalUtils.ArrayListToString(userAchieveTitles);
@@ -223,7 +221,7 @@ namespace lll_seer_launcher
             {
                 this.suitListBox.Items.Clear();
                 this.canUseSuitList.Clear();
-                if (GlobalVariable.userSuitClothDictionary.TryGetValue(GlobalVariable.userId, out Dictionary<int,int> userSuits))
+                if (GlobalVariable.userSuitClothDictionary.TryGetValue(GlobalVariable.loginUserInfo.userId, out Dictionary<int,int> userSuits))
                 {
                     this.suitListBox.Items.Add("---不穿戴任何套装---");
                     this.canUseSuitList.Add(new SuitInfo());
@@ -268,7 +266,7 @@ namespace lll_seer_launcher
             {
                 this.glassesListBox.Items.Clear();
                 this.canUseGlassesList.Clear();
-                if (GlobalVariable.userSuitClothDictionary.TryGetValue(GlobalVariable.userId, out Dictionary<int, int> userCloths))
+                if (GlobalVariable.userSuitClothDictionary.TryGetValue(GlobalVariable.loginUserInfo.userId, out Dictionary<int, int> userCloths))
                 {
                     this.glassesListBox.Items.Add("---不佩戴独立目镜---");
                     this.canUseGlassesList.Add(new GlassesInfo());
@@ -621,18 +619,17 @@ namespace lll_seer_launcher
                 MessageBox.Show("当前还未登录游戏！");
                 return;
             }
-            else if (this.selectUserId != GlobalVariable.userId)
+            else if (this.selectUserId != GlobalVariable.loginUserInfo.userId)
             {
                 MessageBox.Show("当前方案非登录账号方案！");
                 return;
             }
-            SendDataController sendDataController = new SendDataController();
             int selectIndex = this.GetPlanDataGridViewSelectIndex();
             int planId = Convert.ToInt32(this.planDataGridView.Rows[selectIndex].Cells["id"].Value);
             if(this.userPlan.TryGetValue(planId,out SuitAchieveTitlePlan plan))
             {
 
-                if(plan.achieveTitleId > 0) sendDataController.SendDataByCmdIdAndIntList(CmdId.SETTITLE, new int[1] { plan.achieveTitleId});
+                if(plan.achieveTitleId > 0) GlobalVariable.sendDataController.SendDataByCmdIdAndIntList(CmdId.SETTITLE, new int[1] { plan.achieveTitleId});
                 List<int> suitList = new List<int>();
                 int glassesId = plan.glassesId;
                 if (GlobalVariable.suitDictionary.ContainsKey(plan.suitId)) suitList = GlobalVariable.suitDictionary[plan.suitId].clothIdList;
@@ -649,7 +646,7 @@ namespace lll_seer_launcher
                     {
                         sendData[index++] = i;
                     }
-                    sendDataController.SendDataByCmdIdAndIntList(CmdId.CHANGE_CLOTH, sendData);
+                    GlobalVariable.sendDataController.SendDataByCmdIdAndIntList(CmdId.CHANGE_CLOTH, sendData);
                 }
             }
             else

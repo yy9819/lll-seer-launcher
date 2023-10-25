@@ -964,6 +964,34 @@ namespace lll_seer_launcher.core.Servise
                 }
             }
 
+            public static string PetTableSearchPetNameByPetId(int petId)
+            {
+                try
+                {
+                    using (db)
+                    {
+                        db.Open();
+                        string selectSql = "SELECT pet_name " +
+                            "FROM pet WHERE pet_id = @petId;";
+                        SqliteCommand selectCmd = new SqliteCommand(selectSql, db);
+                        selectCmd.Parameters.Add(new SqliteParameter("@petId", $"{petId}"));
+                        SqliteDataReader reader = selectCmd.ExecuteReader();
+                        string petName = "";
+                        while (reader.Read())
+                        {
+                            petName = reader.GetString(0);
+                        }
+                        return petName;
+
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error($"数据库精灵数据信息查询失败！ errorMessage：{ex.Message}");
+                    return "";
+                }
+            }
+
             #endregion
             #region
             public static int PetSkinsTableInsertData(PetSkins insertData)

@@ -13,7 +13,7 @@ namespace lll_seer_launcher.core.Controller
     /// 封包发送controller
     /// 可调用相应格式的封包发送方法进行封包发送
     /// </summary>
-    class SendDataController
+    public class SendDataController
     {
         private SendDataServise sendDataService;
         public SendDataController()
@@ -36,7 +36,7 @@ namespace lll_seer_launcher.core.Controller
         /// <param name="hexBytesData"></param>
         public void SendHexBytesData(byte[] hexBytesData)
         {
-            ByteConverter.HexToBytes(ByteConverter.DecimalToHex(GlobalVariable.userId, 4)).CopyTo(hexBytesData,9);
+            ByteConverter.HexToBytes(ByteConverter.DecimalToHex(GlobalVariable.loginUserInfo.userId, 4)).CopyTo(hexBytesData,9);
             sendDataService.SendHexBytesData(hexBytesData);
         }
         /// <summary>
