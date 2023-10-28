@@ -26,7 +26,7 @@ namespace lll_seer_launcher.core.Servise
             //对未加密数据进行加密(此时不进行seq计算，在安装的hook中监测到该包之后会自动计算seq)
             byte[] encryptBytes = EncryptService.Encrypt(bytes);
             HookControl.send(GlobalVariable.gameSocket, ByteConverter.GetBytesIntPtr(encryptBytes), encryptBytes.Length, 0);
-            Logger.Log("SendData", $"发送封包：{BitConverter.ToString(bytes)}");
+            //Logger.Log("SendData", $"发送封包：{BitConverter.ToString(bytes)}");
         }
 
         /// <summary>

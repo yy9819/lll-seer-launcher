@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections;
 using System.Threading;
 using lll_seer_launcher.core.Controller;
+using lll_seer_launcher.core.Dto.PetDto;
 
 namespace lll_seer_launcher.core.Dto
 {
@@ -17,15 +18,50 @@ namespace lll_seer_launcher.core.Dto
         #region
         /*================================================游戏用全局变量=====================================================*/
         public static GameConfigFlag gameConfigFlag = new GameConfigFlag();
+        public static int fightTurn;
         public class GameConfigFlag
         {
+            /// <summary>
+            /// true（0） 关闭 false（1）开启
+            /// </summary>
             public bool batterySwitch = false;
             public bool disableRecv = false;
+            /// <summary>
+            /// 
+            /// </summary>
             public bool shouldDisableRecv = false;
+            /// <summary>
+            /// 非VIP自动回血
+            /// </summary>
             public bool autoChargeFlag = true;
+            /// <summary>
+            /// 关闭VIP自动回血
+            /// </summary>
             public bool disableVipAutoChargeFlag = false;
+            /// <summary>
+            /// 压血
+            /// </summary>
             public bool lowerHpFlag = false;
+            /// <summary>
+            /// 压血精灵数
+            /// </summary>
             public int lowerHpPetLen = 0;
+            /// <summary>
+            /// 是否自动使用技能
+            /// </summary>
+            public bool autoUseSkillFlg = false;
+            /// <summary>
+            /// 自动使用技能的精灵catchtime
+            /// </summary>
+            public int autoUseSkillPetCatchTime { get; set; }
+            /// <summary>
+            /// 自动使用的技能ID
+            /// </summary>
+            public int autoUseSkillId { get; set; }
+            /// <summary>
+            /// 自动使用技能时是否自动回pp
+            /// </summary>
+            public bool autoUseSkillAddPPFlg { get; set; }
         }
         public static SendDataController sendDataController = new SendDataController();
         public static FireBuff fireBuffCopyObj = new FireBuff();
@@ -37,6 +73,8 @@ namespace lll_seer_launcher.core.Dto
             public int copyGreenBuffUserId = 0;
             public int greenFireUserId = 949386603;
         }
+        public static List<PetInfo> pets { get; set; } = new List<PetInfo>();
+        public static List<PetInfo> awaitPets { get; set; } = new List<PetInfo>();
         #endregion
         #region
         /*===========================================游戏账号信息用全局变量=================================================*/
@@ -66,9 +104,6 @@ namespace lll_seer_launcher.core.Dto
         /// value;对应游戏账号所持有的套装
         /// </summary>
         public static Dictionary<int, Dictionary<int, int>> userSuitClothDictionary { get; set; } = new Dictionary<int, Dictionary<int, int>>();
-
-        public static List<PetInfo> pets { get; set; } = new List<PetInfo>();
-        public static List<PetInfo> awaitPets { get; set; } = new List<PetInfo>();
         #endregion
         #region
         /*=============================================窗口UI相关全局变量===================================================*/

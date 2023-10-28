@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Drawing;
+using System.Collections.Generic;
 using System.Text;
 using System.Linq;
 using System.Windows.Forms;
@@ -6,6 +8,7 @@ using System.Runtime.InteropServices;
 using lll_seer_launcher.core;
 using lll_seer_launcher.core.Controller;
 using lll_seer_launcher.core.Dto;
+using lll_seer_launcher.core.Dto.PetDto;
 using lll_seer_launcher.core.Utils;
 using lll_seer_launcher.core.Forms;
 using mshtml;
@@ -29,6 +32,7 @@ namespace lll_seer_launcher
         private EditPetResourceForm editPetResourceForm = new EditPetResourceForm();
         private FightMapBossForm fightMapBossForm = new FightMapBossForm();
         private SeerTcpCaptureForm seerTcpCaptureForm = new SeerTcpCaptureForm();
+        private FightNoteForm fightNoteForm = new FightNoteForm();
         private string iniFilePath = Directory.GetCurrentDirectory() + "\\bin\\ini\\";
         //private FiddlerController fiddlerController = new FiddlerController();
         //private Process fiddlerProcess;
@@ -179,17 +183,14 @@ namespace lll_seer_launcher
                 this.sendPkgInfo = this.messageEncryptControl.GetHeadInfo(encryptBytes);
                 new Task(() =>
                 {
+                    if(CmdId.BATTERY_DORMANT_SWITCH == this.sendPkgInfo.cmdId)
+                    {
+                        this.SetBatteryStatus($"当前电池{(ByteConverter.BytesTo10(this.sendPkgInfo.decryptData) == 0 ? "关闭":"开启")}中");
+                    }
                     this.InsertTCPData(sendPkgInfo, true);
                 }).Start();
                 this.sendPkgInfo = this.messageEncryptControl.PackHeadInfo(this.sendPkgInfo);
-                if(sendPkgInfo != null)
-                {
-                    bytes = this.sendPkgInfo.encryptData;
-                }
-                else
-                {
-                    return 0;
-                }
+                bytes = this.sendPkgInfo.encryptData;
             }
 
 
@@ -401,9 +402,10 @@ namespace lll_seer_launcher
             }).Start();
         }
 
-        private void lowerHpToolStripMenuItem_Click(object sender, EventArgs e)
+        public void lowerHpToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (!GlobalVariable.isLogin) return;
+            core.Utils.Logger.Log("LowerHP","用户按下了压血");
             if (!this.disableVipAutoChargeToolStripMenuItem.Checked) disableVipAutoChargeToolStripMenuItem_Click(sender, e);
             if (this.autoChargeToolStripMenuItem.Checked) autoChargeToolStripMenuItem_Click(sender, e);
             GlobalVariable.gameConfigFlag.lowerHpFlag = true;
@@ -431,15 +433,64 @@ namespace lll_seer_launcher
         }
 
 
-        private delegate void SetLowerHpStatusCallback();
+        private delegate void SetToolBarStatusCallback();
         public void SetLowerHpStatus(string statusText)
         {
             if (this.IsDisposed) return;
-            SetLowerHpStatusCallback callback = delegate
+            SetToolBarStatusCallback callback = delegate
             {
                 this.lowerHpStatusToolStripStatusLabel.Text = statusText;
             };
             this.Invoke(callback);
+        }
+        private delegate void FightNoteFormCallback();
+        private void showFightNoteFormToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            this.fightNoteForm.Hide();
+            this.fightNoteForm.Show();
+            this.SetFightFormLoaction();
+        }
+        private void SetFightFormLoaction()
+        {
+            this.fightNoteForm.Location = new Point(this.Location.X + this.Size.Width, this.Location.Y);
+        }
+        public void SetPetFightNote(Dictionary<string,FightPetInfo> fightPlayers)
+        {
+            FightNoteFormCallback callback = delegate ()
+            {
+                if (!this.fightNoteForm.Visible) this.fightNoteForm.Show();
+                this.fightNoteForm.SetPetFightNote(fightPlayers);
+
+            };
+            this.Invoke(callback);
+        }
+        public void OnUseSkill(Dictionary<string, AttackValueInfo> fightPlayers)
+        {
+ 
+            this.fightNoteForm.OnUseSkill(fightPlayers);
+
+        }
+
+        public void OnChangePet(ChangePetInfo changePetInfo)
+        {
+            this.fightNoteForm.OnChangePet(changePetInfo);
+        }
+        public void SetBatteryStatus(string status)
+        {
+            if (this.IsDisposed) return;
+            SetToolBarStatusCallback callback = delegate ()
+            {
+                this.batteryStatusToolStripStatusLabel.Text = status;
+            };
+            this.Invoke(callback);
+        }
+        public void StopLoopUseSkill()
+        {
+            this.fightNoteForm.StopLoopUseSkill();
+        }
+        public void InitFightNote()
+        {
+            this.fightNoteForm.InitFightNote();
         }
     }
 }

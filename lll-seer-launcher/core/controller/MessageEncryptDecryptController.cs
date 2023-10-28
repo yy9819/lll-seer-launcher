@@ -96,57 +96,50 @@ namespace lll_seer_launcher.core.Controller
 
         public HeadInfo PackHeadInfo(HeadInfo headInfo)
         {
-            try
+            byte[] encryptData = new byte[headInfo.packageLen];
+            //写入包长
+            int index = 0;
+            ByteConverter.HexToBytes(ByteConverter.DecimalToHex(headInfo.packageLen, 4)).CopyTo(encryptData, index);
+            //写入version
+            index += 4;
+            ByteConverter.HexToBytes(ByteConverter.DecimalToHex(headInfo.version, 1)).CopyTo(encryptData, index);
+            //写入cmdId
+            index += 1;
+            ByteConverter.HexToBytes(ByteConverter.DecimalToHex(headInfo.cmdId, 4)).CopyTo(encryptData, index);
+            //写入userid
+            index += 4;
+            ByteConverter.HexToBytes(ByteConverter.DecimalToHex(headInfo.userId, 4)).CopyTo(encryptData, index);
+            //写入seq顺序码
+            index += 4;
+            if (headInfo.cmdId > 1000)
             {
-                byte[] encryptData = new byte[headInfo.packageLen];
-                //写入包长
-                int index = 0;
-                ByteConverter.HexToBytes(ByteConverter.DecimalToHex(headInfo.packageLen, 4)).CopyTo(encryptData, index);
-                //写入version
-                index += 4;
-                ByteConverter.HexToBytes(ByteConverter.DecimalToHex(headInfo.version, 1)).CopyTo(encryptData, index);
-                //写入cmdId
-                index += 1;
-                ByteConverter.HexToBytes(ByteConverter.DecimalToHex(headInfo.cmdId, 4)).CopyTo(encryptData, index);
-                //写入userid
-                index += 4;
-                ByteConverter.HexToBytes(ByteConverter.DecimalToHex(headInfo.userId, 4)).CopyTo(encryptData, index);
-                //写入seq顺序码
-                index += 4;
-                if (headInfo.cmdId > 1000)
+                byte[] dataBody = headInfo.decryptData;
+                int crc8Val = 0;
+                if (dataBody.Length != 0)
                 {
-                    byte[] dataBody = headInfo.decryptData;
-                    int crc8Val = 0;
-                    if (dataBody.Length != 0)
+                    //与欲发送的主体数据进行异或异与计算
+                    for (int i = 0; i < dataBody.Length; i++)
                     {
-                        //与欲发送的主体数据进行异或异与计算
-                        for (int i = 0; i < dataBody.Length; i++)
-                        {
-                            crc8Val = (crc8Val ^ dataBody[i]) & 255;
-                        }
+                        crc8Val = (crc8Val ^ dataBody[i]) & 255;
                     }
-                    //获取重新计算后的顺序码
-                    GlobalVariable.seq = EncryptService.MSerial(GlobalVariable.seq, headInfo.packageLen - 1, crc8Val, headInfo.cmdId);
-                    string seqHex = ByteConverter.DecimalToHex(GlobalVariable.seq, 4);
-                    ByteConverter.HexToBytes(seqHex).CopyTo(encryptData, index);
                 }
-                else
-                {
-                    ByteConverter.HexToBytes(ByteConverter.DecimalToHex(0, 4)).CopyTo(encryptData, index);
-                }
-                headInfo.seq = GlobalVariable.seq;
-                //写入解密数据，完成组包
-                index += 4;
-                headInfo.decryptData.CopyTo(encryptData, index);
-
-                //将组包完成的数据进行加密
-                headInfo.encryptData = this.Encrypt(encryptData);
-                return headInfo;
-            }catch (Exception ex)
-            {
-                Logger.Error($"errorMessage:{ex.Message}");
-                return null;
+                //获取重新计算后的顺序码
+                GlobalVariable.seq = EncryptService.MSerial(GlobalVariable.seq, headInfo.packageLen - 1, crc8Val, headInfo.cmdId);
+                string seqHex = ByteConverter.DecimalToHex(GlobalVariable.seq, 4);
+                ByteConverter.HexToBytes(seqHex).CopyTo(encryptData, index);
             }
+            else
+            {
+                ByteConverter.HexToBytes(ByteConverter.DecimalToHex(0, 4)).CopyTo(encryptData, index);
+            }
+            headInfo.seq = GlobalVariable.seq;
+            //写入解密数据，完成组包
+            index += 4;
+            headInfo.decryptData.CopyTo(encryptData, index);
+
+            //将组包完成的数据进行加密
+            headInfo.encryptData = this.Encrypt(encryptData);
+            return headInfo;
         }
 
 
@@ -229,7 +222,7 @@ namespace lll_seer_launcher.core.Controller
                         GlobalVariable.isLogin = true;
                         new Task(() =>
                         {
-                            Thread.Sleep(10000);
+                            Thread.Sleep(5000);
                             GlobalVariable.sendDataController.SendDataByCmdIdAndIntList(CmdId.COMMAND_42019,
                                 new int[2] { 22439, GlobalVariable.gameConfigFlag.disableVipAutoChargeFlag ? 0 : 1 });
                             GlobalVariable.sendDataController.SendDataByCmdIdAndIntList(CmdId.BATTERY_DORMANT_SWITCH,

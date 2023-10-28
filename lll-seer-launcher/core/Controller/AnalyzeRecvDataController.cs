@@ -4,7 +4,10 @@ using System.Windows.Forms;
 using System.Threading;
 using System.Threading.Tasks;
 using lll_seer_launcher.core.Servise;
+using lll_seer_launcher.core.Servise.AutoFightService;
+using lll_seer_launcher.core.Servise.FightNoteServise;
 using lll_seer_launcher.core.Dto;
+using lll_seer_launcher.core.Dto.PetDto;
 using lll_seer_launcher.core.Utils;
 
 namespace lll_seer_launcher.core.Controller
@@ -26,17 +29,22 @@ namespace lll_seer_launcher.core.Controller
         {
             methodDictionary = new Dictionary<int, AnalyzeRecvDataMethod>
             {
+                /*==========================================玩家・地图相关解析============================================*/
                 { CmdId.ACHIEVETITLELIST, (param) => AnalyzeAchieveTitleList(param) },
                 { CmdId.ITEM_LIST, (param) =>  AnalyzeItemList(param) },
                 { CmdId.LIST_MAP_PLAYER , (param) =>  AnlyzeMapPlayerList(param)},
                 { CmdId.ENTER_MAP , (param) =>  AnlyzeEnterMap(param)},
                 { CmdId.GET_SIM_USERINFO , (param) =>  AnlyzeSimpleInfo(param)},
                 { CmdId.FIRE_ACT_NOTICE , (param) =>  AnlyzeCopyFireNOTICE(param)},
+                /*==========================================精灵相关解析============================================*/
                 { CmdId.GET_PET_INFO_BY_ONCE , (param) =>  AnlyzeGetPetInfoByOnce(param)},
-                { CmdId.FIGHT_OVER , (param) =>  AnlyzeOnFightOver(param)},
+                /*==========================================战斗相关解析============================================*/
                 { CmdId.MIBAO_FIGHT , (param) =>  AnlyzeMibaoFight(param)},
                 { CmdId.READY_TO_FIGHT , (param) =>  AnlyzeReadyToFight(param)},
+                { CmdId.NOTE_START_FIGHT, (param) =>  AnlyzeNoteStartFight(param)},
                 { CmdId.NOTE_USE_SKILL , (param) =>  AnlyzeNoteUseSkill(param)},
+                { CmdId.CHANGE_PET , (param) =>  AnlyzeChangePet(param)},
+                { CmdId.FIGHT_OVER , (param) =>  AnlyzeOnFightOver(param)},
                 //{ CmdId. , (param) =>  AnlyzeReadyToFight(param)},
             };
         }
@@ -244,78 +252,10 @@ namespace lll_seer_launcher.core.Controller
         {
             lock (lockObject)
             {
-                GlobalVariable.pets.Clear();
-                List<PetInfo> tmpPetBags = new List<PetInfo>();
-                int index = 0;
-                int petCount = ByteConverter.BytesTo10(ByteConverter.TakeBytes(recvDataHeadInfo.decryptData, index, 4));
-                index += 4;
-                for (int i = 0; i < petCount; i++)
-                {
-                    PetInfo petInfo = new PetInfo();
-                    index = petInfo.SetPetInfo(index, recvDataHeadInfo.decryptData);
-                    GlobalVariable.pets.Add(petInfo);
-                }
+                GetPetInfoService.OnGetPetInfoByOnce(recvDataHeadInfo);
                 if (GlobalVariable.gameConfigFlag.lowerHpFlag)
                 {
-                    if(GlobalVariable.pets.Count > 0)
-                    {
-                        GlobalVariable.mainForm.SetLowerHpStatus("精灵列表读取成功，开始压血！");
-                        GlobalVariable.gameConfigFlag.lowerHpPetLen = 0;
-                        while (GlobalVariable.pets.Count > GlobalVariable.gameConfigFlag.lowerHpPetLen)
-                        {
-                            if (GlobalVariable.pets[GlobalVariable.gameConfigFlag.lowerHpPetLen].hp > 0) break;
-                            GlobalVariable.gameConfigFlag.lowerHpPetLen++;
-                        }
-                        if(GlobalVariable.pets.Count > GlobalVariable.gameConfigFlag.lowerHpPetLen)
-                        {
-                            GlobalVariable.sendDataController.SendDataByCmdIdAndIntList(CmdId.MIBAO_FIGHT, new int[1] { 8692 });
-                        }
-                        else
-                        {
-                            new Task(() => {
-                                GlobalVariable.mainForm.SetLowerHpStatus("战斗结束，开始回血");
-                                GlobalVariable.gameConfigFlag.lowerHpFlag = false;
-                                GlobalVariable.sendDataController.SendDataByCmdIdAndIntList(CmdId.ITEM_BUY, new int[2] { 300016, GlobalVariable.pets.Count });
-                                GlobalVariable.sendDataController.SendDataByCmdIdAndIntList(CmdId.ITEM_BUY, new int[2] { 300011, GlobalVariable.pets.Count });
-                                foreach (var pet in GlobalVariable.pets)
-                                {
-                                    GlobalVariable.sendDataController.SendDataByCmdIdAndIntList(CmdId.USE_PET_ITEM_OUT_OF_FIGHT,
-                                        new int[2] { pet.catchTime, 300011 });
-                                    GlobalVariable.sendDataController.SendDataByCmdIdAndIntList(CmdId.USE_PET_ITEM_OUT_OF_FIGHT,
-                                        new int[2] { pet.catchTime, 300016 });
-                                }
-                                GlobalVariable.mainForm.SetLowerHpStatus("压血完成!");
-                                Thread.Sleep(2000);
-                                GlobalVariable.mainForm.SetLowerHpStatus("");
-                            }).Start();
-                        }
-
-                    }
-                    else
-                    {
-                        GlobalVariable.mainForm.SetLowerHpStatus("");
-                        MessageBox.Show("亲爱的小赛尔，\n你的背包里没有精灵，不能进行压血哟~");
-                    }
-                }
-                //foreach (PetInfo petinfo in GlobalVariable.pets)
-                //{
-                //    Console.WriteLine($"id:{petinfo.petId} name:{petinfo.petName} catchTime:{petinfo.catchTime}");
-                //}
-                int awaitPetCount = ByteConverter.BytesTo10(ByteConverter.TakeBytes(recvDataHeadInfo.decryptData, index, 4));
-                GlobalVariable.awaitPets.Clear();
-                if (awaitPetCount > 0)
-                {
-                    index += 4;
-                    for (int i = 0; i < awaitPetCount; i++)
-                    {
-                        PetInfo petInfo = new PetInfo();
-                        index = petInfo.SetPetInfo(index, recvDataHeadInfo.decryptData);
-                        GlobalVariable.awaitPets.Add(petInfo);
-                    }
-                    //foreach (PetInfo petinfo in GlobalVariable.awaitPets)
-                    //{
-                    //    Console.WriteLine($"id:{petinfo.petId} name:{petinfo.petName} catchTime:{petinfo.catchTime}");
-                    //}
+                    LowerHPServise.OnGetPetInfoByOnce();
                 }
             }
         }
@@ -323,107 +263,65 @@ namespace lll_seer_launcher.core.Controller
         {
             if (GlobalVariable.gameConfigFlag.lowerHpFlag)
             {
-                new Task(() => {
-                    GlobalVariable.mainForm.SetLowerHpStatus("进入战斗!");
-                    GlobalVariable.sendDataController.SendDataByCmdIdAndIntList(CmdId.READY_TO_FIGHT, new int[0]);
-                }).Start();
+                LowerHPServise.OnMibaoFight();
             }
         }
         private void AnlyzeReadyToFight(HeadInfo recvDataHeadInfo)
         {
             if (GlobalVariable.gameConfigFlag.lowerHpFlag)
             {
-                new Task(() => {
-                    GlobalVariable.mainForm.SetLowerHpStatus($"正在进行第{GlobalVariable.gameConfigFlag.lowerHpPetLen + 1}只精灵的压血");
-                    GlobalVariable.sendDataController.SendDataByCmdIdAndIntList(CmdId.USE_SKILL, new int[1] { GlobalVariable.pets[GlobalVariable.gameConfigFlag.lowerHpPetLen].skillArray[0] });
-                    //for(int i = 1; i < GlobalVariable.pets.Count; i++)
-                    //{
-                    //    GlobalVariable.mainForm.SetLowerHpStatus($"正在进行第{i+1}只精灵的压血");
-                    //    if(GlobalVariable.pets[i].hp > 0)
-                    //    {
-                    //        Thread.Sleep(500);
-                    //        GlobalVariable.sendDataController.SendDataByCmdIdAndIntList(CmdId.CHANGE_PET, new int[1] { GlobalVariable.pets[i].catchTime });
-                    //        Thread.Sleep(500);
-                    //        GlobalVariable.sendDataController.SendDataByCmdIdAndIntList(CmdId.USE_SKILL, new int[1] { GlobalVariable.pets[i].skillArray[0] });
-                    //    }
-                    //}
-                }).Start();
+                LowerHPServise.OnReadyToFight();
             }
         }
-
+        private void AnlyzeNoteStartFight(HeadInfo recvDataHeadInfo)
+        {
+            GlobalVariable.fightTurn = 0;
+            Dictionary<string,FightPetInfo> fightPlayers = FightNoteServise.OnNoteStartFight(recvDataHeadInfo);
+            GlobalVariable.mainForm.SetPetFightNote(fightPlayers);
+            //foreach(var item in fightPlayers["loginPlayer"].petBagMarkArr.Keys)
+            //{
+            //    Console.WriteLine(item);
+            //}
+            //Console.WriteLine($"loginPlayer:{fightPlayers["loginPlayer"].userId}-{fightPlayers["loginPlayer"].petName}" +
+            //    $" otherPlayer:{fightPlayers["otherPlayer"].userId}-{fightPlayers["otherPlayer"].petName}");
+        }
+        private void AnlyzeChangePet(HeadInfo recvDataHeadInfo)
+        {
+            if(recvDataHeadInfo.decryptData.Length > 4)
+            {
+                ChangePetInfo changePetInfo = FightNoteServise.OnChangePet(recvDataHeadInfo);
+                GlobalVariable.mainForm.OnChangePet(changePetInfo);
+                if (GlobalVariable.gameConfigFlag.autoUseSkillFlg) AutoUseSkillServise.OnChangePet(changePetInfo);
+                //Console.WriteLine($"loginPlayer:{changePetInfo.userId}-{changePetInfo.petName}");
+                //    $" otherPlayer:{fightPlayers["otherPlayer"].userId}-{fightPlayers["otherPlayer"].petName}");
+            }
+        }
         private void AnlyzeNoteUseSkill(HeadInfo recvDataHeadInfo)
         {
-            AttackValueInfo fristPlayerInfo = new AttackValueInfo();
-            AttackValueInfo secondPlayerInfo = new AttackValueInfo();
-            int index = 0;
-            index = fristPlayerInfo.SetAttackValueInfo(index, recvDataHeadInfo.decryptData);
-            int hp;
-            if(fristPlayerInfo.userId  == GlobalVariable.loginUserInfo.userId)
-            {
-                hp = fristPlayerInfo.remainHP;
-            }
-            else
-            {
-                secondPlayerInfo.SetAttackValueInfo(index, recvDataHeadInfo.decryptData);
-                hp = secondPlayerInfo.remainHP;
-            }
-            if (GlobalVariable.gameConfigFlag.lowerHpFlag)
-            {
-                if(hp > 0)
-                {
-                    GlobalVariable.sendDataController.SendDataByCmdIdAndIntList(CmdId.USE_SKILL, 
-                        new int[1] { GlobalVariable.pets[GlobalVariable.gameConfigFlag.lowerHpPetLen].skillArray[0] });
-                }
-                else if (GlobalVariable.pets.Count > ++GlobalVariable.gameConfigFlag.lowerHpPetLen )
-                {
-                    while (GlobalVariable.pets.Count > GlobalVariable.gameConfigFlag.lowerHpPetLen)
-                    {
-                        if (GlobalVariable.pets[GlobalVariable.gameConfigFlag.lowerHpPetLen].hp > 0) break;
-                        GlobalVariable.gameConfigFlag.lowerHpPetLen++;
-                    }
-                    if (GlobalVariable.pets.Count > GlobalVariable.gameConfigFlag.lowerHpPetLen)
-                    {
-                        GlobalVariable.mainForm.SetLowerHpStatus($"正在进行第{GlobalVariable.gameConfigFlag.lowerHpPetLen + 1}只精灵的压血");
-                        GlobalVariable.sendDataController.SendDataByCmdIdAndIntList(CmdId.CHANGE_PET,
-                        new int[1] { GlobalVariable.pets[GlobalVariable.gameConfigFlag.lowerHpPetLen].catchTime });
-                        Thread.Sleep(100);
-                        GlobalVariable.sendDataController.SendDataByCmdIdAndIntList(CmdId.USE_SKILL,
-                            new int[1] { GlobalVariable.pets[GlobalVariable.gameConfigFlag.lowerHpPetLen].skillArray[0] });
-                    }
-                }
-                else
-                {
-                    GlobalVariable.gameConfigFlag.lowerHpPetLen = 0;
-                }
-            }
+            GlobalVariable.fightTurn++;
+            Dictionary<string, AttackValueInfo> players = FightNoteServise.OnNoteUseSkill(recvDataHeadInfo);
+            GlobalVariable.mainForm.OnUseSkill(players);
+            if (GlobalVariable.gameConfigFlag.lowerHpFlag) LowerHPServise.OnNoteUseSkill(players);
+            if (GlobalVariable.gameConfigFlag.autoUseSkillFlg && players["otherPlayer"].remainHP != 0) AutoUseSkillServise.OnUseSkill(players["loginPlayer"]);
             //Console.WriteLine($"fristPlayerInfo:{fristPlayerInfo.userId}  secondPlayerInfo:{secondPlayerInfo.userId}");
         }
         private void AnlyzeOnFightOver(HeadInfo recvDataHeadInfo)
         {
             if (GlobalVariable.gameConfigFlag.lowerHpFlag)
             {
-                new Task(()=>{
-                    GlobalVariable.mainForm.SetLowerHpStatus("战斗结束，开始回血");
-                    GlobalVariable.gameConfigFlag.lowerHpFlag = false;
-                    GlobalVariable.sendDataController.SendDataByCmdIdAndIntList(CmdId.ITEM_BUY, new int[2] { 300016, GlobalVariable.pets.Count });
-                    GlobalVariable.sendDataController.SendDataByCmdIdAndIntList(CmdId.ITEM_BUY, new int[2] { 300011, GlobalVariable.pets.Count });
-                    foreach(var pet in GlobalVariable.pets)
-                    {
-                        GlobalVariable.sendDataController.SendDataByCmdIdAndIntList(CmdId.USE_PET_ITEM_OUT_OF_FIGHT,
-                            new int[2] { pet.catchTime, 300011 });
-                        GlobalVariable.sendDataController.SendDataByCmdIdAndIntList(CmdId.USE_PET_ITEM_OUT_OF_FIGHT,
-                            new int[2] { pet.catchTime, 300016 });
-                    }
-                    GlobalVariable.mainForm.SetLowerHpStatus("压血完成!");
-                    Thread.Sleep(2000);
-                    GlobalVariable.mainForm.SetLowerHpStatus("");
-                }).Start();
+                LowerHPServise.OnFightOver();
             }else if (GlobalVariable.gameConfigFlag.autoChargeFlag  && GlobalVariable.loginUserInfo.vipLevel == 0
                  && GlobalVariable.gameConfigFlag.autoChargeFlag)
             {
                 GlobalVariable.sendDataController.SendDataByCmdIdAndIntList(CmdId.PET_CURE_FREE, new int[0]);
             }
 
+            if (GlobalVariable.gameConfigFlag.autoUseSkillAddPPFlg)
+            {
+                GlobalVariable.mainForm.StopLoopUseSkill();
+            }
+
+            GlobalVariable.mainForm.InitFightNote();
         }
     }
 }

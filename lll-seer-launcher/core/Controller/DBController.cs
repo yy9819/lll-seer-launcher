@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using lll_seer_launcher.core.Servise;
+using lll_seer_launcher.core.Servise.DBServise;
 using lll_seer_launcher.core.Dto;
 using lll_seer_launcher.core.Utils;
 
@@ -13,11 +13,11 @@ namespace lll_seer_launcher.core.Controller
     {
         /*==========================================装备相关controller============================================*/
         #region
-        public static class SuitAndAchieveTitleDBController
+        public class SuitAndAchieveTitleDBController
         {
             public static bool CheckAndInitDB()
             {
-                return DBServise.SuitAndAchieveTitleDbServise.CheckAndInitDB();
+                return SuitAndAchieveTitleDbServise.CheckAndInitDB();
             }
             /*==========================================称号明细表============================================*/
             #region
@@ -25,13 +25,13 @@ namespace lll_seer_launcher.core.Controller
             {
                 foreach (AchieveTitleInfo info in GlobalVariable.achieveTitleDictionary.Values)
                 {
-                    DBServise.SuitAndAchieveTitleDbServise.AchieveTitleTableInsertData(info);
+                    SuitAndAchieveTitleDbServise.AchieveTitleTableInsertData(info);
                 }
                 Logger.Log("InitTableData", "称号表更新完成!");
             }
             public static bool SetAchieveTitleDic()
             {
-                return DBServise.SuitAndAchieveTitleDbServise.AchieveTitleTableAllDataAndSetAchieveTitleDic();
+                return SuitAndAchieveTitleDbServise.AchieveTitleTableAllDataAndSetAchieveTitleDic();
             }
             #endregion
             /*==========================================套装明细表============================================*/
@@ -40,13 +40,13 @@ namespace lll_seer_launcher.core.Controller
             {
                 foreach (SuitInfo info in GlobalVariable.suitDictionary.Values)
                 {
-                    DBServise.SuitAndAchieveTitleDbServise.SuitTableInsertData(info);
+                    SuitAndAchieveTitleDbServise.SuitTableInsertData(info);
                 }
                 Logger.Log("InitTableData", "装备表更新完成!");
             }
             public static bool SetSuitTitleDic()
             {
-                return DBServise.SuitAndAchieveTitleDbServise.SuitTableSelectAllDataAndSetSuitDic();
+                return SuitAndAchieveTitleDbServise.SuitTableSelectAllDataAndSetSuitDic();
             }
             #endregion
             /*==========================================目镜明细表============================================*/
@@ -55,63 +55,63 @@ namespace lll_seer_launcher.core.Controller
             {
                 foreach (GlassesInfo info in GlobalVariable.glassesDictionary.Values)
                 {
-                    DBServise.SuitAndAchieveTitleDbServise.GlassesTableInsertData(info);
+                    SuitAndAchieveTitleDbServise.GlassesTableInsertData(info);
                 }
                 Logger.Log("InitTableData", "目镜表更新完成!");
             }
             public static bool SetGlassesTitleDic()
             {
-                return DBServise.SuitAndAchieveTitleDbServise.GlassesTableAllDataAndSetGlassesDic();
+                return SuitAndAchieveTitleDbServise.GlassesTableAllDataAndSetGlassesDic();
             }
             #endregion
             /*==========================================用户装备持有明细表============================================*/
             #region
             public static int UserTableInsertData(UserSuitAndAchieveTitleInfo insertData)
             {
-                return DBServise.SuitAndAchieveTitleDbServise.UserTableInsertData(insertData);
+                return SuitAndAchieveTitleDbServise.UserTableInsertData(insertData);
             }
             public static int UserTableUpadateClothData(UserSuitAndAchieveTitleInfo insertData)
             {
-                return DBServise.SuitAndAchieveTitleDbServise.UserTableUpdateClothData(insertData);
+                return SuitAndAchieveTitleDbServise.UserTableUpdateClothData(insertData);
             }
             public static int UserTableUpadateAchieveTitleData(UserSuitAndAchieveTitleInfo insertData)
             {
-                return DBServise.SuitAndAchieveTitleDbServise.UserTableUpdateAchieveTitleData(insertData);
+                return SuitAndAchieveTitleDbServise.UserTableUpdateAchieveTitleData(insertData);
             }
             public static Dictionary<int, UserSuitAndAchieveTitleInfo> UserTableSelectDataGetUserClothDic()
             {
-                return DBServise.SuitAndAchieveTitleDbServise.UserTableSelectDataGetUserList();
+                return SuitAndAchieveTitleDbServise.UserTableSelectDataGetUserList();
             }
             public static int UserTableDeleteUser(int userId)
             {
-                return DBServise.SuitAndAchieveTitleDbServise.UserTableDeleteDataByUserId(userId);
+                return SuitAndAchieveTitleDbServise.UserTableDeleteDataByUserId(userId);
             }
             #endregion
             /*==========================================方案明细表============================================*/
             #region
             public static Dictionary<int, SuitAchieveTitlePlan> GetUserPlan(int userId)
             {
-                return DBServise.SuitAndAchieveTitleDbServise.PlanTableSelectData(userId);
+                return SuitAndAchieveTitleDbServise.PlanTableSelectData(userId);
             }
             public static Dictionary<int, SuitAchieveTitlePlan> SearchUserPlan(int userId, string searchWord)
             {
-                return DBServise.SuitAndAchieveTitleDbServise.PlanTableSearch(userId, searchWord);
+                return SuitAndAchieveTitleDbServise.PlanTableSearch(userId, searchWord);
             }
             public static int InsertPlan(SuitAchieveTitlePlan plan)
             {
-                return DBServise.SuitAndAchieveTitleDbServise.PlanTableInsertData(plan);
+                return SuitAndAchieveTitleDbServise.PlanTableInsertData(plan);
             }
             public static int DeletePlan(int planId)
             {
-                return DBServise.SuitAndAchieveTitleDbServise.PlanTableDeleteData(planId);
+                return SuitAndAchieveTitleDbServise.PlanTableDeleteData(planId);
             }
             public static int DeletePlanByuserId(int userId)
             {
-                return DBServise.SuitAndAchieveTitleDbServise.PlanTableDeleteDataByUserId(userId);
+                return SuitAndAchieveTitleDbServise.PlanTableDeleteDataByUserId(userId);
             }
             public static int UpdatePlan(SuitAchieveTitlePlan plan)
             {
-                return DBServise.SuitAndAchieveTitleDbServise.PlanTableUpdateData(plan);
+                return SuitAndAchieveTitleDbServise.PlanTableUpdateData(plan);
             }
             #endregion
         }
@@ -121,56 +121,56 @@ namespace lll_seer_launcher.core.Controller
             /*==========================================精灵明细表============================================*/
             public static bool CheckAndInitDB()
             {
-                return DBServise.PetDBServise.CheckAndInitDB();
+                return PetDBServise.CheckAndInitDB();
             }
             public static int InsertPetData(Pet petInfo)
             {
-                return DBServise.PetDBServise.PetTableInsertData(petInfo);
+                return PetDBServise.PetTableInsertData(petInfo);
             }
 
             public static List<Pet> LikeSearchPetByPetId(int petId)
             {
-                return DBServise.PetDBServise.PetTableLikeSelectDataByPetId(petId);
+                return PetDBServise.PetTableLikeSelectDataByPetId(petId);
             }
             public static List<Pet> LikeSearchPetByPetName(string petName)
             {
-                return DBServise.PetDBServise.PetTableSelectDataByPetName(petName);
+                return PetDBServise.PetTableSelectDataByPetName(petName);
             }            
             public static string SearchPetNameByPetId(int petId)
             {
-                return DBServise.PetDBServise.PetTableSearchPetNameByPetId(petId);
+                return PetDBServise.PetTableSearchPetNameByPetId(petId);
             }
 
             /*==========================================皮肤明细表============================================*/
             public static int InsertPetSkinsData(PetSkins petSkinsInfo)
             {
-                return DBServise.PetDBServise.PetSkinsTableInsertData(petSkinsInfo);
+                return PetDBServise.PetSkinsTableInsertData(petSkinsInfo);
             }
             public static List<PetSkins> LikeSearchPetSkinsByPetId(int skinsId)
             {
-                return DBServise.PetDBServise.PetSkinsTableLikeSelectDataBySkinsId(skinsId);
+                return PetDBServise.PetSkinsTableLikeSelectDataBySkinsId(skinsId);
             }
             public static List<PetSkins> LikeSearchPetSkinsByPetName(string skinsName)
             {
-                return DBServise.PetDBServise.PetSkinsTableSelectDataBySkinsName(skinsName);
+                return PetDBServise.PetSkinsTableSelectDataBySkinsName(skinsName);
             }
 
             /*==========================================方案明细表============================================*/
             public static int AddPlan(PetSkinsReplacePlan planInfo)
             {
-                return DBServise.PetDBServise.PetSkinsPlanTableInsertData(planInfo);
+                return PetDBServise.PetSkinsPlanTableInsertData(planInfo);
             }
             public static int UpdatePlan(PetSkinsReplacePlan planInfo)
             {
-                return DBServise.PetDBServise.PetSkinsPlanTableUpdateData(planInfo);
+                return PetDBServise.PetSkinsPlanTableUpdateData(planInfo);
             }
             public static int DeletePlan(int petId)
             {
-                return DBServise.PetDBServise.PetSkinsPlanTableDeleteData(petId);
+                return PetDBServise.PetSkinsPlanTableDeleteData(petId);
             }
             public static List<PetSkinsReplacePlan> SearchPlan(string petName)
             {
-                return DBServise.PetDBServise.PetSkinsPlanTableSelectData(petName);
+                return PetDBServise.PetSkinsPlanTableSelectData(petName);
             }
         }
     }

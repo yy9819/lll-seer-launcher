@@ -147,19 +147,34 @@
     <Compile Include="core\Controller\InitJsonController.cs" />
     <Compile Include="core\Controller\FormController.cs" />
     <Compile Include="core\Controller\SendDataController.cs" />
-    <Compile Include="core\Dto\AttackValueInfo.cs" />
+    <Compile Include="core\Dto\PetDto\AttackValueInfo.cs" />
     <Compile Include="core\Dto\CmdDic.cs" />
     <Compile Include="core\Dto\CmdId.cs" />
-    <Compile Include="core\Dto\FightInfo.cs" />
+    <Compile Include="core\Dto\PetDto\ChangePetInfo.cs" />
+    <Compile Include="core\Dto\PetDto\FightPetInfo.cs" />
     <Compile Include="core\Dto\GlobalObject.cs" />
     <Compile Include="core\Dto\GlobalVariable.cs" />
     <Compile Include="core\Dto\HeadInfo.cs" />
+    <Compile Include="core\Dto\PetDto\PetEffectInfo.cs" />
+    <Compile Include="core\Dto\PetDto\PetInfo.cs" />
     <Compile Include="core\Dto\UserInfo.cs" />
     <Compile Include="core\Forms\FightMapBossForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="core\Forms\FightMapBossForm.Designer.cs">
       <DependentUpon>FightMapBossForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="core\Forms\FightNoteForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="core\Forms\FightNoteForm.Designer.cs">
+      <DependentUpon>FightNoteForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="core\Forms\PetBag.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="core\Forms\PetBag.Designer.cs">
+      <DependentUpon>PetBag.cs</DependentUpon>
     </Compile>
     <Compile Include="core\Forms\SeerTcpCaptureForm.cs">
       <SubType>Form</SubType>
@@ -168,9 +183,15 @@
       <DependentUpon>SeerTcpCaptureForm.cs</DependentUpon>
     </Compile>
     <Compile Include="core\Servise\AnalyzeRecvDataServise.cs" />
-    <Compile Include="core\Servise\DBServise.cs" />
+    <Compile Include="core\Servise\AutoFightService\AutoUseSkillServise.cs" />
+    <Compile Include="core\Servise\AutoFightService\LowerHPServise.cs" />
+    <Compile Include="core\Servise\DBServise\DBServise.cs" />
+    <Compile Include="core\Servise\DBServise\PetDBServise.cs" />
+    <Compile Include="core\Servise\DBServise\SuitAndAchieveTitleDbServise.cs" />
     <Compile Include="core\Servise\DecryptService.cs" />
     <Compile Include="core\Servise\EncryptService.cs" />
+    <Compile Include="core\Servise\FightNoteServise\FightNoteServise.cs" />
+    <Compile Include="core\Servise\GetPetInfoService.cs" />
     <Compile Include="core\Servise\InitJsonServise.cs" />
     <Compile Include="core\Servise\SendDataServise.cs" />
     <Compile Include="core\Tools\EncryptDecryptTools.cs" />
@@ -213,6 +234,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="core\Forms\FightMapBossForm.resx">
       <DependentUpon>FightMapBossForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="core\Forms\FightNoteForm.resx">
+      <DependentUpon>FightNoteForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="core\Forms\PetBag.resx">
+      <DependentUpon>PetBag.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="core\Forms\SeerTcpCaptureForm.resx">
       <DependentUpon>SeerTcpCaptureForm.cs</DependentUpon>
@@ -257,6 +284,7 @@
     <None Include="Resources\skill.swf" />
     <None Include="Resources\pet.swf" />
     <None Include="Resources\8.png" />
+    <None Include="Resources\214.png" />
     <Content Include="Resources\bibiIcon.ico" />
     <None Include="Resources\bibiLoading.gif" />
     <Content Include="Resources\bibiloading.swf" />

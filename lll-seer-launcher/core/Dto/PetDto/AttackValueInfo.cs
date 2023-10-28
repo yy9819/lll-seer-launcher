@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using lll_seer_launcher.core.Utils;
 
-namespace lll_seer_launcher.core.Dto
+namespace lll_seer_launcher.core.Dto.PetDto
 {
     public class AttackValueInfo
     {
@@ -35,7 +35,13 @@ namespace lll_seer_launcher.core.Dto
         /// -1 YES
         /// </summary>
         public int isCrit;
-        public List<List<int>> skillList = new List<List<int>>();
+        /// <summary>
+        /// 技能
+        /// </summary>
+        public Dictionary<int, List<int>> skillList = new Dictionary<int, List<int>>();
+        /// <summary>
+        /// 异常状态
+        /// </summary>
         public List<int> status = new List<int>();
         /// <summary>
         /// 精灵特殊状态
@@ -45,10 +51,19 @@ namespace lll_seer_launcher.core.Dto
         /// 某些精灵的特殊状态显示
         /// </summary>
         public int petStatus;
+        /// <summary>
+        /// 
+        /// </summary>
         public List<PetStatusEffectInfo> sideEffects = new List<PetStatusEffectInfo>();
         public int battleLv;
         public int changeBitset;
+        /// <summary>
+        /// 先手
+        /// </summary>
         public int priority;
+        /// <summary>
+        /// 免疫
+        /// </summary>
         public List<bool> immunizationStates = new List<bool>();
         public List<int> specailArr = new List<int>();
         public bool issecondFight;
@@ -123,14 +138,14 @@ namespace lll_seer_launcher.core.Dto
                 index += 4;
                 int skillPP = ByteConverter.BytesTo10(ByteConverter.TakeBytes(inputData, index, 4));
                 index += 4;
-                this.skillList.Add(new List<int>(2) { skillId, skillPP });
+                this.skillList.Add(skillId,new List<int>(2) { skillId, skillPP });
             }
 
             //是否暴击
             this.isCrit = ByteConverter.BytesTo10(ByteConverter.TakeBytes(inputData, index, 4));
             index += 4;
 
-            //特效状态
+            //异常状态
             int statusLen = ByteConverter.BytesTo10(ByteConverter.TakeBytes(inputData, index++, 1));
             for (int i = 0; i < statusLen; i++)
             {
@@ -151,10 +166,11 @@ namespace lll_seer_launcher.core.Dto
             //对战状态处理--属性的变化
             int petStatusEffectLen = ByteConverter.BytesTo10(ByteConverter.TakeBytes(inputData, index, 4));
             index += 4;
-            for (int i = 0; i<petStatusEffectLen; i++)
+            for (int i = 0; i < petStatusEffectLen; i++)
             {
                 PetStatusEffectInfo petStatusEffectInfo = new PetStatusEffectInfo();
                 index = petStatusEffectInfo.SetPetStatusEffectInfo(index, inputData);
+                this.sideEffects.Add(petStatusEffectInfo);
             }
 
             //能力变化-->大于0能力提升小于0能力下降
@@ -325,5 +341,61 @@ namespace lll_seer_launcher.core.Dto
                 this.isShow = PetStatusEffectConfig.isShow(this.type,this.id); */
             return index;
         }
+    }
+    public class StatusInfo
+    {
+        public readonly static List<Dictionary<int,string>> Status = new List<Dictionary<int, string>>()
+        {
+            new Dictionary<int, string>()
+            {
+                {0,"麻痹" },
+                {1,"中毒" },
+                {2,"烧伤" },
+                {3,"寄生对手" },
+                {4,"寄生" },
+                {5,"冻伤" },
+                {6,"害怕" },
+                {7,"疲惫" },
+                {8,"睡眠" },
+                {9,"石化" },
+                {10,"混乱" },
+                {11,"衰弱" },
+                {12,"山神守护" },
+                {13,"易燃" },
+                {14,"狂暴" },
+                {15,"冰封" },
+                {16,"流血" },
+                {17,"免疫" },
+                {18,"免疫" },
+                {19,"瘫痪" },
+                {20,"失明" },
+                {21,"异常免疫" },
+                {22,"焚烬" },
+                {23,"诅咒" },
+                {24,"烈焰诅咒" },
+                {25,"致命诅咒" },
+                {26,"虚弱诅咒" },
+                {27,"感染" },
+                {28,"束缚" },
+                {29,"失神" },
+                {30,"沉默" },
+                {31,"臣服" },
+                {32,"凝滞" },
+            },
+            new Dictionary<int, string>()
+            {
+                //参数n 以6为基准  n-6为负数表示能力减弱了多少，为正数表示提升了多少
+                {1,"攻击" },
+                {2,"防御" },
+                {3,"特攻" },
+                {4,"特防" },
+                {5,"速度" },
+                {6,"命中" },
+            },
+            new Dictionary<int, string>()
+            {
+                {1,"印记" }
+            },
+        };
     }
 }

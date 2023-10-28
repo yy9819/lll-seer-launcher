@@ -43,6 +43,8 @@
             this.searchButton = new System.Windows.Forms.Button();
             this.searchTextBox = new System.Windows.Forms.TextBox();
             this.previewDataGridView = new System.Windows.Forms.DataGridView();
+            this.searchPetId = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.searchPetName = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.searchPetRadioButton = new System.Windows.Forms.RadioButton();
             this.searchSkinsRadioButton = new System.Windows.Forms.RadioButton();
@@ -51,8 +53,6 @@
             this.deletePlanButton = new System.Windows.Forms.Button();
             this.setPetButton = new System.Windows.Forms.Button();
             this.setSkinsButton = new System.Windows.Forms.Button();
-            this.searchPetId = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.searchPetName = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.planGroupBox.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.planDataGridView)).BeginInit();
             this.searchGroupBox.SuspendLayout();
@@ -198,6 +198,9 @@
             // 
             // previewDataGridView
             // 
+            this.previewDataGridView.AllowUserToAddRows = false;
+            this.previewDataGridView.AllowUserToDeleteRows = false;
+            this.previewDataGridView.AllowUserToResizeRows = false;
             this.previewDataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.previewDataGridView.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.searchPetId,
@@ -210,6 +213,21 @@
             this.previewDataGridView.Size = new System.Drawing.Size(290, 197);
             this.previewDataGridView.TabIndex = 1;
             this.previewDataGridView.Click += new System.EventHandler(this.ChangePreviewSwf);
+            // 
+            // searchPetId
+            // 
+            this.searchPetId.Frozen = true;
+            this.searchPetId.HeaderText = "id";
+            this.searchPetId.Name = "searchPetId";
+            this.searchPetId.ReadOnly = true;
+            // 
+            // searchPetName
+            // 
+            this.searchPetName.Frozen = true;
+            this.searchPetName.HeaderText = "精灵・皮肤名字";
+            this.searchPetName.Name = "searchPetName";
+            this.searchPetName.ReadOnly = true;
+            this.searchPetName.Width = 200;
             // 
             // groupBox1
             // 
@@ -294,21 +312,6 @@
             this.setSkinsButton.Text = "替换为此皮肤";
             this.setSkinsButton.UseVisualStyleBackColor = true;
             this.setSkinsButton.Click += new System.EventHandler(this.setSkinsButton_Click);
-            // 
-            // searchPetId
-            // 
-            this.searchPetId.Frozen = true;
-            this.searchPetId.HeaderText = "id";
-            this.searchPetId.Name = "searchPetId";
-            this.searchPetId.ReadOnly = true;
-            // 
-            // searchPetName
-            // 
-            this.searchPetName.Frozen = true;
-            this.searchPetName.HeaderText = "精灵・皮肤名字";
-            this.searchPetName.Name = "searchPetName";
-            this.searchPetName.ReadOnly = true;
-            this.searchPetName.Width = 200;
             // 
             // EditPetResourceForm
             // 

@@ -5,6 +5,7 @@ using System.Text;
 using System.Collections;
 using System.Runtime.InteropServices;
 using System.IO;
+using System.Net;
 using System.Diagnostics;
 using System.Threading;
 using lll_seer_launcher.core.Controller;
@@ -81,6 +82,54 @@ namespace lll_seer_launcher.core.Utils
             return count <= 100;
         }
     }
+    public class PetHeadSetter
+    {
+        private string petHeadDirectoryPath = Directory.GetCurrentDirectory() + "\\cache\\pet\\head\\";
+        private const string petHeadLink = "https://seerh5.61.com/resource/assets/pet/head/@.png";
+        public PetHeadSetter()
+        {
+            if(!Directory.Exists(petHeadDirectoryPath))Directory.CreateDirectory(petHeadDirectoryPath);
+        }
+        public string GetHeadPath(int petId)
+        {
+            CheckHeadFile(petId);
+            return $"{petHeadDirectoryPath}{petId}.png";
+        }
+        private async void CheckHeadFile(int petId)
+        {
+            if (File.Exists($"{petHeadDirectoryPath}{petId}.png")) return;
+            try
+            {
+                HttpWebRequest request = WebRequest.Create(petHeadLink.Replace("@", petId.ToString())) as HttpWebRequest;
+                request.Method = "GET";
+
+                // 使用异步方式执行HTTP请求
+                using (HttpWebResponse response = await request.GetResponseAsync() as HttpWebResponse)
+                {
+                    using (Stream responseStream = response.GetResponseStream())
+                    {
+                        using (MemoryStream memoryStream = new MemoryStream())
+                        {
+                            byte[] buffer = new byte[4096];
+                            int bytesRead;
+
+                            while ((bytesRead = responseStream.Read(buffer, 0, buffer.Length)) > 0)
+                            {
+                                memoryStream.Write(buffer, 0, bytesRead);
+                            }
+
+                            byte[] content = memoryStream.ToArray();
+                            File.WriteAllBytes($"{petHeadDirectoryPath}{petId}.png", content);
+                        }
+                    }
+                }
+            }
+            catch { }
+        }
+    }
+    /// <summary>
+    /// 对配置文件进行读写操作
+    /// </summary>
     public class IniFile
     {
         private string filePath;
