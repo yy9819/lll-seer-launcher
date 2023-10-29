@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Runtime.InteropServices;
 using System.Diagnostics;
 using lll_seer_launcher.core.Dto;
+using lll_seer_launcher.core.Utils;
 
 namespace lll_seer_launcher.core.Controller
 {
@@ -29,7 +30,10 @@ namespace lll_seer_launcher.core.Controller
         [DllImport("winmm.dll")]
         private static extern int waveOutGetVolume(IntPtr hVolume , out uint dwVolume);
         [DllImport("winmm.dll")]
-        private static extern int waveOutSetVolume(IntPtr hVolume , uint dwVolume);
+        private static extern int waveOutSetVolume(IntPtr hVolume, uint dwVolume);
+
+        [DllImport("wininet.dll", SetLastError = true, CharSet = CharSet.Auto)]
+        public static extern bool DeleteUrlCacheEntry(string lpszUrlName);
 
         private const int WM_APPCOMMAND = 0x0319;
         private const int APPCOMMAND_VOLUME_MUTE = 0x80000;
@@ -138,13 +142,29 @@ namespace lll_seer_launcher.core.Controller
                 GetClientRect(hWnd, out RECT clientRect);
                 int width = clientRect.right - clientRect.left;
                 int height = clientRect.bottom - clientRect.top;
-                Console.WriteLine(width);
-                Console.WriteLine(height);
+                //Console.WriteLine(width);
+                //Console.WriteLine(height);
 
                 int lParam = (y * 65536 / height) << 16 | (x * 65536 / width);
 
                 SendMessage(hWnd, WM_LBUTTONDOWN, 0, lParam);
                 SendMessage(hWnd, WM_LBUTTONUP, 0, lParam);
+            }
+        }
+
+        
+
+        public static void ClearIECache()
+        {
+            try
+            {
+                // Clear the IE cache for all users
+                DeleteUrlCacheEntry("about:blank");
+                Logger.Log("clearCache","IE缓存清理成功!");
+            }
+            catch (Exception ex)
+            {
+                Logger.Error($"errorMessage:{ex.Message}");
             }
         }
     }

@@ -128,7 +128,7 @@
             this.startCaptureCheckBox.AutoSize = true;
             this.startCaptureCheckBox.Checked = true;
             this.startCaptureCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.startCaptureCheckBox.Location = new System.Drawing.Point(12, 476);
+            this.startCaptureCheckBox.Location = new System.Drawing.Point(721, 476);
             this.startCaptureCheckBox.Name = "startCaptureCheckBox";
             this.startCaptureCheckBox.Size = new System.Drawing.Size(72, 16);
             this.startCaptureCheckBox.TabIndex = 1;
@@ -137,11 +137,11 @@
             // 
             // dataTextBox
             // 
-            this.dataTextBox.Location = new System.Drawing.Point(103, 477);
+            this.dataTextBox.Location = new System.Drawing.Point(6, 474);
             this.dataTextBox.Multiline = true;
             this.dataTextBox.Name = "dataTextBox";
             this.dataTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.dataTextBox.Size = new System.Drawing.Size(709, 116);
+            this.dataTextBox.Size = new System.Drawing.Size(709, 126);
             this.dataTextBox.TabIndex = 2;
             // 
             // SeerTcpCaptureForm

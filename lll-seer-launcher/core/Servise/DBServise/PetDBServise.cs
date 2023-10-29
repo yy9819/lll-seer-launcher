@@ -7,6 +7,7 @@ using Microsoft.Data.Sqlite;
 using System.IO;
 using lll_seer_launcher.core.Utils;
 using lll_seer_launcher.core.Dto;
+using lll_seer_launcher.core.Dto.JSON;
 
 namespace lll_seer_launcher.core.Servise.DBServise
 {
@@ -33,9 +34,10 @@ namespace lll_seer_launcher.core.Servise.DBServise
                         {
                                 new createTableSql("pet", "精灵信息表", "CREATE TABLE pet (id INTEGER PRIMARY KEY AUTOINCREMENT,pet_name CHAR(32) NOT NULL," +
                                 "pet_id INT UNIQUE NOT NULL,pet_hp INT NOT NULL,pet_atk INT NOT NULL,pet_def INT NOT NULL," +
-                                "pet_spatk INT NOT NULL,pet_spdef INT NOT NULL,pet_spd INT NOT NULL,pet_type INT NOT NULL);"),
+                                "pet_spatk INT NOT NULL,pet_spdef INT NOT NULL,pet_spd INT NOT NULL,pet_type INT NOT NULL," +
+                                "pet_realId INT,pet_learnableMoves TEXT);"),
                                 new createTableSql("petskins", "精灵皮肤表", "CREATE TABLE petskins (id INTEGER PRIMARY KEY AUTOINCREMENT,pet_skins_name CHAR(32) NOT NULL," +
-                                "pet_skins_id INT UNIQUE NOT NULL);"),
+                                "pet_skins_id INT UNIQUE NOT NULL,pet_skins_realid INT);"),
                                 new createTableSql("petskinsreplaceplan", "精灵皮肤替换方案表", "CREATE TABLE petskinsreplaceplan (id INTEGER PRIMARY KEY AUTOINCREMENT," +
                                 "pet_name CHAR(32) NOT NULL,pet_id INT UNIQUE NOT NULL,pet_skins_name CHAR(32) NOT NULL,pet_skins_id INT NOT NULL);")
                         };
@@ -70,6 +72,87 @@ namespace lll_seer_launcher.core.Servise.DBServise
         }
 
         #region
+        public static void PetTableTransactionInsertData(List<Pet> insertData)
+        {
+            using (db)
+            {
+                db.Open();
+                int index = 0;
+                using (SqliteTransaction transaction = db.BeginTransaction())
+                {
+                    using (SqliteCommand command = db.CreateCommand())
+                    {
+                        command.Transaction = transaction;
+
+                        command.CommandText = "INSERT OR REPLACE INTO pet (pet_name,pet_id,pet_hp,pet_atk,pet_def,pet_spatk,pet_spdef," +
+                            "pet_spd,pet_type,pet_realId,pet_learnableMoves) " +
+                            "VALUES(@pet_name,@pet_id,@pet_hp,@pet_atk,@pet_def,@pet_spatk,@pet_spdef," +
+                            "@pet_spd,@pet_type,@pet_realId,@pet_learnableMoves);";
+
+                        command.Parameters.Add(new SqliteParameter("@pet_name", DBNull.Value));
+                        command.Parameters.Add(new SqliteParameter("@pet_id", DBNull.Value));
+                        command.Parameters.Add(new SqliteParameter("@pet_hp", DBNull.Value));
+                        command.Parameters.Add(new SqliteParameter("@pet_atk", DBNull.Value));
+                        command.Parameters.Add(new SqliteParameter("@pet_def", DBNull.Value));
+                        command.Parameters.Add(new SqliteParameter("@pet_spatk", DBNull.Value));
+                        command.Parameters.Add(new SqliteParameter("@pet_spdef", DBNull.Value));
+                        command.Parameters.Add(new SqliteParameter("@pet_spd", DBNull.Value));
+                        command.Parameters.Add(new SqliteParameter("@pet_type", DBNull.Value));
+                        command.Parameters.Add(new SqliteParameter("@pet_realId", DBNull.Value));
+                        command.Parameters.Add(new SqliteParameter("@pet_learnableMoves", DBNull.Value));
+                        // Generate and insert a large amount of data
+                        while(index < insertData.Count)
+                        {
+                            if(insertData[index].id > 1400000)
+                            {
+                                break;
+                            }else if(insertData[index].id < 1300000)
+                            {
+                                command.Parameters["@pet_name"].Value = insertData[index].defName;
+                                command.Parameters["@pet_id"].Value = insertData[index].id;
+                                command.Parameters["@pet_hp"].Value = insertData[index].hp;
+                                command.Parameters["@pet_atk"].Value = insertData[index].atk;
+                                command.Parameters["@pet_def"].Value = insertData[index].def;
+                                command.Parameters["@pet_spatk"].Value = insertData[index].spatk;
+                                command.Parameters["@pet_spdef"].Value = insertData[index].spdef;
+                                command.Parameters["@pet_spd"].Value = insertData[index].spd;
+                                command.Parameters["@pet_type"].Value = insertData[index].type;
+                                command.Parameters["@pet_realId"].Value = insertData[index].realId;
+                                command.Parameters["@pet_learnableMoves"].Value = insertData[index].learnableMoves.GetMoves();
+                                command.ExecuteNonQuery();
+                            }
+                            index++;
+                        }
+
+                    }
+                    transaction.Commit();
+                }
+                using (SqliteTransaction transaction = db.BeginTransaction())
+                {
+                    using (SqliteCommand command = db.CreateCommand())
+                    {
+                        command.Transaction = transaction;
+
+                        command.CommandText = "INSERT OR REPLACE INTO petskins (pet_skins_name,pet_skins_id,pet_skins_realid) " +
+                            "VALUES(@pet_skins_name,@pet_skins_id,@pet_skins_realid);";
+
+                        command.Parameters.Add(new SqliteParameter("@pet_skins_name", DBNull.Value));
+                        command.Parameters.Add(new SqliteParameter("@pet_skins_id", DBNull.Value));
+                        command.Parameters.Add(new SqliteParameter("@pet_skins_realid", DBNull.Value));
+                        // Generate and insert a large amount of data
+                        while (index < insertData.Count)
+                        {
+                            command.Parameters["@pet_skins_name"].Value = insertData[index].defName;
+                            command.Parameters["@pet_skins_id"].Value = insertData[index].id;
+                            command.Parameters["@pet_skins_realid"].Value = insertData[index].realId;
+                            command.ExecuteNonQuery();
+                            index++;
+                        }
+                    }
+                    transaction.Commit();
+                }
+            }
+        }
         public static int PetTableInsertData(Pet insertData)
         {
             try
@@ -80,7 +163,7 @@ namespace lll_seer_launcher.core.Servise.DBServise
                     string insertSql = "INSERT INTO pet (pet_name,pet_id,pet_hp,pet_atk,pet_def,pet_spatk,pet_spdef,pet_spd,pet_type) " +
                         "VALUES(@pet_name,@pet_id,@pet_hp,@pet_atk,@pet_def,@pet_spatk,@pet_spdef,@pet_spd,@pet_type);";
                     SqliteCommand insertCmd = new SqliteCommand(insertSql, db);
-                    insertCmd.Parameters.Add(new SqliteParameter("@pet_name", insertData.name));
+                    insertCmd.Parameters.Add(new SqliteParameter("@pet_name", insertData.defName));
                     insertCmd.Parameters.Add(new SqliteParameter("@pet_id", insertData.id));
                     insertCmd.Parameters.Add(new SqliteParameter("@pet_hp", insertData.hp));
                     insertCmd.Parameters.Add(new SqliteParameter("@pet_atk", insertData.atk));
@@ -115,7 +198,7 @@ namespace lll_seer_launcher.core.Servise.DBServise
                         "pet_def = @pet_def,pet_spatk = @pet_spatk,pet_spdef = @pet_spdef,pet_spd = @pet_spd,pet_type=@pet_type " +
                         "WHERE pet_id = @pet_id;";
                     SqliteCommand updateCmd = new SqliteCommand(updateSql, db);
-                    updateCmd.Parameters.Add(new SqliteParameter("@pet_name", updateData.name));
+                    updateCmd.Parameters.Add(new SqliteParameter("@pet_name", updateData.defName));
                     updateCmd.Parameters.Add(new SqliteParameter("@pet_id", updateData.id));
                     updateCmd.Parameters.Add(new SqliteParameter("@pet_hp", updateData.hp));
                     updateCmd.Parameters.Add(new SqliteParameter("@pet_atk", updateData.atk));
@@ -151,7 +234,7 @@ namespace lll_seer_launcher.core.Servise.DBServise
                     while (reader.Read())
                     {
                         Pet pet = new Pet();
-                        pet.name = reader.GetString(0);
+                        pet.defName = reader.GetString(0);
                         pet.id = reader.GetInt32(1);
                         pet.hp = reader.GetInt32(2);
                         pet.atk = reader.GetInt32(3);
@@ -189,7 +272,7 @@ namespace lll_seer_launcher.core.Servise.DBServise
                     while (reader.Read())
                     {
                         Pet pet = new Pet();
-                        pet.name = reader.GetString(0);
+                        pet.defName = reader.GetString(0);
                         pet.id = reader.GetInt32(1);
                         pet.hp = reader.GetInt32(2);
                         pet.atk = reader.GetInt32(3);
@@ -239,6 +322,33 @@ namespace lll_seer_launcher.core.Servise.DBServise
             }
         }
 
+        public static int PetTableGetRealId(int petId)
+        {
+            try
+            {
+                using (db)
+                {
+                    db.Open();
+                    string selectSql = "SELECT pet_realId " +
+                        "FROM pet WHERE pet_id = @petId;";
+                    SqliteCommand selectCmd = new SqliteCommand(selectSql, db);
+                    selectCmd.Parameters.Add(new SqliteParameter("@petId", $"{petId}"));
+                    SqliteDataReader reader = selectCmd.ExecuteReader();
+                    int realId = 0;
+                    while (reader.Read())
+                    {
+                        realId = reader.GetInt32(0);
+                    }
+                    return realId == 0 ? petId : realId;
+
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Error($"数据库精灵数据信息查询失败！ errorMessage：{ex.Message}");
+                return petId;
+            }
+        }
         #endregion
         #region
         public static int PetSkinsTableInsertData(PetSkins insertData)
@@ -267,7 +377,33 @@ namespace lll_seer_launcher.core.Servise.DBServise
                 return -1;
             }
         }
+        public static int PetSkinsTableGetRealId(int petId)
+        {
+            try
+            {
+                using (db)
+                {
+                    db.Open();
+                    string selectSql = "SELECT pet_skins_realid " +
+                        "FROM petskins WHERE pet_skins_id = @petId;";
+                    SqliteCommand selectCmd = new SqliteCommand(selectSql, db);
+                    selectCmd.Parameters.Add(new SqliteParameter("@petId", $"{petId}"));
+                    SqliteDataReader reader = selectCmd.ExecuteReader();
+                    int realId = 0;
+                    while (reader.Read())
+                    {
+                        realId = reader.GetInt32(0);
+                    }
+                    return realId == 0 ? petId : realId;
 
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Error($"数据库精灵数据信息查询失败！ errorMessage：{ex.Message}");
+                return petId;
+            }
+        }
         public static int PetSkinsTableUpdateData(PetSkins updateData)
         {
             try

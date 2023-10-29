@@ -81,6 +81,27 @@ namespace lll_seer_launcher.core.Utils
             }
             return count <= 100;
         }
+
+        public static string GetJsonString(string link)
+        {
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(link);
+            request.Method = "GET";
+            string json = "";
+            try
+            {
+                using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
+                using (Stream responseStream = response.GetResponseStream())
+                using (StreamReader reader = new StreamReader(responseStream))
+                {
+                    if (response.StatusCode == HttpStatusCode.OK)
+                    {
+                        json = reader.ReadToEnd();
+                    }
+                }
+            }
+            catch { }
+            return json;
+        }
     }
     public class PetHeadSetter
     {
@@ -92,6 +113,7 @@ namespace lll_seer_launcher.core.Utils
         }
         public string GetHeadPath(int petId)
         {
+            petId = DBController.PetDBController.GetPetRealId(petId);
             CheckHeadFile(petId);
             return $"{petHeadDirectoryPath}{petId}.png";
         }

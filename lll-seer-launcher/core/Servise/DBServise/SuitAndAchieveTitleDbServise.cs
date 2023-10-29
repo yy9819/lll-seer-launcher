@@ -75,6 +75,35 @@ namespace lll_seer_launcher.core.Servise.DBServise
         }
         #region
         /*==========================================称号数据表操作============================================*/
+        public static void AchieveTitleTableTransactionInsertData(List<AchieveTitleInfo> insertData)
+        {
+            using (db)
+            {
+                db.Open();
+                using (SqliteTransaction transaction = db.BeginTransaction())
+                {
+                    using (SqliteCommand command = db.CreateCommand())
+                    {
+                        command.Transaction = transaction;
+
+                        command.CommandText = "INSERT OR REPLACE INTO achieve_title (title_name,title_abtext_text,title_id) " +
+                        "VALUES(@title_name,@title_abtext_text,@title_id);";
+
+                        command.Parameters.Add(new SqliteParameter("@title_name", DBNull.Value));
+                        command.Parameters.Add(new SqliteParameter("@title_abtext_text", DBNull.Value));
+                        command.Parameters.Add(new SqliteParameter("@title_id", DBNull.Value));
+                        foreach (AchieveTitleInfo item in insertData)
+                        {
+                            command.Parameters["@title_name"].Value = item.title;
+                            command.Parameters["@title_abtext_text"].Value = item.desc8;
+                            command.Parameters["@title_id"].Value = item.id;
+                            command.ExecuteNonQuery();
+                        }
+                    }
+                    transaction.Commit();
+                }
+            }
+        }
         public static int AchieveTitleTableInsertData(AchieveTitleInfo insertData)
         {
             try
@@ -186,6 +215,37 @@ namespace lll_seer_launcher.core.Servise.DBServise
 
         #region
         /*==========================================套装数据表操作============================================*/
+        public static void SuitTableTransactionInsertData(List<SuitInfo> insertData)
+        {
+            using (db)
+            {
+                db.Open();
+                using (SqliteTransaction transaction = db.BeginTransaction())
+                {
+                    using (SqliteCommand command = db.CreateCommand())
+                    {
+                        command.Transaction = transaction;
+
+                        command.CommandText = "INSERT OR REPLACE INTO suit (suit_name,suit_desc_text,suit_id,suit_cloth_id) " +
+                        "VALUES(@suit_name,@suit_desc_text,@suit_id,@suit_cloth_id);";
+
+                        command.Parameters.Add(new SqliteParameter("@suit_name", DBNull.Value));
+                        command.Parameters.Add(new SqliteParameter("@suit_desc_text", DBNull.Value));
+                        command.Parameters.Add(new SqliteParameter("@suit_id", DBNull.Value));
+                        command.Parameters.Add(new SqliteParameter("@suit_cloth_id", DBNull.Value));
+                        foreach (SuitInfo item in insertData)
+                        {
+                            command.Parameters["@suit_name"].Value = item.name;
+                            command.Parameters["@suit_desc_text"].Value = item.desc;
+                            command.Parameters["@suit_id"].Value = item.suitId;
+                            command.Parameters["@suit_cloth_id"].Value = GlobalUtil.IntListToString(item.clothIdList);
+                            command.ExecuteNonQuery();
+                        }
+                    }
+                    transaction.Commit();
+                }
+            }
+        }
         public static int SuitTableInsertData(SuitInfo insertData)
         {
             try
@@ -299,6 +359,35 @@ namespace lll_seer_launcher.core.Servise.DBServise
 
         #region
         /*==========================================目镜数据表操作============================================*/
+        public static void GlassesTableTransactionInsertData(List<GlassesInfo> insertData)
+        {
+            using (db)
+            {
+                db.Open();
+                using (SqliteTransaction transaction = db.BeginTransaction())
+                {
+                    using (SqliteCommand command = db.CreateCommand())
+                    {
+                        command.Transaction = transaction;
+
+                        command.CommandText = "INSERT OR REPLACE INTO glasses (glasses_name,glasses_desc_text,glasses_id) " +
+                        "VALUES(@glasses_name,@glasses_desc_text,@glasses_id);";
+
+                        command.Parameters.Add(new SqliteParameter("@glasses_name", DBNull.Value));
+                        command.Parameters.Add(new SqliteParameter("@glasses_desc_text", DBNull.Value));
+                        command.Parameters.Add(new SqliteParameter("@glasses_id", DBNull.Value));
+                        foreach (GlassesInfo item in insertData)
+                        {
+                            command.Parameters["@glasses_name"].Value = item.name;
+                            command.Parameters["@glasses_desc_text"].Value = item.desc;
+                            command.Parameters["@glasses_id"].Value = item.glassesId;
+                            command.ExecuteNonQuery();
+                        }
+                    }
+                    transaction.Commit();
+                }
+            }
+        }
         public static int GlassesTableInsertData(GlassesInfo insertData)
         {
             try

@@ -6,6 +6,15 @@ using System.Threading.Tasks;
 
 namespace lll_seer_launcher.core.Dto
 {
+    public class VersionConfig
+    {
+        public string appversion { get; set; }
+        public string suitjson { get; set; }
+        public string glassesjson { get; set; }
+        public string achievetitlejson { get; set; }
+        public string downloadurl { get; set; }
+
+    }
     #region
     public class VersionJsonObject
     {
@@ -14,6 +23,7 @@ namespace lll_seer_launcher.core.Dto
         public string achieveTitleVersion { get; set; }
         public string petVersion { get; set; }
         public string petSkinsVersion { get; set; }
+        public string moveVersion { get; set; }
     }
     #endregion
     #region
@@ -108,31 +118,6 @@ namespace lll_seer_launcher.core.Dto
     #endregion
 
     #region
-    public class PetJsonObject
-    {
-        public string date { get; set; }
-        public List<Pet> data { get; set; }
-    }
-    /// <summary>
-    /// 精灵信息
-    /// </summary>
-    public class Pet
-    {
-        public int id { get; set; }
-        public string name { get; set; }
-        public int hp { get; set; }
-        public int atk { get; set; }
-        public int def { get; set; }
-        public int spatk { get; set; }
-        public int spdef { get; set; }
-        public int spd { get; set; }
-        public int type { get; set; }
-    }
-    public class PetSkinsJsonObject
-    {
-        public string date { get; set; }
-        public List<PetSkins> data { get; set; }
-    }
     /// <summary>
     /// 精灵皮肤
     /// </summary>

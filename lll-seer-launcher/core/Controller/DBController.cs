@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using lll_seer_launcher.core.Servise.DBServise;
 using lll_seer_launcher.core.Dto;
+using lll_seer_launcher.core.Dto.JSON;
 using lll_seer_launcher.core.Utils;
 
 namespace lll_seer_launcher.core.Controller
@@ -23,10 +24,12 @@ namespace lll_seer_launcher.core.Controller
             #region
             public static void InitAchieveTitleTable()
             {
+                List<AchieveTitleInfo> achieveTitleInfo = new List<AchieveTitleInfo>();
                 foreach (AchieveTitleInfo info in GlobalVariable.achieveTitleDictionary.Values)
                 {
-                    SuitAndAchieveTitleDbServise.AchieveTitleTableInsertData(info);
+                    achieveTitleInfo.Add(info);
                 }
+                SuitAndAchieveTitleDbServise.AchieveTitleTableTransactionInsertData(achieveTitleInfo);
                 Logger.Log("InitTableData", "称号表更新完成!");
             }
             public static bool SetAchieveTitleDic()
@@ -38,10 +41,12 @@ namespace lll_seer_launcher.core.Controller
             #region
             public static void InitSuitTable()
             {
+                List<SuitInfo> suitInfo = new List<SuitInfo>();
                 foreach (SuitInfo info in GlobalVariable.suitDictionary.Values)
                 {
-                    SuitAndAchieveTitleDbServise.SuitTableInsertData(info);
+                    suitInfo.Add(info);
                 }
+                SuitAndAchieveTitleDbServise.SuitTableTransactionInsertData(suitInfo);
                 Logger.Log("InitTableData", "装备表更新完成!");
             }
             public static bool SetSuitTitleDic()
@@ -51,12 +56,15 @@ namespace lll_seer_launcher.core.Controller
             #endregion
             /*==========================================目镜明细表============================================*/
             #region
+
             public static void InitGlassesTable()
             {
+                List<GlassesInfo> list = new List<GlassesInfo>();
                 foreach (GlassesInfo info in GlobalVariable.glassesDictionary.Values)
                 {
-                    SuitAndAchieveTitleDbServise.GlassesTableInsertData(info);
+                    list.Add(info);
                 }
+                SuitAndAchieveTitleDbServise.GlassesTableTransactionInsertData(list);
                 Logger.Log("InitTableData", "目镜表更新完成!");
             }
             public static bool SetGlassesTitleDic()
@@ -118,6 +126,10 @@ namespace lll_seer_launcher.core.Controller
         #endregion
         public static class PetDBController
         {
+            public static void PetTableTransactionInsertData(List<Pet> pets)
+            {
+                PetDBServise.PetTableTransactionInsertData(pets);
+            }
             /*==========================================精灵明细表============================================*/
             public static bool CheckAndInitDB()
             {
@@ -135,7 +147,7 @@ namespace lll_seer_launcher.core.Controller
             public static List<Pet> LikeSearchPetByPetName(string petName)
             {
                 return PetDBServise.PetTableSelectDataByPetName(petName);
-            }            
+            }
             public static string SearchPetNameByPetId(int petId)
             {
                 return PetDBServise.PetTableSearchPetNameByPetId(petId);
@@ -154,7 +166,10 @@ namespace lll_seer_launcher.core.Controller
             {
                 return PetDBServise.PetSkinsTableSelectDataBySkinsName(skinsName);
             }
-
+            public static int GetPetRealId(int petId)
+            {
+                return PetDBServise.PetTableGetRealId(petId);
+            }
             /*==========================================方案明细表============================================*/
             public static int AddPlan(PetSkinsReplacePlan planInfo)
             {
@@ -171,6 +186,30 @@ namespace lll_seer_launcher.core.Controller
             public static List<PetSkinsReplacePlan> SearchPlan(string petName)
             {
                 return PetDBServise.PetSkinsPlanTableSelectData(petName);
+            }
+            public static int GetPetSkinsRealId(int petId)
+            {
+                return PetDBServise.PetSkinsTableGetRealId(petId);
+            }
+        }
+
+        public static class SkillDBController
+        {
+            public static bool CheckAndInitDB()
+            {
+                return SkillDBServise.CheckAndInitDB();
+            }
+            public static void SkillTableTransactionInsertData(List<Move> skillInfo)
+            {
+                SkillDBServise.SkillTableTransactionInsertData(skillInfo);
+            }
+            public static int InsertData(Move skillInfo)
+            {
+                return SkillDBServise.SkillTableInsertData(skillInfo);
+            }
+            public static string SearchName(int skillId)
+            {
+                return SkillDBServise.SkillTableSearchSkillNameBySkillId(skillId);
             }
         }
     }

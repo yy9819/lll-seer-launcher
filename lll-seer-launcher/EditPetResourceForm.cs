@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using lll_seer_launcher.core.Controller;
 using lll_seer_launcher.core.Dto;
+using lll_seer_launcher.core.Dto.JSON;
 
 namespace lll_seer_launcher
 {
@@ -29,6 +30,7 @@ namespace lll_seer_launcher
         {
             int index = this.GetPreviewDataGridViewSelectIndex();
             int petId = Convert.ToInt32(this.previewDataGridView.Rows[index].Cells["searchPetId"].Value);
+            petId = petId < 1400000 ? DBController.PetDBController.GetPetRealId(petId) : DBController.PetDBController.GetPetSkinsRealId(petId);
             if (petId > 0)
             {
                 this.petSwfPreviewWebBrowser.Navigate($"https://seer.61.com/resource/fightResource/pet/swf/{petId}.swf");
@@ -84,7 +86,7 @@ namespace lll_seer_launcher
                 {
                     foreach(Pet pet in petInfo)
                     {
-                        this.previewDataGridView.Rows.Add(pet.id,pet.name);
+                        this.previewDataGridView.Rows.Add(pet.id,pet.defName);
                     }
                 }
             }

@@ -39,7 +39,8 @@ namespace lll_seer_launcher.core.Controller
                 /*==========================================精灵相关解析============================================*/
                 { CmdId.GET_PET_INFO_BY_ONCE , (param) =>  AnlyzeGetPetInfoByOnce(param)},
                 /*==========================================战斗相关解析============================================*/
-                { CmdId.MIBAO_FIGHT , (param) =>  AnlyzeMibaoFight(param)},
+                //{ CmdId.MIBAO_FIGHT , (param) =>  AnlyzeMibaoFight(param)},
+                { CmdId.NOTE_READY_TO_FIGHT , (param) =>  AnlyzeNoteReadyToFight(param)},
                 { CmdId.READY_TO_FIGHT , (param) =>  AnlyzeReadyToFight(param)},
                 { CmdId.NOTE_START_FIGHT, (param) =>  AnlyzeNoteStartFight(param)},
                 { CmdId.NOTE_USE_SKILL , (param) =>  AnlyzeNoteUseSkill(param)},
@@ -264,6 +265,21 @@ namespace lll_seer_launcher.core.Controller
             if (GlobalVariable.gameConfigFlag.lowerHpFlag)
             {
                 LowerHPServise.OnMibaoFight();
+            }
+            //else if (GlobalVariable.gameConfigFlag.shouldDisableRecv)
+            //{
+            //    GlobalVariable.sendDataController.SendDataByCmdIdAndIntList(CmdId.READY_TO_FIGHT, new int[0]);
+            //}
+        }
+        private void AnlyzeNoteReadyToFight(HeadInfo recvDataHeadInfo)
+        {
+            if (GlobalVariable.gameConfigFlag.lowerHpFlag)
+            {
+                LowerHPServise.OnMibaoFight();
+            }
+            else if (GlobalVariable.gameConfigFlag.shouldDisableRecv)
+            {
+                GlobalVariable.sendDataController.SendDataByCmdIdAndIntList(CmdId.READY_TO_FIGHT, new int[0]);
             }
         }
         private void AnlyzeReadyToFight(HeadInfo recvDataHeadInfo)

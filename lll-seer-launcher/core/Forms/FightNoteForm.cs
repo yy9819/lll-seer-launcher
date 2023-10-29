@@ -7,6 +7,7 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using lll_seer_launcher.core.Controller;
 using lll_seer_launcher.core.Dto;
 using lll_seer_launcher.core.Dto.PetDto;
 using lll_seer_launcher.core.Utils;
@@ -93,17 +94,19 @@ namespace lll_seer_launcher.core.Forms
                     AttackValueInfo otherPlayer = playersInfo["otherPlayer"];
                     this.fightNoteTextBox.AppendText(
                         $"\r\n===================第{GlobalVariable.fightTurn}回合==================\r\n" +
-                        $"[我方]使用技能[{loginPlayer.skillId}] " +
+                        $"[我方]使用技能[{loginPlayer.skillId}-{DBController.SkillDBController.SearchName(loginPlayer.skillId)}] " +
                         $"{(loginPlayer.atkTimes == 0 && loginPlayer.skillId != 0 ? "攻击MISS！" : "")}" +
                         $"{(loginPlayer.isCrit == 1 ? "打出了致命一击!" : "")}" +
                         $"造成[{loginPlayer.lostHP}]点伤害" +
-                        $"{(loginPlayer.gainHP > 0 ? $",回复{loginPlayer.gainHP}血" : "")}\r\n"+
+                        $"{(loginPlayer.gainHP > 0 ? $",回复{loginPlayer.gainHP}血" : "")}\r\n" +
+                        $"{(loginPlayer.maxHP == 0 ? "我方当前出战精灵[阵亡]!\r\n" : "")}"+
 
-                        $"[对方]使用技能[{otherPlayer.skillId}] " +
+                        $"[对方]使用技能[{otherPlayer.skillId}-{DBController.SkillDBController.SearchName(otherPlayer.skillId)}] " +
                         $"{(otherPlayer.atkTimes == 0  && otherPlayer.skillId != 0 ? "攻击MISS！" : "")}" +
                         $"{(otherPlayer.isCrit == 1 ? "打出了致命一击!" : "")}" +
                         $"造成[{otherPlayer.lostHP}]点伤害" +
-                        $"{(otherPlayer.gainHP > 0 ? $",回复{otherPlayer.gainHP}血" : "")}\r\n"
+                        $"{(otherPlayer.gainHP > 0 ? $",回复{otherPlayer.gainHP}血" : "")}\r\n" +
+                        $"{(otherPlayer.maxHP == 0 ? "对方当前出战精灵[阵亡]!\r\n" : "")}"
                     );
                     this.fightNoteTextBox.ScrollToCaret();
 
@@ -180,7 +183,7 @@ namespace lll_seer_launcher.core.Forms
                                 foreach (var skill in pet.skillArray.Keys)
                                 {
                                     this.skillList.Add(skill);
-                                    this.skillListBox.Items.Add(skill);
+                                    this.skillListBox.Items.Add(pet.skillArray[skill]);
                                     this.skillListBox.SelectedIndex = 0;
                                 }
                                 break;
@@ -230,14 +233,17 @@ namespace lll_seer_launcher.core.Forms
                     {
                         this.petList.Items.Add(petInfo.petName);
                         this.petCatchTimeList.Add(petInfo.catchTime);
-                    }
-                    this.skillList.Clear();
-                    this.skillListBox.Items.Clear();
-                    foreach (var skill in GlobalVariable.pets[0].skillArray.Keys)
-                    {
-                        this.skillList.Add(skill);
-                        this.skillListBox.Items.Add(skill);
-                        this.skillListBox.SelectedIndex = 0;
+                        if(petInfo.catchTime == loginPlayer.catchTime)
+                        {
+                            this.skillList.Clear();
+                            this.skillListBox.Items.Clear();
+                            foreach (var skill in petInfo.skillArray.Keys)
+                            {
+                                this.skillList.Add(skill);
+                                this.skillListBox.Items.Add(petInfo.skillArray[skill]);
+                                this.skillListBox.SelectedIndex = 0;
+                            }
+                        }
                     }
                     //设置双方出战精灵头像
                     this.SetLoginPlayerPetHead(loginPlayer.petId);
@@ -474,6 +480,9 @@ namespace lll_seer_launcher.core.Forms
             if(GlobalVariable.gameConfigFlag.autoUseSkillFlg) GlobalVariable.gameConfigFlag.autoUseSkillId = this.skillList[this.skillListBox.SelectedIndex];
         }
 
-      
+        private void hideFightModuleCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            GlobalVariable.gameConfigFlag.shouldDisableRecv  = this.hideFightModuleCheckBox.Checked;
+        }
     }
 }

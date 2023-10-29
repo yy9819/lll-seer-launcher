@@ -25,19 +25,22 @@ namespace lll_seer_launcher
             Application.SetCompatibleTextRenderingDefault(false);
             loadingForm = new LoadingForm();
             Application.Run(loadingForm);
-            MainFormInstance = new seerMainWindow();
-            if (GlobalUtil.StartFiddler())
+            if (GlobalVariable.successfullyInit)
             {
-                new Thread(() => 
+                MainFormInstance = new seerMainWindow();
+                if (GlobalUtil.StartFiddler())
                 {
-                    Thread.Sleep(5000);
-                    URLMonInterop.SetProxyInProcess("127.0.0.1:4201", "<-loopback>");
-                }).Start();
-                Application.Run(MainFormInstance);
-            }
-            else
-            {
-                MessageBox.Show("赛尔号资源捕获器启动失败！");
+                    new Thread(() =>
+                    {
+                        Thread.Sleep(5000);
+                        URLMonInterop.SetProxyInProcess("127.0.0.1:4201", "<-loopback>");
+                    }).Start();
+                    Application.Run(MainFormInstance);
+                }
+                else
+                {
+                    MessageBox.Show("赛尔号资源捕获器启动失败！");
+                }
             }
         }
 

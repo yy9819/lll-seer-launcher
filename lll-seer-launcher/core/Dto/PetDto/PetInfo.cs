@@ -211,7 +211,7 @@ namespace lll_seer_launcher.core.Dto.PetDto
                 int skillId = ByteConverter.BytesTo10(ByteConverter.TakeBytes(inputData, index, 4));
                 if (!this.skillArray.ContainsKey(skillId))
                 {
-                    this.skillArray.Add(skillId, "");
+                    this.skillArray.Add(skillId, DBController.SkillDBController.SearchName(skillId));
                 }
                 index += 8;
             }

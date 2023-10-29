@@ -42,6 +42,7 @@ namespace lll_seer_launcher
             this.loginUserIdToolStripStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.fireBuffTimeCountToolStripStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.lowerHpStatusToolStripStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
+            this.batteryStatusToolStripStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.mainFormMenuStrip = new System.Windows.Forms.MenuStrip();
             this.toolStripMenuItemSetting = new System.Windows.Forms.ToolStripMenuItem();
             this.gameReloadMenu = new System.Windows.Forms.ToolStripMenuItem();
@@ -70,7 +71,8 @@ namespace lll_seer_launcher
             this.lowerHpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.autoChargeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.disableVipAutoChargeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.batteryStatusToolStripStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
+            this.clearIECacheToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.clearCacheToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.mainFormStatusStrip.SuspendLayout();
             this.mainFormMenuStrip.SuspendLayout();
             this.SuspendLayout();
@@ -128,6 +130,11 @@ namespace lll_seer_launcher
             this.lowerHpStatusToolStripStatusLabel.Name = "lowerHpStatusToolStripStatusLabel";
             this.lowerHpStatusToolStripStatusLabel.Size = new System.Drawing.Size(0, 21);
             // 
+            // batteryStatusToolStripStatusLabel
+            // 
+            this.batteryStatusToolStripStatusLabel.Name = "batteryStatusToolStripStatusLabel";
+            this.batteryStatusToolStripStatusLabel.Size = new System.Drawing.Size(0, 21);
+            // 
             // mainFormMenuStrip
             // 
             this.mainFormMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -147,7 +154,9 @@ namespace lll_seer_launcher
             this.gameReloadMenu,
             this.muteGameToolStripMenuItem,
             this.batteryDormantSwitchToolStripMenuItem,
-            this.openTcpCaptureFormToolStripMenuItem});
+            this.openTcpCaptureFormToolStripMenuItem,
+            this.clearIECacheToolStripMenuItem,
+            this.clearCacheToolStripMenuItem});
             this.toolStripMenuItemSetting.Name = "toolStripMenuItemSetting";
             this.toolStripMenuItemSetting.Size = new System.Drawing.Size(44, 21);
             this.toolStripMenuItemSetting.Text = "设置";
@@ -226,35 +235,35 @@ namespace lll_seer_launcher
             // hideSkillToolStripMenuItem
             // 
             this.hideSkillToolStripMenuItem.Name = "hideSkillToolStripMenuItem";
-            this.hideSkillToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.hideSkillToolStripMenuItem.Size = new System.Drawing.Size(172, 22);
             this.hideSkillToolStripMenuItem.Text = "技能透明";
             this.hideSkillToolStripMenuItem.Click += new System.EventHandler(this.hideSkillToolStripMenuItem_Click);
             // 
             // hidePetToolStripMenuItem
             // 
             this.hidePetToolStripMenuItem.Name = "hidePetToolStripMenuItem";
-            this.hidePetToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.hidePetToolStripMenuItem.Size = new System.Drawing.Size(172, 22);
             this.hidePetToolStripMenuItem.Text = "精灵透明";
             this.hidePetToolStripMenuItem.Click += new System.EventHandler(this.hidePetToolStripMenuItem_Click);
             // 
             // showEditFormToolStripMenuItem
             // 
             this.showEditFormToolStripMenuItem.Name = "showEditFormToolStripMenuItem";
-            this.showEditFormToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.showEditFormToolStripMenuItem.Size = new System.Drawing.Size(172, 22);
             this.showEditFormToolStripMenuItem.Text = "精灵换肤编辑窗口";
             this.showEditFormToolStripMenuItem.Click += new System.EventHandler(this.showEditFormToolStripMenuItem_Click);
             // 
             // openSeerFiddlerWindowToolStripMenuItem
             // 
             this.openSeerFiddlerWindowToolStripMenuItem.Name = "openSeerFiddlerWindowToolStripMenuItem";
-            this.openSeerFiddlerWindowToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.openSeerFiddlerWindowToolStripMenuItem.Size = new System.Drawing.Size(172, 22);
             this.openSeerFiddlerWindowToolStripMenuItem.Text = "资源链接捕获窗口";
             this.openSeerFiddlerWindowToolStripMenuItem.Click += new System.EventHandler(this.openSeerFiddlerWindowToolStripMenuItem_Click);
             // 
             // reloadToolStripMenuItem
             // 
             this.reloadToolStripMenuItem.Name = "reloadToolStripMenuItem";
-            this.reloadToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.reloadToolStripMenuItem.Size = new System.Drawing.Size(172, 22);
             this.reloadToolStripMenuItem.Text = "修复登录器网络";
             this.reloadToolStripMenuItem.Click += new System.EventHandler(this.reloadToolStripMenuItem_Click);
             // 
@@ -280,7 +289,7 @@ namespace lll_seer_launcher
             this.goldBuffToolStripMenuItem,
             this.goldBuffPlusToolStripMenuItem});
             this.copyFireToolStripMenuItem.Name = "copyFireToolStripMenuItem";
-            this.copyFireToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.copyFireToolStripMenuItem.Size = new System.Drawing.Size(167, 22);
             this.copyFireToolStripMenuItem.Text = "借火";
             // 
             // greenBuffToolStripMenuItem
@@ -335,28 +344,37 @@ namespace lll_seer_launcher
             // lowerHpToolStripMenuItem
             // 
             this.lowerHpToolStripMenuItem.Name = "lowerHpToolStripMenuItem";
-            this.lowerHpToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.lowerHpToolStripMenuItem.Size = new System.Drawing.Size(167, 22);
             this.lowerHpToolStripMenuItem.Text = "压血";
             this.lowerHpToolStripMenuItem.Click += new System.EventHandler(this.lowerHpToolStripMenuItem_Click);
             // 
             // autoChargeToolStripMenuItem
             // 
             this.autoChargeToolStripMenuItem.Name = "autoChargeToolStripMenuItem";
-            this.autoChargeToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.autoChargeToolStripMenuItem.Size = new System.Drawing.Size(167, 22);
             this.autoChargeToolStripMenuItem.Text = "自动回血(非VIP)";
             this.autoChargeToolStripMenuItem.Click += new System.EventHandler(this.autoChargeToolStripMenuItem_Click);
             // 
             // disableVipAutoChargeToolStripMenuItem
             // 
             this.disableVipAutoChargeToolStripMenuItem.Name = "disableVipAutoChargeToolStripMenuItem";
-            this.disableVipAutoChargeToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.disableVipAutoChargeToolStripMenuItem.Size = new System.Drawing.Size(167, 22);
             this.disableVipAutoChargeToolStripMenuItem.Text = "关闭VIP自动回血";
             this.disableVipAutoChargeToolStripMenuItem.Click += new System.EventHandler(this.disableVipAutoChargeToolStripMenuItem_Click);
             // 
-            // batteryStatusToolStripStatusLabel
+            // clearIECacheToolStripMenuItem
             // 
-            this.batteryStatusToolStripStatusLabel.Name = "batteryStatusToolStripStatusLabel";
-            this.batteryStatusToolStripStatusLabel.Size = new System.Drawing.Size(0, 21);
+            this.clearIECacheToolStripMenuItem.Name = "clearIECacheToolStripMenuItem";
+            this.clearIECacheToolStripMenuItem.Size = new System.Drawing.Size(242, 22);
+            this.clearIECacheToolStripMenuItem.Text = "清理IE缓存";
+            this.clearIECacheToolStripMenuItem.Click += new System.EventHandler(this.clearIECacheToolStripMenuItem_Click);
+            // 
+            // clearCacheToolStripMenuItem
+            // 
+            this.clearCacheToolStripMenuItem.Name = "clearCacheToolStripMenuItem";
+            this.clearCacheToolStripMenuItem.Size = new System.Drawing.Size(242, 22);
+            this.clearCacheToolStripMenuItem.Text = "清理登录器缓存";
+            this.clearCacheToolStripMenuItem.Click += new System.EventHandler(this.clearCacheToolStripMenuItem_Click);
             // 
             // seerMainWindow
             // 
@@ -396,7 +414,7 @@ namespace lll_seer_launcher
                 currentProcess.Refresh();
                 try
                 {
-                    if (!this.IsDisposed)
+                    if (!this.IsDisposed && !this.Disposing)
                     {
                         GetUsedMemoryCallBack callBack = delegate ()
                         {
@@ -442,7 +460,7 @@ namespace lll_seer_launcher
             }
             finally
             {
-                if (!this.IsDisposed)
+                if (!this.IsDisposed && !this.Disposing)
                 {
                     callBack = delegate ()
                     {
@@ -489,6 +507,8 @@ namespace lll_seer_launcher
         private System.Windows.Forms.ToolStripStatusLabel lowerHpStatusToolStripStatusLabel;
         private System.Windows.Forms.ToolStripMenuItem showFightNoteFormToolStripMenuItem;
         private System.Windows.Forms.ToolStripStatusLabel batteryStatusToolStripStatusLabel;
+        private System.Windows.Forms.ToolStripMenuItem clearIECacheToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem clearCacheToolStripMenuItem;
     }
 }
 

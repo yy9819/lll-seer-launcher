@@ -7,7 +7,7 @@
     <ProjectGuid>{1BB0CCB4-E203-41CD-BC6A-BA25E3B5AB59}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <RootNamespace>lll_seer_launcher</RootNamespace>
-    <AssemblyName>lll-seer-launcher</AssemblyName>
+    <AssemblyName>啦啦啦赛尔号登录器</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -147,12 +147,15 @@
     <Compile Include="core\Controller\InitJsonController.cs" />
     <Compile Include="core\Controller\FormController.cs" />
     <Compile Include="core\Controller\SendDataController.cs" />
+    <Compile Include="core\Dto\JSON\PetJsonDto.cs" />
+    <Compile Include="core\Dto\JSON\SkillJsonDto.cs" />
+    <Compile Include="core\Dto\JSON\VersionDto.cs" />
     <Compile Include="core\Dto\PetDto\AttackValueInfo.cs" />
     <Compile Include="core\Dto\CmdDic.cs" />
     <Compile Include="core\Dto\CmdId.cs" />
     <Compile Include="core\Dto\PetDto\ChangePetInfo.cs" />
     <Compile Include="core\Dto\PetDto\FightPetInfo.cs" />
-    <Compile Include="core\Dto\GlobalObject.cs" />
+    <Compile Include="core\Dto\JSON\GlobalObject.cs" />
     <Compile Include="core\Dto\GlobalVariable.cs" />
     <Compile Include="core\Dto\HeadInfo.cs" />
     <Compile Include="core\Dto\PetDto\PetEffectInfo.cs" />
@@ -187,6 +190,7 @@
     <Compile Include="core\Servise\AutoFightService\LowerHPServise.cs" />
     <Compile Include="core\Servise\DBServise\DBServise.cs" />
     <Compile Include="core\Servise\DBServise\PetDBServise.cs" />
+    <Compile Include="core\Servise\DBServise\SkillDBServise.cs" />
     <Compile Include="core\Servise\DBServise\SuitAndAchieveTitleDbServise.cs" />
     <Compile Include="core\Servise\DecryptService.cs" />
     <Compile Include="core\Servise\EncryptService.cs" />

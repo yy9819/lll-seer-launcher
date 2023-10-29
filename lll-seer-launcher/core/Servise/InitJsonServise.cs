@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using System.IO;
+using System.Net;
 using lll_seer_launcher.core.Dto;
+using lll_seer_launcher.core.Dto.JSON;
 using lll_seer_launcher.core.Utils;
 using lll_seer_launcher.core.Controller;
 
@@ -10,57 +12,85 @@ namespace lll_seer_launcher.core.Servise
 {
     public static class InitJsonServise
     {
-        private static string folderPath = Directory.GetCurrentDirectory() + "\\resource\\json\\";
+        private static string folderPath = Directory.GetCurrentDirectory() + "\\bin\\json\\";
+        private static string taomeeJsonLink = "https://seerh5.61.com/resource/config/xml/";
+        private static string taomeeJsonVersionLink = "https://seerh5.61.com/version/version.json";
 
-        public static void LoadConfigJsonFile()
+        private static string jsonLink = "http://52.68.134.105/resource/json/";
+
+        public static void LoadConfigJsonFile(VersionConfig serverJsonInfo)
         {
-            string serverVersionPath = folderPath + "serverversion.json";
+            if(!Directory.Exists(folderPath))Directory.CreateDirectory(folderPath);
             string loaclVersionPath = folderPath + "loaclversion.json";
             try
             {
-                string serverJsonString = File.ReadAllText(serverVersionPath);
-                VersionJsonObject serverJsonInfo = JsonConvert.DeserializeObject<VersionJsonObject>(serverJsonString);
-                Dictionary<string, bool> shoudUpdataJsonDic = new Dictionary<string, bool>();
-                Dictionary<string, string> jsonPathDic = new Dictionary<string, string>();
                 if (File.Exists(loaclVersionPath))
                 {
                     string localJsonString = File.ReadAllText(loaclVersionPath);
-                    VersionJsonObject localJsonInfo = JsonConvert.DeserializeObject<VersionJsonObject>(localJsonString);
-                    shoudUpdataJsonDic.Add("suit", !(serverJsonInfo.suitVersion == localJsonInfo.suitVersion));
-                    shoudUpdataJsonDic.Add("glasses", !(serverJsonInfo.glassesVersion == localJsonInfo.glassesVersion));
-                    shoudUpdataJsonDic.Add("achieveTitle", !(serverJsonInfo.achieveTitleVersion == localJsonInfo.achieveTitleVersion));
-                    shoudUpdataJsonDic.Add("pet", !(serverJsonInfo.petVersion == localJsonInfo.petVersion));
-                    shoudUpdataJsonDic.Add("petSkins", !(serverJsonInfo.petSkinsVersion == localJsonInfo.petSkinsVersion));
+                    VersionConfig localJsonInfo = JsonConvert.DeserializeObject<VersionConfig>(localJsonString);
+                    GlobalVariable.shoudUpdateJsonDic.Add("suit", !(serverJsonInfo.suitjson == localJsonInfo.suitjson));
+                    GlobalVariable.shoudUpdateJsonDic.Add("glasses", !(serverJsonInfo.glassesjson == localJsonInfo.glassesjson));
+                    GlobalVariable.shoudUpdateJsonDic.Add("achieveTitle", !(serverJsonInfo.achievetitlejson == localJsonInfo.achievetitlejson));
                 }
                 else
                 {
-                    shoudUpdataJsonDic.Add("suit", true);
-                    shoudUpdataJsonDic.Add("glasses", true);
-                    shoudUpdataJsonDic.Add("achieveTitle", true);
-                    shoudUpdataJsonDic.Add("pet", true);
-                    shoudUpdataJsonDic.Add("petSkins", true);
+                    GlobalVariable.shoudUpdateJsonDic.Add("suit", true);
+                    GlobalVariable.shoudUpdateJsonDic.Add("glasses", true);
+                    GlobalVariable.shoudUpdateJsonDic.Add("achieveTitle", true);
                 }
-                jsonPathDic.Add("suit", serverJsonInfo.suitVersion);
-                jsonPathDic.Add("glasses", serverJsonInfo.glassesVersion);
-                jsonPathDic.Add("achieveTitle", serverJsonInfo.achieveTitleVersion);
-                jsonPathDic.Add("pet", serverJsonInfo.petVersion);
-                jsonPathDic.Add("petSkins", serverJsonInfo.petSkinsVersion);
-                File.WriteAllText(loaclVersionPath, serverJsonString);
-                GlobalVariable.shoudUpdateJsonDic = shoudUpdataJsonDic;
-                GlobalVariable.jsonPathDic = jsonPathDic;
+                var data = new
+                {
+                    suitjson = serverJsonInfo.suitjson,
+                    glassesjson = serverJsonInfo.glassesjson,
+                    achievetitlejson = serverJsonInfo.achievetitlejson,
+                };
+                File.WriteAllText(loaclVersionPath, JsonConvert.SerializeObject(data));
             }
-            catch (Exception)
-            {
-
-            }
+            catch { }
         }
 
-        public static bool InitAchieveTitleDictionary(string jsonName)
+        public static bool LoadTaomeeJson()
         {
-            string path = folderPath + jsonName;
+            string serverVersionJson = GlobalUtil.GetJsonString(taomeeJsonVersionLink);
+            if(serverVersionJson == "")
+            {
+                return false;
+            }
+            else
+            {
+                string localTaomeeVersionJsonPath = folderPath + "localtaomeeversionjson.json";
+                try
+                {
+                    TaomeeVersionDto taomeeServerJsonInfo = JsonConvert.DeserializeObject<TaomeeVersionDto>(serverVersionJson);
+                    if (File.Exists(localTaomeeVersionJsonPath))
+                    {
+                        string localJsonString = File.ReadAllText(localTaomeeVersionJsonPath);
+                        TaomeeVersionDto localJsonInfo = JsonConvert.DeserializeObject<TaomeeVersionDto>(localJsonString);
+
+                        GlobalVariable.shoudUpdateJsonDic.Add("pet", !(taomeeServerJsonInfo.files.resource.config.xml.monstersJson == localJsonInfo.files.resource.config.xml.monstersJson));
+                        GlobalVariable.shoudUpdateJsonDic.Add("skill", !(taomeeServerJsonInfo.files.resource.config.xml.movesJson == localJsonInfo.files.resource.config.xml.movesJson));
+                    }
+                    else
+                    {
+                        GlobalVariable.shoudUpdateJsonDic.Add("pet", true);
+                        GlobalVariable.shoudUpdateJsonDic.Add("skill", true);
+                    }
+                    GlobalVariable.jsonPathDic.Add("pet", taomeeServerJsonInfo.files.resource.config.xml.monstersJson);
+                    GlobalVariable.jsonPathDic.Add("skill", taomeeServerJsonInfo.files.resource.config.xml.movesJson);
+                    File.WriteAllText(localTaomeeVersionJsonPath, serverVersionJson);
+                }
+                catch { }
+                return true;
+            }
+            
+        }
+
+        public static bool InitAchieveTitleDictionary()
+        {
+            string link = jsonLink + "achievetitlelist.json";
+            string jsonString = GlobalUtil.GetJsonString(link);
             try
             {
-                string jsonString = File.ReadAllText(path);
                 AchieveTitleJsonObject info = JsonConvert.DeserializeObject<AchieveTitleJsonObject>(jsonString);
                 Dictionary<int, AchieveTitleInfo> achieveDic = new Dictionary<int, AchieveTitleInfo>();
                 foreach (var item in info.data)
@@ -77,12 +107,12 @@ namespace lll_seer_launcher.core.Servise
                 return false;
             }
         }
-        public static bool InitSuitDictionary(string jsonName)
+        public static bool InitSuitDictionary()
         {
-            string path = folderPath + jsonName;
+            string link = jsonLink + "suitlist.json";
+            string jsonString = GlobalUtil.GetJsonString(link);
             try
             {
-                string jsonString = File.ReadAllText(path);
                 SuitJsonObject info = JsonConvert.DeserializeObject<SuitJsonObject>(jsonString);
                 Dictionary<int, SuitInfo> suitDic = new Dictionary<int, SuitInfo>();
                 foreach (var item in info.data)
@@ -100,22 +130,29 @@ namespace lll_seer_launcher.core.Servise
             }
         }
 
-        public static bool InitGlassesDictionary(string jsonName)
+        public static bool InitGlassesDictionary()
         {
-            //string path = folderPath + "glassesList.json";
-            string path = folderPath + jsonName;
+            string link = jsonLink + "glasseslist.json";
+            string jsonString = GlobalUtil.GetJsonString(link);
             try
             {
-                string jsonString = File.ReadAllText(path);
-                GlassesJsonObject info = JsonConvert.DeserializeObject<GlassesJsonObject>(jsonString);
-                Dictionary<int, GlassesInfo> glassesDic = new Dictionary<int, GlassesInfo>();
-                foreach (var item in info.data)
+                if (jsonString != "")
                 {
-                    glassesDic.Add(item.glassesId, item);
+
+                    GlassesJsonObject info = JsonConvert.DeserializeObject<GlassesJsonObject>(jsonString);
+                    Dictionary<int, GlassesInfo> glassesDic = new Dictionary<int, GlassesInfo>();
+                    foreach (var item in info.data)
+                    {
+                        glassesDic.Add(item.glassesId, item);
+                    }
+                    GlobalVariable.glassesDictionary = glassesDic;
+                    Logger.Log("jsonFileInit", "目镜json加载完成。");
+                    return true;
                 }
-                GlobalVariable.glassesDictionary = glassesDic;
-                Logger.Log("jsonFileInit", "目镜json加载完成。");
-                return true;
+                else
+                {
+                    return false;
+                }
             }
             catch (Exception ex)
             {
@@ -126,18 +163,21 @@ namespace lll_seer_launcher.core.Servise
 
         public static bool InitPetDB(string jsonName)
         {
-            //string path = folderPath + "glassesList.json";
-            string path = folderPath + jsonName;
+            string link = taomeeJsonLink + jsonName;
             try
             {
-                string jsonString = File.ReadAllText(path);
-                PetJsonObject info = JsonConvert.DeserializeObject<PetJsonObject>(jsonString);
-                foreach (var item in info.data)
+                string jsonString = GlobalUtil.GetJsonString(link);
+                if (jsonString != "")
                 {
-                    DBController.PetDBController.InsertPetData(item);
+                    PetJsonDto info = JsonConvert.DeserializeObject<PetJsonDto>(jsonString);
+                    DBController.PetDBController.PetTableTransactionInsertData(info.monsters.monster);
+                    Logger.Log("jsonFileInit", "精灵json加载完成。");
+                    return true;
                 }
-                Logger.Log("jsonFileInit", "精灵json加载完成。");
-                return true;
+                else
+                {
+                    return false;
+                }
             }
             catch (Exception ex)
             {
@@ -145,26 +185,32 @@ namespace lll_seer_launcher.core.Servise
                 return false;
             }
         }
-        public static bool InitPetSkinsDB(string jsonName)
+
+        public static bool InitSkillDB(string jsonName)
         {
-            //string path = folderPath + "glassesList.json";
-            string path = folderPath + jsonName;
+            string link = taomeeJsonLink + jsonName;
             try
             {
-                string jsonString = File.ReadAllText(path);
-                PetSkinsJsonObject info = JsonConvert.DeserializeObject<PetSkinsJsonObject>(jsonString);
-                foreach (var item in info.data)
+                string jsonString = GlobalUtil.GetJsonString(link);
+                if(jsonString != "")
                 {
-                    DBController.PetDBController.InsertPetSkinsData(item);
+                    SkillJsonDto info = JsonConvert.DeserializeObject<SkillJsonDto>(jsonString);
+                    DBController.SkillDBController.SkillTableTransactionInsertData(info.movesTbl.moves.move);
+                    Logger.Log("jsonFileInit", "技能json加载完成。");
+                    return true;
                 }
-                Logger.Log("jsonFileInit", "精灵皮肤json加载完成。");
-                return true;
+                else
+                {
+                    return false;
+                }
             }
             catch (Exception ex)
             {
-                Logger.Error($"精灵json加载失败！！！errorMessage{ex.Message}");
+                Logger.Error($"技能json加载失败！！！errorMessage{ex.Message}");
                 return false;
             }
         }
+
+        
     }
 }

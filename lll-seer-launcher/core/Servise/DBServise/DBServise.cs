@@ -10,7 +10,8 @@ namespace lll_seer_launcher.core.Servise.DBServise
         protected static Dictionary<string, string> dbMap = new Dictionary<string, string>()
             {
                 { "suitDB","suit.db" }, 
-                { "petDB","pet.db" }
+                { "petDB","pet.db" },
+                { "skillDB","skill.db" },
             };
         protected class createTableSql
         {

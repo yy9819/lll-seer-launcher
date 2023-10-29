@@ -492,5 +492,31 @@ namespace lll_seer_launcher
         {
             this.fightNoteForm.InitFightNote();
         }
+
+        private void clearIECacheToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+           
+            DialogResult result = MessageBox.Show("是否确认执行此操作?", "确认框", MessageBoxButtons.OKCancel, MessageBoxIcon.Question);
+            if (result == DialogResult.OK)
+            {
+                FormController.ClearIECache();
+            }
+        }
+
+        private void clearCacheToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            DialogResult result = MessageBox.Show("是否确认执行此操作?", "确认框", MessageBoxButtons.OKCancel, MessageBoxIcon.Question);
+            if (result == DialogResult.OK)
+            {
+                if(Directory.Exists(Directory.GetCurrentDirectory() + "/cache"))
+                {
+                    try
+                    {
+                        Directory.Delete(Directory.GetCurrentDirectory() + "/cache", true);
+                    }
+                    catch { }
+                }
+            }
+        }
     }
 }

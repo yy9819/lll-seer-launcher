@@ -14,6 +14,7 @@ namespace lll_seer_launcher.core.Dto
         public static seerMainWindow mainForm;
         public const string seerFiddlerTitle = "seerFiddler";
         public static bool loadingComplate = false;
+        public static bool successfullyInit = true;
         #endregion
         #region
         /*================================================游戏用全局变量=====================================================*/
@@ -168,8 +169,8 @@ namespace lll_seer_launcher.core.Dto
         #endregion
         #region
         /*=============================================json相关用全局变量================================================*/
-        public static Dictionary<string,bool> shoudUpdateJsonDic { get; set; }
-        public static Dictionary<string,string> jsonPathDic { get; set; }
+        public static Dictionary<string, bool> shoudUpdateJsonDic { get; set; } = new Dictionary<string, bool>();
+        public static Dictionary<string,string> jsonPathDic { get; set; } = new Dictionary<string, string>();
         #endregion
     }
 }
