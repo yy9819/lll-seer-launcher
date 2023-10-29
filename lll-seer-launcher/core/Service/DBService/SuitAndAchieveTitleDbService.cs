@@ -8,11 +8,11 @@ using System.IO;
 using lll_seer_launcher.core.Utils;
 using lll_seer_launcher.core.Dto;
 
-namespace lll_seer_launcher.core.Servise.DBServise
+namespace lll_seer_launcher.core.Service.DBService
 {
     #region
-    /*==========================================装备相关Servise============================================*/
-    public class SuitAndAchieveTitleDbServise : DBServise
+    /*==========================================装备相关Service============================================*/
+    public class SuitAndAchieveTitleDbService : DBService
     {
         private static string suitDBPath = dbPath + dbMap["suitDB"];
         private static SqliteConnection db;

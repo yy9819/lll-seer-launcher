@@ -7,9 +7,9 @@ using lll_seer_launcher.core.Utils;
 using lll_seer_launcher.core.Controller;
 using lll_seer_launcher.core.Dto;
 
-namespace lll_seer_launcher.core.Servise
+namespace lll_seer_launcher.core.Service
 {
-    class SendDataServise
+    class SendDataService
     {
         /// <summary>
         /// 封包发送主函数！

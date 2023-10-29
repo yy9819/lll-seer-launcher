@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 using lll_seer_launcher.core.Dto;
 using lll_seer_launcher.core.Dto.PetDto;
 
-namespace lll_seer_launcher.core.Servise.FightNoteServise
+namespace lll_seer_launcher.core.Service.FightNoteService
 {
-    public class FightNoteServise
+    public class FightNoteService
     {
         public static Dictionary<string, FightPetInfo> OnNoteStartFight(HeadInfo recvDataHeadInfo)
         {

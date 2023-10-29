@@ -6,9 +6,9 @@ using lll_seer_launcher.core.Utils;
 using lll_seer_launcher.core.Dto;
 using lll_seer_launcher.core.Dto.PetDto;
 
-namespace lll_seer_launcher.core.Servise.AutoFightService
+namespace lll_seer_launcher.core.Service.AutoFightService
 {
-    public class AutoUseSkillServise
+    public class AutoUseSkillService
     {
         public static void OnUseSkill(AttackValueInfo attackValueInfo)
         {

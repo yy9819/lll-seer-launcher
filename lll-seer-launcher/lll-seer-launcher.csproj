@@ -185,19 +185,19 @@
     <Compile Include="core\Forms\SeerTcpCaptureForm.Designer.cs">
       <DependentUpon>SeerTcpCaptureForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="core\Servise\AnalyzeRecvDataServise.cs" />
-    <Compile Include="core\Servise\AutoFightService\AutoUseSkillServise.cs" />
-    <Compile Include="core\Servise\AutoFightService\LowerHPServise.cs" />
-    <Compile Include="core\Servise\DBServise\DBServise.cs" />
-    <Compile Include="core\Servise\DBServise\PetDBServise.cs" />
-    <Compile Include="core\Servise\DBServise\SkillDBServise.cs" />
-    <Compile Include="core\Servise\DBServise\SuitAndAchieveTitleDbServise.cs" />
-    <Compile Include="core\Servise\DecryptService.cs" />
-    <Compile Include="core\Servise\EncryptService.cs" />
-    <Compile Include="core\Servise\FightNoteServise\FightNoteServise.cs" />
-    <Compile Include="core\Servise\GetPetInfoService.cs" />
-    <Compile Include="core\Servise\InitJsonServise.cs" />
-    <Compile Include="core\Servise\SendDataServise.cs" />
+    <Compile Include="core\Service\AnalyzeRecvDataService.cs" />
+    <Compile Include="core\Service\AutoFightService\AutoUseSkillService.cs" />
+    <Compile Include="core\Service\AutoFightService\LowerHPService.cs" />
+    <Compile Include="core\Service\DBService\DBService.cs" />
+    <Compile Include="core\Service\DBService\PetDBService.cs" />
+    <Compile Include="core\Service\DBService\SkillDBService.cs" />
+    <Compile Include="core\Service\DBService\SuitAndAchieveTitleDbService.cs" />
+    <Compile Include="core\Service\DecryptService.cs" />
+    <Compile Include="core\Service\EncryptService.cs" />
+    <Compile Include="core\Service\FightNoteService\FightNoteService.cs" />
+    <Compile Include="core\Service\GetPetInfoService.cs" />
+    <Compile Include="core\Service\InitJsonServise.cs" />
+    <Compile Include="core\Service\SendDataServise.cs" />
     <Compile Include="core\Tools\EncryptDecryptTools.cs" />
     <Compile Include="core\Utils\ByteConverter.cs" />
     <Compile Include="core\Controller\MessageEncryptDecryptController.cs" />

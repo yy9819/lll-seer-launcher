@@ -9,9 +9,9 @@ using lll_seer_launcher.core.Dto;
 using lll_seer_launcher.core.Dto.PetDto;
 using lll_seer_launcher.core.Utils;
 
-namespace lll_seer_launcher.core.Servise.AutoFightService
+namespace lll_seer_launcher.core.Service.AutoFightService
 {
-    public class LowerHPServise
+    public class LowerHPService
     {
         public static void OnGetPetInfoByOnce()
         {

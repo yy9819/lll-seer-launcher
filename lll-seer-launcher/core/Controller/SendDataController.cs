@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using lll_seer_launcher.core.Servise;
+using lll_seer_launcher.core.Service;
 using lll_seer_launcher.core.Utils;
 using lll_seer_launcher.core.Dto;
 
@@ -15,10 +15,10 @@ namespace lll_seer_launcher.core.Controller
     /// </summary>
     public class SendDataController
     {
-        private SendDataServise sendDataService;
+        private SendDataService sendDataService;
         public SendDataController()
         {
-            this.sendDataService = new SendDataServise();
+            this.sendDataService = new SendDataService();
         }
 
         /// <summary>

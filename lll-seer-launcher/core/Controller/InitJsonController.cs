@@ -1,5 +1,5 @@
 ﻿using System;
-using lll_seer_launcher.core.Servise;
+using lll_seer_launcher.core.Service;
 using lll_seer_launcher.core.Dto;
 using lll_seer_launcher.core.Dto.JSON;
 
@@ -9,33 +9,33 @@ namespace lll_seer_launcher.core.Controller
     {
         public void InitJson(VersionConfig versionConfig)
         {
-            InitJsonServise.LoadConfigJsonFile(versionConfig);
+            InitJsonService.LoadConfigJsonFile(versionConfig);
         }
         public bool InitTaomeeJson()
         {
-            return InitJsonServise.LoadTaomeeJson();
+            return InitJsonService.LoadTaomeeJson();
         }
 
         public bool InitAchieveTitleDictionary()
         {
-            return InitJsonServise.InitAchieveTitleDictionary();
+            return InitJsonService.InitAchieveTitleDictionary();
         }
         public bool InitSuitDictionary()
         {
-            return InitJsonServise.InitSuitDictionary();
+            return InitJsonService.InitSuitDictionary();
         }
         public bool InitGlassesDictionary()
         {
-            return InitJsonServise.InitGlassesDictionary();
+            return InitJsonService.InitGlassesDictionary();
         }
         public bool InitPetDB()
         {
-            return InitJsonServise.InitPetDB(GlobalVariable.jsonPathDic["pet"]);
+            return InitJsonService.InitPetDB(GlobalVariable.jsonPathDic["pet"]);
         }
        
         public bool InitSkillDB()
         {
-            return InitJsonServise.InitSkillDB(GlobalVariable.jsonPathDic["skill"]);
+            return InitJsonService.InitSkillDB(GlobalVariable.jsonPathDic["skill"]);
         }
     }
 }

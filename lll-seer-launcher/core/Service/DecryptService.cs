@@ -8,7 +8,7 @@ using lll_seer_launcher.core.Utils;
 using lll_seer_launcher.core.Tools;
 using lll_seer_launcher.core.Dto;
 
-namespace lll_seer_launcher.core.Servise
+namespace lll_seer_launcher.core.Service
 {
     class DecryptService
     {

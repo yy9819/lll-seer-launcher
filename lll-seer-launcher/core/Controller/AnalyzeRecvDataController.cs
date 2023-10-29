@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Windows.Forms;
 using System.Threading;
 using System.Threading.Tasks;
-using lll_seer_launcher.core.Servise;
-using lll_seer_launcher.core.Servise.AutoFightService;
-using lll_seer_launcher.core.Servise.FightNoteServise;
+using lll_seer_launcher.core.Service;
+using lll_seer_launcher.core.Service.AutoFightService;
+using lll_seer_launcher.core.Service.FightNoteService;
 using lll_seer_launcher.core.Dto;
 using lll_seer_launcher.core.Dto.PetDto;
 using lll_seer_launcher.core.Utils;
@@ -80,7 +80,7 @@ namespace lll_seer_launcher.core.Controller
         private void AnalyzeAchieveTitleList(HeadInfo recvDataHeadInfo)
         {
 
-            AnalyzeRecvDataServise.AnalyzeAchieveTitleList(recvDataHeadInfo);
+            AnalyzeRecvDataService.AnalyzeAchieveTitleList(recvDataHeadInfo);
         }
 
         /// <summary>
@@ -98,7 +98,7 @@ namespace lll_seer_launcher.core.Controller
             int fristItemId = ByteConverter.BytesTo10(ByteConverter.TakeBytes(recvDataHeadInfo.decryptData, 4, 4));
             if (fristItemId >= 1300083 && fristItemId < 1400000)
             {
-                AnalyzeRecvDataServise.AnalyzeSuit(recvDataHeadInfo);
+                AnalyzeRecvDataService.AnalyzeSuit(recvDataHeadInfo);
             }
         }
 
@@ -256,7 +256,7 @@ namespace lll_seer_launcher.core.Controller
                 GetPetInfoService.OnGetPetInfoByOnce(recvDataHeadInfo);
                 if (GlobalVariable.gameConfigFlag.lowerHpFlag)
                 {
-                    LowerHPServise.OnGetPetInfoByOnce();
+                    LowerHPService.OnGetPetInfoByOnce();
                 }
             }
         }
@@ -264,7 +264,7 @@ namespace lll_seer_launcher.core.Controller
         {
             if (GlobalVariable.gameConfigFlag.lowerHpFlag)
             {
-                LowerHPServise.OnMibaoFight();
+                LowerHPService.OnMibaoFight();
             }
             //else if (GlobalVariable.gameConfigFlag.shouldDisableRecv)
             //{
@@ -275,7 +275,7 @@ namespace lll_seer_launcher.core.Controller
         {
             if (GlobalVariable.gameConfigFlag.lowerHpFlag)
             {
-                LowerHPServise.OnMibaoFight();
+                LowerHPService.OnMibaoFight();
             }
             else if (GlobalVariable.gameConfigFlag.shouldDisableRecv)
             {
@@ -286,13 +286,13 @@ namespace lll_seer_launcher.core.Controller
         {
             if (GlobalVariable.gameConfigFlag.lowerHpFlag)
             {
-                LowerHPServise.OnReadyToFight();
+                LowerHPService.OnReadyToFight();
             }
         }
         private void AnlyzeNoteStartFight(HeadInfo recvDataHeadInfo)
         {
             GlobalVariable.fightTurn = 0;
-            Dictionary<string,FightPetInfo> fightPlayers = FightNoteServise.OnNoteStartFight(recvDataHeadInfo);
+            Dictionary<string,FightPetInfo> fightPlayers = FightNoteService.OnNoteStartFight(recvDataHeadInfo);
             GlobalVariable.mainForm.SetPetFightNote(fightPlayers);
             //foreach(var item in fightPlayers["loginPlayer"].petBagMarkArr.Keys)
             //{
@@ -305,9 +305,9 @@ namespace lll_seer_launcher.core.Controller
         {
             if(recvDataHeadInfo.decryptData.Length > 4)
             {
-                ChangePetInfo changePetInfo = FightNoteServise.OnChangePet(recvDataHeadInfo);
+                ChangePetInfo changePetInfo = FightNoteService.OnChangePet(recvDataHeadInfo);
                 GlobalVariable.mainForm.OnChangePet(changePetInfo);
-                if (GlobalVariable.gameConfigFlag.autoUseSkillFlg) AutoUseSkillServise.OnChangePet(changePetInfo);
+                if (GlobalVariable.gameConfigFlag.autoUseSkillFlg) AutoUseSkillService.OnChangePet(changePetInfo);
                 //Console.WriteLine($"loginPlayer:{changePetInfo.userId}-{changePetInfo.petName}");
                 //    $" otherPlayer:{fightPlayers["otherPlayer"].userId}-{fightPlayers["otherPlayer"].petName}");
             }
@@ -315,17 +315,17 @@ namespace lll_seer_launcher.core.Controller
         private void AnlyzeNoteUseSkill(HeadInfo recvDataHeadInfo)
         {
             GlobalVariable.fightTurn++;
-            Dictionary<string, AttackValueInfo> players = FightNoteServise.OnNoteUseSkill(recvDataHeadInfo);
+            Dictionary<string, AttackValueInfo> players = FightNoteService.OnNoteUseSkill(recvDataHeadInfo);
             GlobalVariable.mainForm.OnUseSkill(players);
-            if (GlobalVariable.gameConfigFlag.lowerHpFlag) LowerHPServise.OnNoteUseSkill(players);
-            if (GlobalVariable.gameConfigFlag.autoUseSkillFlg && players["otherPlayer"].remainHP != 0) AutoUseSkillServise.OnUseSkill(players["loginPlayer"]);
+            if (GlobalVariable.gameConfigFlag.lowerHpFlag) LowerHPService.OnNoteUseSkill(players);
+            if (GlobalVariable.gameConfigFlag.autoUseSkillFlg && players["otherPlayer"].remainHP != 0) AutoUseSkillService.OnUseSkill(players["loginPlayer"]);
             //Console.WriteLine($"fristPlayerInfo:{fristPlayerInfo.userId}  secondPlayerInfo:{secondPlayerInfo.userId}");
         }
         private void AnlyzeOnFightOver(HeadInfo recvDataHeadInfo)
         {
             if (GlobalVariable.gameConfigFlag.lowerHpFlag)
             {
-                LowerHPServise.OnFightOver();
+                LowerHPService.OnFightOver();
             }else if (GlobalVariable.gameConfigFlag.autoChargeFlag  && GlobalVariable.loginUserInfo.vipLevel == 0
                  && GlobalVariable.gameConfigFlag.autoChargeFlag)
             {

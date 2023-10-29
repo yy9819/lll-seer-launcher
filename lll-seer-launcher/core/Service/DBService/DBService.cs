@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.IO;
 
-namespace lll_seer_launcher.core.Servise.DBServise
+namespace lll_seer_launcher.core.Service.DBService
 {
-    public class DBServise
+    public class DBService
     {
         protected static string dbPath = Directory.GetCurrentDirectory() + "\\bin\\DB\\";
         protected static Dictionary<string, string> dbMap = new Dictionary<string, string>()

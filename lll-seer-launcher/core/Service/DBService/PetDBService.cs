@@ -9,9 +9,9 @@ using lll_seer_launcher.core.Utils;
 using lll_seer_launcher.core.Dto;
 using lll_seer_launcher.core.Dto.JSON;
 
-namespace lll_seer_launcher.core.Servise.DBServise
+namespace lll_seer_launcher.core.Service.DBService
 {
-    public class PetDBServise:DBServise
+    public class PetDBService:DBService
     {
         private static string petDBPath = dbPath + dbMap["petDB"];
         private static SqliteConnection db;

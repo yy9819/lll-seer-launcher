@@ -9,7 +9,7 @@ using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Windows.Forms;
 using lll_seer_launcher.core.Dto;
-using lll_seer_launcher.core.Servise;
+using lll_seer_launcher.core.Service;
 using lll_seer_launcher.core.Tools;
 using lll_seer_launcher.core.Utils;
 

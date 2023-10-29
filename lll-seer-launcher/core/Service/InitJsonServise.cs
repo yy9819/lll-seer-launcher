@@ -8,9 +8,9 @@ using lll_seer_launcher.core.Dto.JSON;
 using lll_seer_launcher.core.Utils;
 using lll_seer_launcher.core.Controller;
 
-namespace lll_seer_launcher.core.Servise
+namespace lll_seer_launcher.core.Service
 {
-    public static class InitJsonServise
+    public static class InitJsonService
     {
         private static string folderPath = Directory.GetCurrentDirectory() + "\\bin\\json\\";
         private static string taomeeJsonLink = "https://seerh5.61.com/resource/config/xml/";

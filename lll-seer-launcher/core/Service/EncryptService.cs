@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 using lll_seer_launcher.core.Utils;
 using lll_seer_launcher.core.Tools;
 
-namespace lll_seer_launcher.core.Servise
+namespace lll_seer_launcher.core.Service
 {
     class EncryptService
     {
