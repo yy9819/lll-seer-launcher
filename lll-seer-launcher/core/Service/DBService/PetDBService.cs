@@ -15,6 +15,20 @@ namespace lll_seer_launcher.core.Service.DBService
     {
         private static string petDBPath = dbPath + dbMap["petDB"];
         private static SqliteConnection db;
+        private static Dictionary<string, CreateTableSql> tableDic = new Dictionary<string, CreateTableSql>()
+        {
+            { "pet" , new CreateTableSql("pet", "精灵信息表", "CREATE TABLE pet (id INTEGER PRIMARY KEY AUTOINCREMENT,pet_name CHAR(32) NOT NULL," +
+                                "pet_id INT UNIQUE NOT NULL,pet_hp INT NOT NULL,pet_atk INT NOT NULL,pet_def INT NOT NULL," +
+                                "pet_spatk INT NOT NULL,pet_spdef INT NOT NULL,pet_spd INT NOT NULL,pet_type INT NOT NULL," +
+                                "pet_realId INT,pet_learnableMoves TEXT);")},
+            { "petskins", new CreateTableSql("petskins", "精灵皮肤表", "CREATE TABLE petskins (id INTEGER PRIMARY KEY AUTOINCREMENT,pet_skins_name CHAR(32) NOT NULL," +
+                                "pet_skins_id INT UNIQUE NOT NULL,pet_skins_realid INT);")},
+            { "petskinsreplaceplan" , new CreateTableSql("petskinsreplaceplan", "精灵皮肤替换方案表", "CREATE TABLE petskinsreplaceplan (id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                                "pet_name CHAR(32) NOT NULL,pet_id INT UNIQUE NOT NULL,pet_skins_name CHAR(32) NOT NULL,pet_skins_id INT NOT NULL);")},
+            { "petbagplan" , new CreateTableSql("petbagplan", "精灵背包方案表", "CREATE TABLE petbagplan (id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                                "plan_name CHAR(32) ,pet_name_list TEXT NOT NULL,pet_id_list TEXT NOT NULL,pet_catchtime_list TEXT NOT NULL);")},
+
+        };
         public static bool CheckAndInitDB()
         {
             try
@@ -27,40 +41,14 @@ namespace lll_seer_launcher.core.Service.DBService
                     File.Create(petDBPath).Close();
                     Logger.Log("CreateDB", "数据库文件创建完成！");
                     Logger.Log("CreateDBTableStart", "开始创建数据库table");
-                    using (db = new SqliteConnection($"Filename={petDBPath}"))
-                    {
-                        db.Open();
-                        createTableSql[] createTableCmds = new createTableSql[3]
-                        {
-                                new createTableSql("pet", "精灵信息表", "CREATE TABLE pet (id INTEGER PRIMARY KEY AUTOINCREMENT,pet_name CHAR(32) NOT NULL," +
-                                "pet_id INT UNIQUE NOT NULL,pet_hp INT NOT NULL,pet_atk INT NOT NULL,pet_def INT NOT NULL," +
-                                "pet_spatk INT NOT NULL,pet_spdef INT NOT NULL,pet_spd INT NOT NULL,pet_type INT NOT NULL," +
-                                "pet_realId INT,pet_learnableMoves TEXT);"),
-                                new createTableSql("petskins", "精灵皮肤表", "CREATE TABLE petskins (id INTEGER PRIMARY KEY AUTOINCREMENT,pet_skins_name CHAR(32) NOT NULL," +
-                                "pet_skins_id INT UNIQUE NOT NULL,pet_skins_realid INT);"),
-                                new createTableSql("petskinsreplaceplan", "精灵皮肤替换方案表", "CREATE TABLE petskinsreplaceplan (id INTEGER PRIMARY KEY AUTOINCREMENT," +
-                                "pet_name CHAR(32) NOT NULL,pet_id INT UNIQUE NOT NULL,pet_skins_name CHAR(32) NOT NULL,pet_skins_id INT NOT NULL);")
-                        };
-                        foreach (var cmd in createTableCmds)
-                        {
-                            try
-                            {
-                                Logger.Log("CrateTableStart", $"正在创建--{cmd.dbTableName}--");
-                                SqliteCommand createTableCmd = new SqliteCommand(cmd.sqlString, db);
-                                createTableCmd.ExecuteNonQuery();
-                                Logger.Log("CrateTableEnd", $"创建--{cmd.dbTableCheneseName}--成功!");
-                            }
-                            catch (Exception ex)
-                            {
-                                Logger.Error($"创建{cmd.dbTableCheneseName}时出错！errorMessage：{ex.Message}");
-                                return false;
-                            }
-                        }
-                    }
                 }
-                else
+                using (db = new SqliteConnection($"Filename={petDBPath}"))
                 {
-                    db = new SqliteConnection($"Filename={petDBPath}");
+                    db.Open();
+                    foreach (var key in tableDic.Keys)
+                    {
+                        if (!TableExists(db, key)) if (!CrateTable(db, tableDic[key])) return false;
+                    }
                 }
                 Logger.Log("DBInit", "初始化精灵数据库完成!!!");
             }

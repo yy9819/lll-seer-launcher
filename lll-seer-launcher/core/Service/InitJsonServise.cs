@@ -77,7 +77,12 @@ namespace lll_seer_launcher.core.Service
                     }
                     GlobalVariable.jsonPathDic.Add("pet", taomeeServerJsonInfo.files.resource.config.xml.monstersJson);
                     GlobalVariable.jsonPathDic.Add("skill", taomeeServerJsonInfo.files.resource.config.xml.movesJson);
-                    File.WriteAllText(localTaomeeVersionJsonPath, serverVersionJson);
+
+                    string data = "{\"files\":{\"resource\":{\"config\":{\"xml\":{" + 
+                        $"\"monsters.json\":\"{taomeeServerJsonInfo.files.resource.config.xml.monstersJson}\"," +
+                        $"\"moves.json\":\"{taomeeServerJsonInfo.files.resource.config.xml.movesJson}\""+
+                        "}}}}}";
+                    File.WriteAllText(localTaomeeVersionJsonPath, data);
                 }
                 catch { }
                 return true;

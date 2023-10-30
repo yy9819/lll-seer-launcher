@@ -222,12 +222,16 @@ namespace lll_seer_launcher.core.Controller
                 //获取当前装备的cloth数量并计算火焰对应的位置
                 index += ByteConverter.BytesTo10(ByteConverter.TakeBytes(recvDataHeadInfo.decryptData, index, 4)) * 8 + 8;
                 //获取当前玩家的火焰类型
-                int fireBuff = ByteConverter.BytesTo10(ByteConverter.TakeBytes(recvDataHeadInfo.decryptData, index, 1));
+                int fireBuff = ByteConverter.BytesTo10(ByteConverter.TakeBytes(recvDataHeadInfo.decryptData, index++, 1));
+                int loginTime = ByteConverter.BytesTo10(ByteConverter.TakeBytes(recvDataHeadInfo.decryptData, index, 4));
+                index += 4;
+                int lastOfflineTime = ByteConverter.BytesTo10(ByteConverter.TakeBytes(recvDataHeadInfo.decryptData, index, 4));
                 //如果当前正在进行借绿火，且判断当前玩家是否为需要借火的目标
                 if (GlobalVariable.fireBuffCopyObj.copyGreenBuff[0] && GlobalVariable.fireBuffCopyObj.copyGreenBuffUserId == userId)
                 {
                     //如果装备的是绿火，则设置当前的借火flag里的第三个flag（是否为绿火为真）
-                    if(fireBuff == 5 || fireBuff == 6)
+                    //且判断是否在线
+                    if(loginTime > lastOfflineTime && (fireBuff == 5 || fireBuff == 6))
                     {
                         GlobalVariable.fireBuffCopyObj.copyGreenBuff[2] = true;
                         Logger.Log("copyFire","快速借火--绿火");
@@ -241,7 +245,7 @@ namespace lll_seer_launcher.core.Controller
                     GlobalVariable.fireBuffCopyObj.greenFireBuffDic.Add(userId, fireBuff);
                 }
             }
-            
+
         }
 
 

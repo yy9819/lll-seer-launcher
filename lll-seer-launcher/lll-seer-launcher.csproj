@@ -285,13 +285,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\skill.swf" />
-    <None Include="Resources\pet.swf" />
     <None Include="Resources\8.png" />
     <None Include="Resources\214.png" />
     <Content Include="Resources\bibiIcon.ico" />
     <None Include="Resources\bibiLoading.gif" />
-    <Content Include="Resources\bibiloading.swf" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.8">
