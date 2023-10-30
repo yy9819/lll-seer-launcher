@@ -3,96 +3,214 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using lll_seer_launcher.core.Servise;
+using lll_seer_launcher.core.Service.DBService;
 using lll_seer_launcher.core.Dto;
+using lll_seer_launcher.core.Dto.JSON;
 using lll_seer_launcher.core.Utils;
 
 namespace lll_seer_launcher.core.Controller
 {
     public class DBController
     {
-        public static class SuitAndAchieveTitleDbController
+        /*==========================================装备相关controller============================================*/
+        #region
+        public class SuitAndAchieveTitleDBController
         {
             public static bool CheckAndInitDB()
             {
-                return DBServise.SuitAndAchieveTitleDbServise.CheckAndInitDB();
+                return SuitAndAchieveTitleDbService.CheckAndInitDB();
             }
-
+            /*==========================================称号明细表============================================*/
             #region
             public static void InitAchieveTitleTable()
             {
-                foreach(AchieveTitleInfo info in GlobalVariable.achieveTitleDictionary.Values)
+                List<AchieveTitleInfo> achieveTitleInfo = new List<AchieveTitleInfo>();
+                foreach (AchieveTitleInfo info in GlobalVariable.achieveTitleDictionary.Values)
                 {
-                    DBServise.SuitAndAchieveTitleDbServise.AchieveTitleTableInsertData(info);
+                    achieveTitleInfo.Add(info);
                 }
-                Logger.Log("InitTableData","称号表更新完成!");
+                SuitAndAchieveTitleDbService.AchieveTitleTableTransactionInsertData(achieveTitleInfo);
+                Logger.Log("InitTableData", "称号表更新完成!");
             }
             public static bool SetAchieveTitleDic()
             {
-                return DBServise.SuitAndAchieveTitleDbServise.AchieveTitleTableAllDataAndSetAchieveTitleDic();
+                return SuitAndAchieveTitleDbService.AchieveTitleTableAllDataAndSetAchieveTitleDic();
             }
             #endregion
+            /*==========================================套装明细表============================================*/
             #region
             public static void InitSuitTable()
             {
+                List<SuitInfo> suitInfo = new List<SuitInfo>();
                 foreach (SuitInfo info in GlobalVariable.suitDictionary.Values)
                 {
-                    DBServise.SuitAndAchieveTitleDbServise.SuitTableInsertData(info);
+                    suitInfo.Add(info);
                 }
+                SuitAndAchieveTitleDbService.SuitTableTransactionInsertData(suitInfo);
                 Logger.Log("InitTableData", "装备表更新完成!");
             }
             public static bool SetSuitTitleDic()
             {
-                return DBServise.SuitAndAchieveTitleDbServise.SuitTableSelectAllDataAndSetSuitDic();
+                return SuitAndAchieveTitleDbService.SuitTableSelectAllDataAndSetSuitDic();
             }
             #endregion
+            /*==========================================目镜明细表============================================*/
             #region
+
             public static void InitGlassesTable()
             {
+                List<GlassesInfo> list = new List<GlassesInfo>();
                 foreach (GlassesInfo info in GlobalVariable.glassesDictionary.Values)
                 {
-                    DBServise.SuitAndAchieveTitleDbServise.GlassesTableInsertData(info);
+                    list.Add(info);
                 }
+                SuitAndAchieveTitleDbService.GlassesTableTransactionInsertData(list);
                 Logger.Log("InitTableData", "目镜表更新完成!");
             }
             public static bool SetGlassesTitleDic()
             {
-                return DBServise.SuitAndAchieveTitleDbServise.GlassesTableAllDataAndSetGlassesDic();
+                return SuitAndAchieveTitleDbService.GlassesTableAllDataAndSetGlassesDic();
             }
             #endregion
             /*==========================================用户装备持有明细表============================================*/
             #region
             public static int UserTableInsertData(UserSuitAndAchieveTitleInfo insertData)
             {
-                return DBServise.SuitAndAchieveTitleDbServise.UserTableInsertData(insertData);
-            } 
-            public static int UserTableUpadateData(UserSuitAndAchieveTitleInfo insertData)
+                return SuitAndAchieveTitleDbService.UserTableInsertData(insertData);
+            }
+            public static int UserTableUpadateClothData(UserSuitAndAchieveTitleInfo insertData)
             {
-                return DBServise.SuitAndAchieveTitleDbServise.UserTableUpdateData(insertData);
+                return SuitAndAchieveTitleDbService.UserTableUpdateClothData(insertData);
+            }
+            public static int UserTableUpadateAchieveTitleData(UserSuitAndAchieveTitleInfo insertData)
+            {
+                return SuitAndAchieveTitleDbService.UserTableUpdateAchieveTitleData(insertData);
             }
             public static Dictionary<int, UserSuitAndAchieveTitleInfo> UserTableSelectDataGetUserClothDic()
             {
-                return DBServise.SuitAndAchieveTitleDbServise.UserTableSelectDataGetUserList();
+                return SuitAndAchieveTitleDbService.UserTableSelectDataGetUserList();
+            }
+            public static int UserTableDeleteUser(int userId)
+            {
+                return SuitAndAchieveTitleDbService.UserTableDeleteDataByUserId(userId);
             }
             #endregion
+            /*==========================================方案明细表============================================*/
             #region
-            public static Dictionary<int,SuitAchieveTitlePlan> GetUserPlan(int userId)
+            public static Dictionary<int, SuitAchieveTitlePlan> GetUserPlan(int userId)
             {
-                return DBServise.SuitAndAchieveTitleDbServise.PlanTableSelectData(userId);
+                return SuitAndAchieveTitleDbService.PlanTableSelectData(userId);
+            }
+            public static Dictionary<int, SuitAchieveTitlePlan> SearchUserPlan(int userId, string searchWord)
+            {
+                return SuitAndAchieveTitleDbService.PlanTableSearch(userId, searchWord);
             }
             public static int InsertPlan(SuitAchieveTitlePlan plan)
             {
-                return DBServise.SuitAndAchieveTitleDbServise.PlanTableInsertData(plan);
+                return SuitAndAchieveTitleDbService.PlanTableInsertData(plan);
             }
             public static int DeletePlan(int planId)
             {
-                return DBServise.SuitAndAchieveTitleDbServise.PlanTableDeleteData(planId);
+                return SuitAndAchieveTitleDbService.PlanTableDeleteData(planId);
+            }
+            public static int DeletePlanByuserId(int userId)
+            {
+                return SuitAndAchieveTitleDbService.PlanTableDeleteDataByUserId(userId);
             }
             public static int UpdatePlan(SuitAchieveTitlePlan plan)
             {
-                return DBServise.SuitAndAchieveTitleDbServise.PlanTableUpdateData(plan);
+                return SuitAndAchieveTitleDbService.PlanTableUpdateData(plan);
             }
             #endregion
+        }
+        #endregion
+        public static class PetDBController
+        {
+            public static void PetTableTransactionInsertData(List<Pet> pets)
+            {
+                PetDBService.PetTableTransactionInsertData(pets);
+            }
+            /*==========================================精灵明细表============================================*/
+            public static bool CheckAndInitDB()
+            {
+                return PetDBService.CheckAndInitDB();
+            }
+            public static int InsertPetData(Pet petInfo)
+            {
+                return PetDBService.PetTableInsertData(petInfo);
+            }
+
+            public static List<Pet> LikeSearchPetByPetId(int petId)
+            {
+                return PetDBService.PetTableLikeSelectDataByPetId(petId);
+            }
+            public static List<Pet> LikeSearchPetByPetName(string petName)
+            {
+                return PetDBService.PetTableSelectDataByPetName(petName);
+            }
+            public static string SearchPetNameByPetId(int petId)
+            {
+                return PetDBService.PetTableSearchPetNameByPetId(petId);
+            }
+
+            /*==========================================皮肤明细表============================================*/
+            public static int InsertPetSkinsData(PetSkins petSkinsInfo)
+            {
+                return PetDBService.PetSkinsTableInsertData(petSkinsInfo);
+            }
+            public static List<PetSkins> LikeSearchPetSkinsByPetId(int skinsId)
+            {
+                return PetDBService.PetSkinsTableLikeSelectDataBySkinsId(skinsId);
+            }
+            public static List<PetSkins> LikeSearchPetSkinsByPetName(string skinsName)
+            {
+                return PetDBService.PetSkinsTableSelectDataBySkinsName(skinsName);
+            }
+            public static int GetPetRealId(int petId)
+            {
+                return PetDBService.PetTableGetRealId(petId);
+            }
+            /*==========================================方案明细表============================================*/
+            public static int AddPlan(PetSkinsReplacePlan planInfo)
+            {
+                return PetDBService.PetSkinsPlanTableInsertData(planInfo);
+            }
+            public static int UpdatePlan(PetSkinsReplacePlan planInfo)
+            {
+                return PetDBService.PetSkinsPlanTableUpdateData(planInfo);
+            }
+            public static int DeletePlan(int petId)
+            {
+                return PetDBService.PetSkinsPlanTableDeleteData(petId);
+            }
+            public static List<PetSkinsReplacePlan> SearchPlan(string petName)
+            {
+                return PetDBService.PetSkinsPlanTableSelectData(petName);
+            }
+            public static int GetPetSkinsRealId(int petId)
+            {
+                return PetDBService.PetSkinsTableGetRealId(petId);
+            }
+        }
+
+        public static class SkillDBController
+        {
+            public static bool CheckAndInitDB()
+            {
+                return SkillDBService.CheckAndInitDB();
+            }
+            public static void SkillTableTransactionInsertData(List<Move> skillInfo)
+            {
+                SkillDBService.SkillTableTransactionInsertData(skillInfo);
+            }
+            public static int InsertData(Move skillInfo)
+            {
+                return SkillDBService.SkillTableInsertData(skillInfo);
+            }
+            public static string SearchName(int skillId)
+            {
+                return SkillDBService.SkillTableSearchSkillNameBySkillId(skillId);
+            }
         }
     }
 }

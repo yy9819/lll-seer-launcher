@@ -42,19 +42,21 @@
             this.achieveTittleTextBox = new System.Windows.Forms.TextBox();
             this.achieveTitleListBox = new System.Windows.Forms.ListBox();
             this.totalGroupBox = new System.Windows.Forms.GroupBox();
-            this.button1 = new System.Windows.Forms.Button();
+            this.planSearchTextBox = new System.Windows.Forms.TextBox();
+            this.placnSearchButton = new System.Windows.Forms.Button();
+            this.deleteUserButton = new System.Windows.Forms.Button();
             this.updatePlanButton = new System.Windows.Forms.Button();
             this.changePlanButton = new System.Windows.Forms.Button();
             this.deletePlanButton = new System.Windows.Forms.Button();
             this.addPlanButton = new System.Windows.Forms.Button();
             this.userListComboBox = new System.Windows.Forms.ComboBox();
             this.planDataGridView = new System.Windows.Forms.DataGridView();
-            this.getUserSuitGlassesTittleInfoButton = new System.Windows.Forms.Button();
             this.name = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.suit = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.glasses = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.achieveTitle = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.id = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.getUserSuitGlassesTittleInfoButton = new System.Windows.Forms.Button();
             this.suitGroupBox.SuspendLayout();
             this.suitAbTextGroupBox.SuspendLayout();
             this.glassesGroupBox.SuspendLayout();
@@ -163,7 +165,9 @@
             // 
             // totalGroupBox
             // 
-            this.totalGroupBox.Controls.Add(this.button1);
+            this.totalGroupBox.Controls.Add(this.planSearchTextBox);
+            this.totalGroupBox.Controls.Add(this.placnSearchButton);
+            this.totalGroupBox.Controls.Add(this.deleteUserButton);
             this.totalGroupBox.Controls.Add(this.updatePlanButton);
             this.totalGroupBox.Controls.Add(this.changePlanButton);
             this.totalGroupBox.Controls.Add(this.deletePlanButton);
@@ -175,11 +179,25 @@
             this.totalGroupBox.Name = "totalGroupBox";
             this.totalGroupBox.TabStop = false;
             // 
-            // button1
+            // planSearchTextBox
             // 
-            resources.ApplyResources(this.button1, "button1");
-            this.button1.Name = "button1";
-            this.button1.UseVisualStyleBackColor = true;
+            resources.ApplyResources(this.planSearchTextBox, "planSearchTextBox");
+            this.planSearchTextBox.Name = "planSearchTextBox";
+            this.planSearchTextBox.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.planSearchTextBox_KeyPress);
+            // 
+            // placnSearchButton
+            // 
+            resources.ApplyResources(this.placnSearchButton, "placnSearchButton");
+            this.placnSearchButton.Name = "placnSearchButton";
+            this.placnSearchButton.UseVisualStyleBackColor = true;
+            this.placnSearchButton.Click += new System.EventHandler(this.placnSearchButton_Click);
+            // 
+            // deleteUserButton
+            // 
+            resources.ApplyResources(this.deleteUserButton, "deleteUserButton");
+            this.deleteUserButton.Name = "deleteUserButton";
+            this.deleteUserButton.UseVisualStyleBackColor = true;
+            this.deleteUserButton.Click += new System.EventHandler(this.deleteUserButton_Click);
             // 
             // updatePlanButton
             // 
@@ -193,6 +211,7 @@
             resources.ApplyResources(this.changePlanButton, "changePlanButton");
             this.changePlanButton.Name = "changePlanButton";
             this.changePlanButton.UseVisualStyleBackColor = true;
+            this.changePlanButton.Click += new System.EventHandler(this.changePlanButton_Click);
             // 
             // deletePlanButton
             // 
@@ -231,13 +250,6 @@
             this.planDataGridView.RowTemplate.Height = 23;
             this.planDataGridView.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.planDataGridView_CellClick);
             // 
-            // getUserSuitGlassesTittleInfoButton
-            // 
-            resources.ApplyResources(this.getUserSuitGlassesTittleInfoButton, "getUserSuitGlassesTittleInfoButton");
-            this.getUserSuitGlassesTittleInfoButton.Name = "getUserSuitGlassesTittleInfoButton";
-            this.getUserSuitGlassesTittleInfoButton.UseVisualStyleBackColor = true;
-            this.getUserSuitGlassesTittleInfoButton.Click += new System.EventHandler(this.getUserSuitGlassTittleInfoButton_Click);
-            // 
             // name
             // 
             resources.ApplyResources(this.name, "name");
@@ -267,6 +279,13 @@
             this.id.Name = "id";
             this.id.ReadOnly = true;
             // 
+            // getUserSuitGlassesTittleInfoButton
+            // 
+            resources.ApplyResources(this.getUserSuitGlassesTittleInfoButton, "getUserSuitGlassesTittleInfoButton");
+            this.getUserSuitGlassesTittleInfoButton.Name = "getUserSuitGlassesTittleInfoButton";
+            this.getUserSuitGlassesTittleInfoButton.UseVisualStyleBackColor = true;
+            this.getUserSuitGlassesTittleInfoButton.Click += new System.EventHandler(this.getUserSuitGlassTittleInfoButton_Click);
+            // 
             // ChangeSuitForm
             // 
             resources.ApplyResources(this, "$this");
@@ -291,6 +310,7 @@
             this.titelAbTextGroupBox.ResumeLayout(false);
             this.titelAbTextGroupBox.PerformLayout();
             this.totalGroupBox.ResumeLayout(false);
+            this.totalGroupBox.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.planDataGridView)).EndInit();
             this.ResumeLayout(false);
 
@@ -318,11 +338,13 @@
         private System.Windows.Forms.Button deletePlanButton;
         private System.Windows.Forms.Button addPlanButton;
         private System.Windows.Forms.DataGridView planDataGridView;
-        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button deleteUserButton;
         private System.Windows.Forms.DataGridViewTextBoxColumn name;
         private System.Windows.Forms.DataGridViewTextBoxColumn suit;
         private System.Windows.Forms.DataGridViewTextBoxColumn glasses;
         private System.Windows.Forms.DataGridViewTextBoxColumn achieveTitle;
         private System.Windows.Forms.DataGridViewTextBoxColumn id;
+        private System.Windows.Forms.TextBox planSearchTextBox;
+        private System.Windows.Forms.Button placnSearchButton;
     }
 }

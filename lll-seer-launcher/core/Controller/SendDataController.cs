@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using lll_seer_launcher.core.Servise;
+using lll_seer_launcher.core.Service;
 using lll_seer_launcher.core.Utils;
 using lll_seer_launcher.core.Dto;
 
@@ -13,12 +13,12 @@ namespace lll_seer_launcher.core.Controller
     /// 封包发送controller
     /// 可调用相应格式的封包发送方法进行封包发送
     /// </summary>
-    class SendDataController
+    public class SendDataController
     {
-        private SendDataServise sendDataService;
+        private SendDataService sendDataService;
         public SendDataController()
         {
-            this.sendDataService = new SendDataServise();
+            this.sendDataService = new SendDataService();
         }
 
         /// <summary>
@@ -36,7 +36,7 @@ namespace lll_seer_launcher.core.Controller
         /// <param name="hexBytesData"></param>
         public void SendHexBytesData(byte[] hexBytesData)
         {
-            hexBytesData = ByteConverter.RepalaceBytes(hexBytesData, ByteConverter.HexToBytes(ByteConverter.DecimalToHex(GlobalVariable.userId, 4)), 9);
+            ByteConverter.HexToBytes(ByteConverter.DecimalToHex(GlobalVariable.loginUserInfo.userId, 4)).CopyTo(hexBytesData,9);
             sendDataService.SendHexBytesData(hexBytesData);
         }
         /// <summary>

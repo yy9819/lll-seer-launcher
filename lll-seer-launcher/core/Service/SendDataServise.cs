@@ -7,9 +7,9 @@ using lll_seer_launcher.core.Utils;
 using lll_seer_launcher.core.Controller;
 using lll_seer_launcher.core.Dto;
 
-namespace lll_seer_launcher.core.Servise
+namespace lll_seer_launcher.core.Service
 {
-    class SendDataServise
+    class SendDataService
     {
         /// <summary>
         /// 封包发送主函数！
@@ -22,11 +22,11 @@ namespace lll_seer_launcher.core.Servise
             //1：欲发送数据不符合封包发送条件，在字节数组末尾添加一个0
             //0：欲发送数据符合封包发送条件
             byte[] bytes = new byte[bytesData.Length + (bytesData.Length % 2 != 0 ? 1 : 0)];
-            bytes = ByteConverter.RepalaceBytes(bytes, bytesData, 0);
+            bytesData.CopyTo(bytes, 0);
             //对未加密数据进行加密(此时不进行seq计算，在安装的hook中监测到该包之后会自动计算seq)
             byte[] encryptBytes = EncryptService.Encrypt(bytes);
             HookControl.send(GlobalVariable.gameSocket, ByteConverter.GetBytesIntPtr(encryptBytes), encryptBytes.Length, 0);
-            Logger.Log("SendData", $"发送封包：{BitConverter.ToString(bytes)}");
+            //Logger.Log("SendData", $"发送封包：{BitConverter.ToString(bytes)}");
         }
 
         /// <summary>
@@ -49,7 +49,7 @@ namespace lll_seer_launcher.core.Servise
             int dataLen = 17 + hexDataString.Length / 2;
             byte[] dataBytes = new byte[dataLen];
             byte[] body = ByteConverter.HexToBytes(hexDataString);
-            dataBytes = ByteConverter.RepalaceBytes(dataBytes, this.PackHead(cmdId, dataLen , body), 0);
+            this.PackHead(cmdId, dataLen, body).CopyTo(dataBytes, 0);
             SendHexBytesData(dataBytes);
         }
 
@@ -62,7 +62,7 @@ namespace lll_seer_launcher.core.Servise
         {
             int dataLen = 17 + hexDataBytes.Length;
             byte[] dataBytes = new byte[dataLen];
-            dataBytes = ByteConverter.RepalaceBytes(dataBytes, this.PackHead(cmdId, dataLen , hexDataBytes), 0);
+            this.PackHead(cmdId, dataLen, hexDataBytes).CopyTo(dataBytes, 0);
             SendHexBytesData(dataBytes);
         }
 
@@ -79,10 +79,10 @@ namespace lll_seer_launcher.core.Servise
             int index = 0;
             for (int i = 0; i < dataList.Length; i++)
             {
-                body = ByteConverter.RepalaceBytes(dataBytes, ByteConverter.HexToBytes(ByteConverter.DecimalToHex(dataList[i], 4)), index);
+                ByteConverter.HexToBytes(ByteConverter.DecimalToHex(dataList[i], 4)).CopyTo(body, index);
                 index += 4;
             }
-            dataBytes = ByteConverter.RepalaceBytes(dataBytes, this.PackHead(cmdId, dataLen , body), 0);
+            this.PackHead(cmdId, dataLen, body).CopyTo(dataBytes, 0);
 
             SendHexBytesData(dataBytes);
         }
@@ -98,23 +98,23 @@ namespace lll_seer_launcher.core.Servise
         {
             byte[] dataBytes = new byte[dataLen];
             int index = 0;
-            dataBytes = ByteConverter.RepalaceBytes(dataBytes, ByteConverter.HexToBytes(ByteConverter.DecimalToHex(dataLen, 4)), index);
+            ByteConverter.HexToBytes(ByteConverter.DecimalToHex(dataLen, 4)).CopyTo(dataBytes, index);
 
             index += 4;
-            dataBytes = ByteConverter.RepalaceBytes(dataBytes, ByteConverter.HexToBytes(ByteConverter.DecimalToHex(31, 1)), index);
+            ByteConverter.HexToBytes(ByteConverter.DecimalToHex(31, 1)).CopyTo(dataBytes, index);
 
             index += 1;
-            dataBytes = ByteConverter.RepalaceBytes(dataBytes, ByteConverter.HexToBytes(ByteConverter.DecimalToHex(cmdId, 4)), index);
+            ByteConverter.HexToBytes(ByteConverter.DecimalToHex(cmdId, 4)).CopyTo(dataBytes,index);
 
             index += 4;
-            dataBytes = ByteConverter.RepalaceBytes(dataBytes, ByteConverter.HexToBytes(ByteConverter.DecimalToHex(GlobalVariable.userId, 4)), index);
+            ByteConverter.HexToBytes(ByteConverter.DecimalToHex(GlobalVariable.loginUserInfo.userId, 4)).CopyTo(dataBytes, index);
 
             index += 4;
-            ByteConverter.RepalaceBytes(dataBytes, ByteConverter.HexToBytes(ByteConverter.DecimalToHex(0, 4)), index);
+            ByteConverter.HexToBytes(ByteConverter.DecimalToHex(0, 4)).CopyTo(dataBytes, index);
             if (dataLen > 17)
             {
                 index += 4; 
-                ByteConverter.RepalaceBytes(dataBytes, body, index);
+                body.CopyTo(dataBytes, index);
             }
 
             return dataBytes;
