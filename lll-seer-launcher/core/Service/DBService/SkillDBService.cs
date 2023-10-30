@@ -15,6 +15,17 @@ namespace lll_seer_launcher.core.Service.DBService
     {
         private static string skillDBPath = dbPath + dbMap["skillDB"];
         private static SqliteConnection db;
+        private static Dictionary<string, CreateTableSql> tableDic = new Dictionary<string, CreateTableSql>()
+        {
+            { "skill" , new CreateTableSql("skill", "技能信息表", "CREATE TABLE skill (id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                                "skill_name CHAR(32) NOT NULL," +
+                                "skill_id INT UNIQUE NOT NULL," +
+                                "skill_type INT NOT NULL," +
+                                "skill_power INT NOT NULL," +
+                                "skill_maxpp INT NOT NULL," +
+                                "skill_accuracy INT NOT NULL);")},
+
+        };
         public static bool CheckAndInitDB()
         {
             try
@@ -27,39 +38,14 @@ namespace lll_seer_launcher.core.Service.DBService
                     File.Create(skillDBPath).Close();
                     Logger.Log("CreateDB", "数据库文件创建完成！");
                     Logger.Log("CreateDBTableStart", "开始创建数据库table");
-                    using (db = new SqliteConnection($"Filename={skillDBPath}"))
-                    {
-                        db.Open();
-                        createTableSql[] createTableCmds = new createTableSql[1]
-                        {
-                                new createTableSql("skill", "技能信息表", "CREATE TABLE skill (id INTEGER PRIMARY KEY AUTOINCREMENT," +
-                                "skill_name CHAR(32) NOT NULL," +
-                                "skill_id INT UNIQUE NOT NULL," +
-                                "skill_type INT NOT NULL," +
-                                "skill_power INT NOT NULL," +
-                                "skill_maxpp INT NOT NULL," +
-                                "skill_accuracy INT NOT NULL);"),
-                        };
-                        foreach (var cmd in createTableCmds)
-                        {
-                            try
-                            {
-                                Logger.Log("CrateTableStart", $"正在创建--{cmd.dbTableName}--");
-                                SqliteCommand createTableCmd = new SqliteCommand(cmd.sqlString, db);
-                                createTableCmd.ExecuteNonQuery();
-                                Logger.Log("CrateTableEnd", $"创建--{cmd.dbTableCheneseName}--成功!");
-                            }
-                            catch (Exception ex)
-                            {
-                                Logger.Error($"创建{cmd.dbTableCheneseName}时出错！errorMessage：{ex.Message}");
-                                return false;
-                            }
-                        }
-                    }
                 }
-                else
+                using (db = new SqliteConnection($"Filename={skillDBPath}"))
                 {
-                    db = new SqliteConnection($"Filename={skillDBPath}");
+                    db.Open();
+                    foreach (var key in tableDic.Keys)
+                    {
+                        if (!TableExists(db, key)) if (!CrateTable(db, tableDic[key])) return false;
+                    }
                 }
                 Logger.Log("DBInit", "初始化技能数据库完成!!!");
             }

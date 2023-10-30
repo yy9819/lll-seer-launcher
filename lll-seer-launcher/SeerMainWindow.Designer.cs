@@ -49,6 +49,8 @@ namespace lll_seer_launcher
             this.muteGameToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.batteryDormantSwitchToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.openTcpCaptureFormToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.clearIECacheToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.clearCacheToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.seerUtilsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.changSuitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.fightMapBossToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -71,8 +73,6 @@ namespace lll_seer_launcher
             this.lowerHpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.autoChargeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.disableVipAutoChargeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.clearIECacheToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.clearCacheToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.mainFormStatusStrip.SuspendLayout();
             this.mainFormMenuStrip.SuspendLayout();
             this.SuspendLayout();
@@ -189,6 +189,20 @@ namespace lll_seer_launcher
             this.openTcpCaptureFormToolStripMenuItem.Text = "打开赛尔号command捕获窗口";
             this.openTcpCaptureFormToolStripMenuItem.Click += new System.EventHandler(this.openTcpCaptureFormToolStripMenuItem_Click);
             // 
+            // clearIECacheToolStripMenuItem
+            // 
+            this.clearIECacheToolStripMenuItem.Name = "clearIECacheToolStripMenuItem";
+            this.clearIECacheToolStripMenuItem.Size = new System.Drawing.Size(242, 22);
+            this.clearIECacheToolStripMenuItem.Text = "清理IE缓存";
+            this.clearIECacheToolStripMenuItem.Click += new System.EventHandler(this.clearIECacheToolStripMenuItem_Click);
+            // 
+            // clearCacheToolStripMenuItem
+            // 
+            this.clearCacheToolStripMenuItem.Name = "clearCacheToolStripMenuItem";
+            this.clearCacheToolStripMenuItem.Size = new System.Drawing.Size(242, 22);
+            this.clearCacheToolStripMenuItem.Text = "清理登录器缓存";
+            this.clearCacheToolStripMenuItem.Click += new System.EventHandler(this.clearCacheToolStripMenuItem_Click);
+            // 
             // seerUtilsToolStripMenuItem
             // 
             this.seerUtilsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -202,21 +216,21 @@ namespace lll_seer_launcher
             // changSuitToolStripMenuItem
             // 
             this.changSuitToolStripMenuItem.Name = "changSuitToolStripMenuItem";
-            this.changSuitToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.changSuitToolStripMenuItem.Size = new System.Drawing.Size(160, 22);
             this.changSuitToolStripMenuItem.Text = "更换装备与称号";
             this.changSuitToolStripMenuItem.Click += new System.EventHandler(this.changSuitToolStripMenuItem_Click);
             // 
             // fightMapBossToolStripMenuItem
             // 
             this.fightMapBossToolStripMenuItem.Name = "fightMapBossToolStripMenuItem";
-            this.fightMapBossToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.fightMapBossToolStripMenuItem.Size = new System.Drawing.Size(160, 22);
             this.fightMapBossToolStripMenuItem.Text = "对战地图怪";
             this.fightMapBossToolStripMenuItem.Click += new System.EventHandler(this.fightMapBossToolStripMenuItem_Click);
             // 
             // showFightNoteFormToolStripMenuItem
             // 
             this.showFightNoteFormToolStripMenuItem.Name = "showFightNoteFormToolStripMenuItem";
-            this.showFightNoteFormToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.showFightNoteFormToolStripMenuItem.Size = new System.Drawing.Size(160, 22);
             this.showFightNoteFormToolStripMenuItem.Text = "对战助手";
             this.showFightNoteFormToolStripMenuItem.Click += new System.EventHandler(this.showFightNoteFormToolStripMenuItem_Click);
             // 
@@ -361,20 +375,6 @@ namespace lll_seer_launcher
             this.disableVipAutoChargeToolStripMenuItem.Size = new System.Drawing.Size(167, 22);
             this.disableVipAutoChargeToolStripMenuItem.Text = "关闭VIP自动回血";
             this.disableVipAutoChargeToolStripMenuItem.Click += new System.EventHandler(this.disableVipAutoChargeToolStripMenuItem_Click);
-            // 
-            // clearIECacheToolStripMenuItem
-            // 
-            this.clearIECacheToolStripMenuItem.Name = "clearIECacheToolStripMenuItem";
-            this.clearIECacheToolStripMenuItem.Size = new System.Drawing.Size(242, 22);
-            this.clearIECacheToolStripMenuItem.Text = "清理IE缓存";
-            this.clearIECacheToolStripMenuItem.Click += new System.EventHandler(this.clearIECacheToolStripMenuItem_Click);
-            // 
-            // clearCacheToolStripMenuItem
-            // 
-            this.clearCacheToolStripMenuItem.Name = "clearCacheToolStripMenuItem";
-            this.clearCacheToolStripMenuItem.Size = new System.Drawing.Size(242, 22);
-            this.clearCacheToolStripMenuItem.Text = "清理登录器缓存";
-            this.clearCacheToolStripMenuItem.Click += new System.EventHandler(this.clearCacheToolStripMenuItem_Click);
             // 
             // seerMainWindow
             // 
