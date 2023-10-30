@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace lll_seer_launcher.core.Dto
 {
-    static class CmdId
+    public static class CmdId
     {
       public  const int LOADING_TIME_STAT = 9303;
       

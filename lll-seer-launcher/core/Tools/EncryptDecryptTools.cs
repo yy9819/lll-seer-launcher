@@ -79,8 +79,10 @@ namespace lll_seer_launcher.core.Tools
                 }
                 byte[] tempBytesLeft = ByteConverter.TakeBytes(encryptedData, encryptedDataLen - result, result);
                 byte[] tempBytesRight = ByteConverter.TakeBytes(encryptedData, 0, encryptedDataLen - result);
-                encryptedData = ByteConverter.RepalaceBytes(encryptedData, tempBytesLeft, 0);
-                encryptedData = ByteConverter.RepalaceBytes(encryptedData, tempBytesRight, result);
+                tempBytesLeft.CopyTo(encryptedData, 0);
+                //encryptedData = ByteConverter.RepalaceBytes(encryptedData, tempBytesLeft, 0);
+                tempBytesRight.CopyTo(encryptedData, result);
+                //encryptedData = ByteConverter.RepalaceBytes(encryptedData, tempBytesRight, result);
             }
 
             return encryptedData;

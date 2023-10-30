@@ -8,7 +8,7 @@ using lll_seer_launcher.core.Utils;
 using lll_seer_launcher.core.Tools;
 using lll_seer_launcher.core.Dto;
 
-namespace lll_seer_launcher.core.Servise
+namespace lll_seer_launcher.core.Service
 {
     class DecryptService
     {
@@ -24,12 +24,14 @@ namespace lll_seer_launcher.core.Servise
             int encryptedDataLen = targetData.Length - 4;
             int decryptedDataLen = encryptedDataLen + 1;
             byte[] decryptedData = ByteConverter.TakeBytes(targetData, 4, decryptedDataLen);
+            byte[] decryptedData2 = new byte[targetData.Length];
             if (decryptedData.Length > 4)
             {
                 decryptedData = DecryptData(decryptedData);
-                targetData = ByteConverter.RepalaceBytes(targetData, decryptedData, 4);
+                ByteConverter.TakeBytes(targetData, 0, 4).CopyTo(decryptedData2, 0);
+                decryptedData.CopyTo(decryptedData2, 4);
             }
-            return targetData;
+            return decryptedData2;
         }
 
         /// <summary>

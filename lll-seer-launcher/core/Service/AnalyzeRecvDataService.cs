@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 using lll_seer_launcher.core.Utils;
 using lll_seer_launcher.core.Dto;
 
-namespace lll_seer_launcher.core.Servise
+namespace lll_seer_launcher.core.Service
 {
-    class AnalyzeRecvDataServise
+    class AnalyzeRecvDataService
     {
         /// <summary>
         /// 加载当前账号所持有的称号
@@ -25,13 +25,13 @@ namespace lll_seer_launcher.core.Servise
                 achieveTitleId = ByteConverter.BytesTo10(ByteConverter.TakeBytes(recvDataHeadInfo.decryptData, i*4, 4));
                 if(achieveTitleId > 150 ) achieveTitles.Add(achieveTitleId);
             }
-            if(GlobalVariable.userAchieveTitleDictionary.ContainsKey(GlobalVariable.userId))
+            if(GlobalVariable.userAchieveTitleDictionary.ContainsKey(GlobalVariable.loginUserInfo.userId))
             {
-                GlobalVariable.userAchieveTitleDictionary[GlobalVariable.userId] = achieveTitles;
+                GlobalVariable.userAchieveTitleDictionary[GlobalVariable.loginUserInfo.userId] = achieveTitles;
             }
             else
             {
-                GlobalVariable.userAchieveTitleDictionary.Add(GlobalVariable.userId, achieveTitles);
+                GlobalVariable.userAchieveTitleDictionary.Add(GlobalVariable.loginUserInfo.userId, achieveTitles);
             }
             //GlobalVariable.userAchieveTitleDictionary.TryGetValue(GlobalVariable.userId, out achieveTitles);
             GlobalVariable.initSuitGroupBoxsCompleteFlg[0] = true;
@@ -53,13 +53,13 @@ namespace lll_seer_launcher.core.Servise
                 if(ByteConverter.BytesTo10(ByteConverter.TakeBytes(recvDataHeadInfo.decryptData, index + 4 , 4)) == 1)clothDic.Add(clothId, clothId);
                 index += 20;
             }
-            if (GlobalVariable.userSuitClothDictionary.ContainsKey(GlobalVariable.userId))
+            if (GlobalVariable.userSuitClothDictionary.ContainsKey(GlobalVariable.loginUserInfo.userId))
             {
-                GlobalVariable.userSuitClothDictionary[GlobalVariable.userId] = clothDic;
+                GlobalVariable.userSuitClothDictionary[GlobalVariable.loginUserInfo.userId] = clothDic;
             }
             else
             {
-                GlobalVariable.userSuitClothDictionary.Add(GlobalVariable.userId, clothDic);
+                GlobalVariable.userSuitClothDictionary.Add(GlobalVariable.loginUserInfo.userId, clothDic);
             }
             GlobalVariable.initSuitGroupBoxsCompleteFlg[1] = true;
             //Console.WriteLine(BitConverter.ToString(recvDataHeadInfo.decryptData));
