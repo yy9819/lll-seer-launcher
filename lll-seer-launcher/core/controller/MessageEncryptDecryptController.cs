@@ -222,6 +222,8 @@ namespace lll_seer_launcher.core.Controller
                         GlobalVariable.isLogin = true;
                         new Task(() =>
                         {
+                            GlobalVariable.sendDataController.SendDataByCmdIdAndIntList(CmdId.GET_PET_INFO_BY_ONCE,
+                               new int[0]);
                             Thread.Sleep(5000);
                             GlobalVariable.sendDataController.SendDataByCmdIdAndIntList(CmdId.COMMAND_42019,
                                 new int[2] { 22439, GlobalVariable.gameConfigFlag.disableVipAutoChargeFlag ? 0 : 1 });
@@ -232,6 +234,7 @@ namespace lll_seer_launcher.core.Controller
                     else
                     {
                         this.analyzeRecvDataController.RunAnalyzeRecvDataMethod(headInfo);
+                        GlobalVariable.analyzeRecvDataController.RunAnalyzeRecvDataMethod(headInfo);
                     }
                 }
             }

@@ -49,7 +49,7 @@ namespace lll_seer_launcher.core.Forms
         /// <summary>
         /// 精灵列表
         /// </summary>
-        private List<int> petCatchTimeList = new List<int>();
+        private List<PetInfo> fightPetInfo = new List<PetInfo>();
         /// <summary>
         /// 当前战斗精灵
         /// </summary>
@@ -92,30 +92,33 @@ namespace lll_seer_launcher.core.Forms
                 {
                     AttackValueInfo loginPlayer = playersInfo["loginPlayer"];
                     AttackValueInfo otherPlayer = playersInfo["otherPlayer"];
+                    //设置伤害note
                     this.fightNoteTextBox.AppendText(
                         $"\r\n===================第{GlobalVariable.fightTurn}回合==================\r\n" +
                         $"[我方]使用技能[{loginPlayer.skillId}-{DBController.SkillDBController.SearchName(loginPlayer.skillId)}] " +
                         $"{(loginPlayer.atkTimes == 0 && loginPlayer.skillId != 0 ? "攻击MISS！" : "")}" +
                         $"{(loginPlayer.isCrit == 1 ? "打出了致命一击!" : "")}" +
-                        $"造成[{loginPlayer.lostHP}]点伤害" +
+                        $"造成[{loginPlayer.lostHP}]点伤害{(loginPlayer.realHurtHp > 0 ? $",造成[{loginPlayer.realHurtHp}点真实伤害]":"")}" +
                         $"{(loginPlayer.gainHP > 0 ? $",回复{loginPlayer.gainHP}血" : "")}\r\n" +
                         $"{(loginPlayer.maxHP == 0 ? "我方当前出战精灵[阵亡]!\r\n" : "")}"+
 
                         $"[对方]使用技能[{otherPlayer.skillId}-{DBController.SkillDBController.SearchName(otherPlayer.skillId)}] " +
                         $"{(otherPlayer.atkTimes == 0  && otherPlayer.skillId != 0 ? "攻击MISS！" : "")}" +
                         $"{(otherPlayer.isCrit == 1 ? "打出了致命一击!" : "")}" +
-                        $"造成[{otherPlayer.lostHP}]点伤害" +
+                        $"造成[{otherPlayer.lostHP}]点伤害{(otherPlayer.realHurtHp > 0 ? $",造成[{otherPlayer.realHurtHp}点真实伤害]" : "")}" +
                         $"{(otherPlayer.gainHP > 0 ? $",回复{otherPlayer.gainHP}血" : "")}\r\n" +
                         $"{(otherPlayer.maxHP == 0 ? "对方当前出战精灵[阵亡]!\r\n" : "")}"
                     );
                     this.fightNoteTextBox.ScrollToCaret();
 
+                    //更新双方血条
                     //$"[对方]--使用[{otherPlayer.skillId}-{otherPlayer.petName}]登场！\r\n";
                     this.loginPlayerPetHP.Value = loginPlayer.maxHpSelf == 0 ? 0 :(int)((long)loginPlayer.remainHP * 100 / loginPlayer.maxHpSelf);
                     this.otherPlayerPetHP.Value = otherPlayer.maxHpSelf == 0 ? 0 :(int)((long)otherPlayer.remainHP * 100 / otherPlayer.maxHpSelf);
                     this.loginPlayerHPLabel.Text = loginPlayer.maxHpSelf == 0 ? "" : $"{loginPlayer.remainHP}/{loginPlayer.maxHpSelf}";
                     this.otherPlayerHPLabel.Text = otherPlayer.maxHpSelf == 0 ? "" : $"{(int)((long)otherPlayer.remainHP * 100 / otherPlayer.maxHpSelf)}%";
 
+                    //更新双方强化等级以及异常状态
                     this.loginPlayerPetAbilityLabel.Text = "";
                     this.otherPlayerPetAbilityLabel.Text = "";
                     this.loginPlayerPetStatusLabel.Text = "";
@@ -158,7 +161,29 @@ namespace lll_seer_launcher.core.Forms
                             this.otherPlayerPetAbilityLabel.Text += $"{statusName}{ status.parm - 6} ";
                         }
                     }
+
+                    //更新技能pp
+                    if (this.Disposing || this.IsDisposed || !this.Visible) return;
+                    try
+                    {
+                        for(int i = 0; i < this.fightPetInfo.Count; i++)
+                        {
+                            if(this.fightPetInfo[i].catchTime == fightPetCatchTime)
+                            {
+                                this.fightPetInfo[i].skillArray = loginPlayer.skillArray;
+                                int j = 0;
+                                foreach (var skill in loginPlayer.skillArray.Keys)
+                                {
+                                    this.skillListBox.Items[j++] = $"{loginPlayer.skillArray[skill].skillName}|{loginPlayer.skillArray[skill].skillPP}";
+                                }
+                                break;
+                            }
+                        }
+                        
+                    }
+                    catch { }
                 };
+                
                 this.Invoke(callback);
             }).Start();
         }
@@ -174,7 +199,7 @@ namespace lll_seer_launcher.core.Forms
                         //更新我方出战精灵
                         this.fightPetCatchTime = changePetInfo.catchTime;
                         //更新当前出战精灵的技能
-                        foreach(var pet in GlobalVariable.pets)
+                        foreach(var pet in this.fightPetInfo)
                         {
                             if(pet.catchTime == changePetInfo.catchTime)
                             {
@@ -183,7 +208,7 @@ namespace lll_seer_launcher.core.Forms
                                 foreach (var skill in pet.skillArray.Keys)
                                 {
                                     this.skillList.Add(skill);
-                                    this.skillListBox.Items.Add(pet.skillArray[skill]);
+                                    this.skillListBox.Items.Add($"{pet.skillArray[skill].skillName}|{pet.skillArray[skill].skillPP}");
                                     this.skillListBox.SelectedIndex = 0;
                                 }
                                 break;
@@ -226,24 +251,36 @@ namespace lll_seer_launcher.core.Forms
                     FightPetInfo otherPlayer = fightPlayersInfo["otherPlayer"];
                     //设置当前出战精灵
                     this.fightPetCatchTime = loginPlayer.catchTime;
-
+                    this.fightPetInfo.Clear();
                     this.petList.Items.Clear();
-                    this.petCatchTimeList.Clear();
-                    foreach(var petInfo in GlobalVariable.pets)
+
+                    if (GlobalVariable.pets.TryGetValue(this.fightPetCatchTime, out PetInfo petInfo)) { }
+                    else
                     {
-                        this.petList.Items.Add(petInfo.petName);
-                        this.petCatchTimeList.Add(petInfo.catchTime);
-                        if(petInfo.catchTime == loginPlayer.catchTime)
+                        petInfo = GlobalVariable.awaitPets[this.fightPetCatchTime];
+                    }
+                    this.fightPetInfo.Add(petInfo);
+                    this.petList.Items.Add(petInfo.petName);
+
+                    this.skillList.Clear();
+                    this.skillListBox.Items.Clear();
+                    foreach (var skill in petInfo.skillArray.Keys)
+                    {
+                        this.skillList.Add(skill);
+                        this.skillListBox.Items.Add($"{petInfo.skillArray[skill].skillName}|{petInfo.skillArray[skill].skillPP}");
+                        this.skillListBox.SelectedIndex = 0;
+                    }
+
+                    foreach(var otherPet in loginPlayer.changehps)
+                    {
+                        if (GlobalVariable.pets.TryGetValue(otherPet["id"], out PetInfo otherPetInfo)){ }
+                        else
                         {
-                            this.skillList.Clear();
-                            this.skillListBox.Items.Clear();
-                            foreach (var skill in petInfo.skillArray.Keys)
-                            {
-                                this.skillList.Add(skill);
-                                this.skillListBox.Items.Add(petInfo.skillArray[skill]);
-                                this.skillListBox.SelectedIndex = 0;
-                            }
+                            otherPetInfo = GlobalVariable.awaitPets[otherPet["id"]];
                         }
+                        this.petList.Items.Add(otherPetInfo.petName);
+                        this.fightPetInfo.Add(otherPetInfo);
+                        
                     }
                     //设置双方出战精灵头像
                     this.SetLoginPlayerPetHead(loginPlayer.petId);
@@ -319,30 +356,12 @@ namespace lll_seer_launcher.core.Forms
         {
             this.loginPlayerPetInfo.Text = $"{fightPlayerInfo.petId}\n{fightPlayerInfo.petName}\n{fightPlayerInfo.level}";
             this.loginPlayerHPLabel.Text = $"{fightPlayerInfo.hp}/{fightPlayerInfo.maxHp}";
-            //if (fightPlayerInfo.petId == 3788)
-            //{
-            //    this.loginPlayerXinHP.Visible = true;
-            //    this.loginPlayerXinHP.Value = fightPlayerInfo.xinHp * 100/ fightPlayerInfo.xinMaxHp;
-            //}
-            //else
-            //{
-            //    this.loginPlayerXinHP.Visible = false;
-            //}
             this.loginPlayerPetHP.Value = (int)((long)fightPlayerInfo.hp * 100 / fightPlayerInfo.maxHp);
         }
         private void SetOtherPlayerPetFightInfo(FightPetInfo fightPlayerInfo)
         {
             this.otherPlayerPetInfo.Text = $"{fightPlayerInfo.petId}\n{fightPlayerInfo.petName}\n{fightPlayerInfo.level}";
             this.otherPlayerHPLabel.Text = $"{(int)((long)fightPlayerInfo.hp * 100 / fightPlayerInfo.maxHp)}%";
-            //if (fightPlayerInfo.petId == 3788)
-            //{
-            //    this.otherPlayerXinHP.Visible = true;
-            //    this.otherPlayerXinHP.Value = fightPlayerInfo.xinHp * 100/ fightPlayerInfo.xinMaxHp;
-            //}
-            //else
-            //{
-            //    this.otherPlayerXinHP.Visible = false;
-            //}
             this.otherPlayerPetHP.Value = (int)((long)fightPlayerInfo.hp * 100 / fightPlayerInfo.maxHp);
         }
 
@@ -382,11 +401,11 @@ namespace lll_seer_launcher.core.Forms
 
         private void petList_DoubleClick(object sender, EventArgs e)
         {
-            if (this.petList.SelectedIndex >= 0 && this.fightPetCatchTime != this.petCatchTimeList[this.petList.SelectedIndex])
+            if (this.petList.SelectedIndex >= 0 && this.fightPetCatchTime != this.fightPetInfo[this.petList.SelectedIndex].catchTime)
             {
                 GlobalVariable.sendDataController.SendDataByCmdIdAndIntList(CmdId.CHANGE_PET, new int[1]
                     {
-                        this.petCatchTimeList[this.petList.SelectedIndex]
+                        this.fightPetInfo[this.petList.SelectedIndex].catchTime
                     });
             }
         }
@@ -401,6 +420,7 @@ namespace lll_seer_launcher.core.Forms
 
         private void lowerHPButton_Click(object sender, EventArgs e)
         {
+            if (!GlobalVariable.isLogin || GlobalVariable.gameConfigFlag.inFight) return;
             GlobalVariable.mainForm.lowerHpToolStripMenuItem_Click(sender, e);
         }
 
@@ -411,11 +431,13 @@ namespace lll_seer_launcher.core.Forms
 
         private void curePetButton_Click(object sender, EventArgs e)
         {
+            if (!GlobalVariable.isLogin || GlobalVariable.gameConfigFlag.inFight) return;
             GlobalVariable.sendDataController.SendDataByCmdIdAndIntList(CmdId.PET_CURE_FREE, new int[0]);
         }
 
         private void skillListBox_DoubleClick(object sender, EventArgs e)
         {
+            if (this.skillListBox.SelectedIndex < 0) return;
             GlobalVariable.sendDataController.SendDataByCmdIdAndIntList(CmdId.USE_SKILL,
                         new int[1] { this.skillList[this.skillListBox.SelectedIndex] });
         }
@@ -427,13 +449,22 @@ namespace lll_seer_launcher.core.Forms
                 this.loopUseSkillCheckBox.Checked = false;
                 return;
             }
-            if (loopUseSkillCheckBox.Checked)
+            try
             {
-                GlobalVariable.gameConfigFlag.autoUseSkillId = this.skillList[this.skillListBox.SelectedIndex];
-                GlobalVariable.gameConfigFlag.autoUseSkillFlg = true;
-                GlobalVariable.gameConfigFlag.autoUseSkillPetCatchTime = this.fightPetCatchTime;
+                if (loopUseSkillCheckBox.Checked)
+                {
+                    GlobalVariable.gameConfigFlag.autoUseSkillId = this.skillList[this.skillListBox.SelectedIndex];
+                    GlobalVariable.gameConfigFlag.autoUseSkillFlg = true;
+                    GlobalVariable.gameConfigFlag.autoUseSkillPetCatchTime = this.fightPetCatchTime;
+                }
+                else
+                {
+                    GlobalVariable.gameConfigFlag.autoUseSkillId = 0;
+                    GlobalVariable.gameConfigFlag.autoUseSkillFlg = false;
+                    GlobalVariable.gameConfigFlag.autoUseSkillPetCatchTime = 0;
+                }
             }
-            else
+            catch
             {
                 GlobalVariable.gameConfigFlag.autoUseSkillId = 0;
                 GlobalVariable.gameConfigFlag.autoUseSkillFlg = false;
@@ -460,13 +491,14 @@ namespace lll_seer_launcher.core.Forms
         }
         public void InitFightNote()
         {
-            if (!this.IsDisposed)
+            if (!this.IsDisposed && this.Visible)
             {
                 InitFormCallback callback = delegate ()
                 {
+                    this.fightNoteTextBox.Text += "\n\n===================战斗结束!==================\n\n";
                     this.autoAddPPCheckBox.Checked = this.loopUseSkillCheckBox.Checked = false;
                     this.petList.Items.Clear();
-                    this.petCatchTimeList.Clear();
+                    this.fightPetInfo.Clear();
                     this.skillList.Clear();
                     this.skillListBox.Items.Clear();
                 };
@@ -483,6 +515,14 @@ namespace lll_seer_launcher.core.Forms
         private void hideFightModuleCheckBox_CheckedChanged(object sender, EventArgs e)
         {
             GlobalVariable.gameConfigFlag.shouldDisableRecv  = this.hideFightModuleCheckBox.Checked;
+        }
+
+        private void notUseSkillButton_Click(object sender, EventArgs e)
+        {
+            if (GlobalVariable.gameConfigFlag.inFight)
+            {
+                GlobalVariable.sendDataController.SendDataByCmdIdAndIntList(CmdId.USE_SKILL, new int[1] { 0 });
+            }
         }
     }
 }

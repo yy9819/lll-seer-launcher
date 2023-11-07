@@ -15,11 +15,29 @@ namespace lll_seer_launcher.core.Dto
         public const string seerFiddlerTitle = "seerFiddler";
         public static bool loadingComplate = false;
         public static bool successfullyInit = true;
+        public static List<string> notices = new List<string>() { "交流群：306605758"};
         #endregion
         #region
         /*================================================游戏用全局变量=====================================================*/
+
+        public static AnalyzeSendDataController analyzeSendDataController = new AnalyzeSendDataController();
+        public static PublicAnalyzeRecvDataController analyzeRecvDataController = new PublicAnalyzeRecvDataController();
+        public static readonly Dictionary<string, object> lockObjs = new Dictionary<string, object>()
+        {
+            {"petList",new object() },
+            {"petBag",new object() },
+            {"petInfoDic",new object() },
+            {"publicRecvListener",new object() },
+            {"setPetInfo",new object() },
+            {"getRealId",new object() },
+        };
         public static GameConfigFlag gameConfigFlag = new GameConfigFlag();
         public static int fightTurn;
+        public static Dictionary<int,Dictionary<int,Dictionary<int,PetListInfo>>> petList = 
+            new Dictionary<int, Dictionary<int, Dictionary<int, PetListInfo>>>();
+        public static Dictionary<int,PetInfo> petCatchTimeDic = new Dictionary<int,PetInfo>();
+
+
         public class GameConfigFlag
         {
             /// <summary>
@@ -63,6 +81,14 @@ namespace lll_seer_launcher.core.Dto
             /// 自动使用技能时是否自动回pp
             /// </summary>
             public bool autoUseSkillAddPPFlg { get; set; }
+            /// <summary>
+            /// 
+            /// </summary>
+            public bool getPetBag { get; set; }
+            /// <summary>
+            /// 是否在战斗中
+            /// </summary>
+            public bool inFight { get; set; }
         }
         public static SendDataController sendDataController = new SendDataController();
         public static FireBuff fireBuffCopyObj = new FireBuff();
@@ -70,12 +96,18 @@ namespace lll_seer_launcher.core.Dto
         {
             public int copyFireBuffType = 0;
             public Dictionary<int, int> greenFireBuffDic = new Dictionary<int, int>();
+            /// <summary>
+            /// -1 是否在借火
+            /// -2 对应角色的信息查询完成
+            /// -3 对应角色目前是否为绿火
+            /// </summary>
             public bool[] copyGreenBuff = new bool[3] { false, false, false };
             public int copyGreenBuffUserId = 0;
             public int greenFireUserId = 949386603;
         }
-        public static List<PetInfo> pets { get; set; } = new List<PetInfo>();
-        public static List<PetInfo> awaitPets { get; set; } = new List<PetInfo>();
+        public static Dictionary<int,PetInfo> pets { get; set; } = new Dictionary<int, PetInfo>();
+        public static List<PetInfo> lowerHpPets { get; set; } = new List<PetInfo>();
+        public static Dictionary<int, PetInfo> awaitPets { get; set; } = new Dictionary<int, PetInfo>();
         #endregion
         #region
         /*===========================================游戏账号信息用全局变量=================================================*/

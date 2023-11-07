@@ -8,6 +8,34 @@ namespace lll_seer_launcher.core.Dto.PetDto
 {
     public class PetInfo
     {
+        private Dictionary<int, string> natureDic = new Dictionary<int, string>()
+        {
+            {0,"孤独(攻击+10% ,防御-10%)"},
+            {1,"固执(攻击+10% ,特攻-10%)"},
+            {2,"调皮(攻击+10% ,特防-10%)"},
+            {3,"勇敢(攻击+10% ,速度-10%)"},
+            {4,"大胆(防御+10% ,攻击-10%)"},
+            {5,"顽皮(防御+10% ,特攻-10%)"},
+            {6,"无虑(防御+10% ,特防-10%)"},
+            {7,"悠闲(防御+10% ,速度-10%)"},
+            {8,"保守(特攻+10% ,攻击-10%)"},
+            {9,"稳重(特攻+10% ,防御-10%)"},
+            {10,"马虎(特攻+10% ,特防-10%)"},
+            {11,"冷静(特攻+10% ,速度-10%)"},
+            {12,"沉着(特防+10% ,攻击-10%)"},
+            {13,"温顺(特防+10% ,防御-10%)"},
+            {14,"慎重(特防+10% ,特攻-10%)"},
+            {15,"狂妄(特防+10% ,速度-10%)"},
+            {16,"胆小(速度+10% ,攻击-10%)"},
+            {17,"急躁(速度+10% ,防御-10%)"},
+            {18,"开朗(速度+10% ,特攻-10%)"},
+            {19,"天真(速度+10% ,特防-10%)"},
+            {20,"害羞(平衡发展)"},
+            {21,"实干(平衡发展)"},
+            {22,"坦率(平衡发展)"},
+            {23,"浮躁(平衡发展)"},
+            {24,"认真(平衡发展)"},
+        };
         #region
         public int petId { get; set; }
         public string petName { get; set; }
@@ -22,11 +50,15 @@ namespace lll_seer_launcher.core.Dto.PetDto
         /// <summary>
         /// 性格
         /// </summary>
-        public int nature { get; set; }
+        public string nature { get; set; }
         /// <summary>
         /// 属性
         /// </summary>
         public int abilityType { get; set; }
+        /// <summary>
+        /// 精灵属性
+        /// </summary>
+        public string type { get; set; }
         /// <summary>
         /// 等级
         /// </summary>
@@ -91,7 +123,7 @@ namespace lll_seer_launcher.core.Dto.PetDto
         /// 技能List
         /// -skillLens不管为多少，skillArray固定占5 * 8个字节(技能Id + pp)
         /// </summary>
-        public Dictionary<int,string> skillArray { get; set; } = new Dictionary<int, string>();
+        public Dictionary<int, SkillInfo> skillArray { get; set; } = new Dictionary<int, SkillInfo>();
         /// <summary>
         /// 捕捉时间
         /// </summary>
@@ -136,12 +168,31 @@ namespace lll_seer_launcher.core.Dto.PetDto
         /// </summary>
         public const int otherInfoLens = 26 * 4;
         #endregion
+        public PetInfo(PetListInfo petListInfo)
+        {
+            this.petId = petListInfo.petId;
+            this.petName = petListInfo.petName;
+            this.catchTime = petListInfo.catchTime;
+            this.level = petListInfo.level;
+        }
+        public PetInfo() { }
+        public int GetNextIndex(int index, byte[] inputData)
+        {
+            index += 180;
+            //效果总数
+            this.effectCount = ByteConverter.BytesTo10(ByteConverter.TakeBytes(inputData, index, 2));
+            index += 2;
+            index += this.effectCount * 24;
+            index += PetInfo.resistanceInfoLens;
+            index += PetInfo.otherInfoLens;
+            return index;
+        }
         public int SetPetInfo(int index, byte[] inputData)
         {
             this.petId = ByteConverter.BytesTo10(ByteConverter.TakeBytes(inputData, index, 4));
             index += 4;
-
             this.petName = DBController.PetDBController.SearchPetNameByPetId(petId);
+
             index += 16;
 
             this.generation = ByteConverter.BytesTo10(ByteConverter.TakeBytes(inputData, index, 4));
@@ -150,10 +201,12 @@ namespace lll_seer_launcher.core.Dto.PetDto
             this.dv = ByteConverter.BytesTo10(ByteConverter.TakeBytes(inputData, index, 4));
             index += 4;
             //设置性格
-            this.nature = ByteConverter.BytesTo10(ByteConverter.TakeBytes(inputData, index, 4));
+            int natureId = ByteConverter.BytesTo10(ByteConverter.TakeBytes(inputData, index, 4));
+            this.nature = this.natureDic[natureId];
             index += 4;
             //设置属性
             this.abilityType = ByteConverter.BytesTo10(ByteConverter.TakeBytes(inputData, index, 4));
+            this.type = DBController.SkillDBController.GetTypeName(DBController.PetDBController.GetPetType(this.petId));
             index += 4;
             //设置等级
             this.level = ByteConverter.BytesTo10(ByteConverter.TakeBytes(inputData, index, 4));
@@ -211,7 +264,11 @@ namespace lll_seer_launcher.core.Dto.PetDto
                 int skillId = ByteConverter.BytesTo10(ByteConverter.TakeBytes(inputData, index, 4));
                 if (!this.skillArray.ContainsKey(skillId))
                 {
-                    this.skillArray.Add(skillId, DBController.SkillDBController.SearchName(skillId));
+                    SkillInfo skillInfo = new SkillInfo();
+                    skillInfo.skillId = skillId;
+                    skillInfo.skillName = DBController.SkillDBController.SearchName(skillId);
+                    skillInfo.skillPP = ByteConverter.BytesTo10(ByteConverter.TakeBytes(inputData, index + 4, 4));
+                    this.skillArray.Add(skillId, skillInfo);
                 }
                 index += 8;
             }
@@ -250,5 +307,11 @@ namespace lll_seer_launcher.core.Dto.PetDto
             index += PetInfo.otherInfoLens;
             return index;
         }
+    }
+    public class SkillInfo
+    {
+        public int skillId { get; set; }
+        public string skillName { get; set; }
+        public int skillPP { get; set; }
     }
 }

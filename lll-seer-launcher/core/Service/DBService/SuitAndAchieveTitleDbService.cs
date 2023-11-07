@@ -16,6 +16,19 @@ namespace lll_seer_launcher.core.Service.DBService
     {
         private static string suitDBPath = dbPath + dbMap["suitDB"];
         private static SqliteConnection db;
+        private static Dictionary<string, CreateTableSql> tableDic = new Dictionary<string, CreateTableSql>()
+        {
+            { "achieve_title" , new CreateTableSql("achieve_title", "称号表", "CREATE TABLE achieve_title (id INTEGER PRIMARY KEY AUTOINCREMENT,title_name CHAR(32) NOT NULL," +
+                                "title_abtext_text TEXT NOT NULL,title_id INT UNIQUE NOT NULL);") },
+            { "suit", new CreateTableSql("suit", "套装表", "CREATE TABLE suit (id INTEGER PRIMARY KEY AUTOINCREMENT,suit_name CHAR(32) NOT NULL," +
+                                "suit_desc_text TEXT NOT NULL,suit_id INT UNIQUE NOT NULL,suit_cloth_id TEXT NOT NULL);")},
+            {"glasses", new CreateTableSql("glasses", "目镜表", "CREATE TABLE glasses (id INTEGER PRIMARY KEY AUTOINCREMENT,glasses_name CHAR(32) NOT NULL," +
+                                "glasses_desc_text TEXT NOT NULL,glasses_id INT UNIQUE NOT NULL);")},
+            {"user", new CreateTableSql("user", "用户装备持有明细表", "CREATE TABLE user (id INTEGER PRIMARY KEY AUTOINCREMENT,user_id INT UNIQUE NOT NULL,suit_list TEXT NOT NULL," +
+                                "glasses_list TEXT NOT NULL,achieve_title_list TEXT NOT NULL);")},
+            {"plan",new CreateTableSql("plan", "方案表", "CREATE TABLE plan (id INTEGER PRIMARY KEY AUTOINCREMENT,plan_name CHAR(32) NOT NULL," +
+                                "user_id INT NOT NULL,suit_id INT NOT NULL,glasses_id INT NOT NULL,achieve_title_id INT NOT NULL);") }
+        };
         public static bool CheckAndInitDB()
         {
             try
@@ -28,42 +41,14 @@ namespace lll_seer_launcher.core.Service.DBService
                     File.Create(suitDBPath).Close();
                     Logger.Log("CreateDB", "数据库文件创建完成！");
                     Logger.Log("CreateDBTableStart", "开始创建数据库table");
-                    using (db = new SqliteConnection($"Filename={suitDBPath}"))
-                    {
-                        db.Open();
-                        createTableSql[] createTableCmds = new createTableSql[5]
-                        {
-                                new createTableSql("achieve_title", "称号表", "CREATE TABLE achieve_title (id INTEGER PRIMARY KEY AUTOINCREMENT,title_name CHAR(32) NOT NULL," +
-                                "title_abtext_text TEXT NOT NULL,title_id INT UNIQUE NOT NULL);"),
-                                new createTableSql("suit", "套装表", "CREATE TABLE suit (id INTEGER PRIMARY KEY AUTOINCREMENT,suit_name CHAR(32) NOT NULL," +
-                                "suit_desc_text TEXT NOT NULL,suit_id INT UNIQUE NOT NULL,suit_cloth_id TEXT NOT NULL);"),
-                                new createTableSql("glasses", "目镜表", "CREATE TABLE glasses (id INTEGER PRIMARY KEY AUTOINCREMENT,glasses_name CHAR(32) NOT NULL," +
-                                "glasses_desc_text TEXT NOT NULL,glasses_id INT UNIQUE NOT NULL);"),
-                                new createTableSql("user", "用户装备持有明细表", "CREATE TABLE user (id INTEGER PRIMARY KEY AUTOINCREMENT,user_id INT UNIQUE NOT NULL,suit_list TEXT NOT NULL," +
-                                "glasses_list TEXT NOT NULL,achieve_title_list TEXT NOT NULL);"),
-                                new createTableSql("plan", "方案表", "CREATE TABLE plan (id INTEGER PRIMARY KEY AUTOINCREMENT,plan_name CHAR(32) NOT NULL," +
-                                "user_id INT NOT NULL,suit_id INT NOT NULL,glasses_id INT NOT NULL,achieve_title_id INT NOT NULL);")
-                        };
-                        foreach (var cmd in createTableCmds)
-                        {
-                            try
-                            {
-                                Logger.Log("CrateTableStart", $"正在创建--{cmd.dbTableName}--");
-                                SqliteCommand createTableCmd = new SqliteCommand(cmd.sqlString, db);
-                                createTableCmd.ExecuteNonQuery();
-                                Logger.Log("CrateTableEnd", $"创建--{cmd.dbTableCheneseName}--成功!");
-                            }
-                            catch (Exception ex)
-                            {
-                                Logger.Error($"创建{cmd.dbTableCheneseName}时出错！errorMessage：{ex.Message}");
-                                return false;
-                            }
-                        }
-                    }
                 }
-                else
+                using (db = new SqliteConnection($"Filename={suitDBPath}"))
                 {
-                    db = new SqliteConnection($"Filename={suitDBPath}");
+                    db.Open();
+                    foreach (var key in tableDic.Keys)
+                    {
+                        if (!TableExists(db, key)) if (!CrateTable(db, tableDic[key])) return false;
+                    }
                 }
                 Logger.Log("DBInit", "初始化装备数据库完成!!!");
             }
@@ -73,6 +58,8 @@ namespace lll_seer_launcher.core.Service.DBService
             }
             return true;
         }
+        
+
         #region
         /*==========================================称号数据表操作============================================*/
         public static void AchieveTitleTableTransactionInsertData(List<AchieveTitleInfo> insertData)
@@ -95,7 +82,7 @@ namespace lll_seer_launcher.core.Service.DBService
                         foreach (AchieveTitleInfo item in insertData)
                         {
                             command.Parameters["@title_name"].Value = item.title;
-                            command.Parameters["@title_abtext_text"].Value = item.desc8;
+                            command.Parameters["@title_abtext_text"].Value = item.abtext;
                             command.Parameters["@title_id"].Value = item.id;
                             command.ExecuteNonQuery();
                         }
@@ -702,9 +689,10 @@ namespace lll_seer_launcher.core.Service.DBService
                     string updateSql = "UPDATE plan " +
                         "SET plan_name = @name,suit_id = @suitId,glasses_id = @glassesId,achieve_title_id = @achieveTitleId " +
                         "WHERE id = @id;";
+
                     SqliteCommand updateCmd = new SqliteCommand(updateSql, db);
                     updateCmd.Parameters.Add(new SqliteParameter("@name", updateData.name));
-                    updateCmd.Parameters.Add(new SqliteParameter("@userId", updateData.userId));
+                    updateCmd.Parameters.Add(new SqliteParameter("@id", updateData.id));
                     updateCmd.Parameters.Add(new SqliteParameter("@suitId", updateData.suitId));
                     updateCmd.Parameters.Add(new SqliteParameter("@glassesId", updateData.glassesId));
                     updateCmd.Parameters.Add(new SqliteParameter("@achieveTitleId", updateData.achieveTitleId));

@@ -13,6 +13,7 @@ namespace lll_seer_launcher.core.Dto
         public string nickName { get; set; }
         public int coins { get; set; }
         public int vipLevel { get; set; }
+        public int petBagGreatestAmount { get; set; }
         public int fireBuffType { get; set; }
         public List<int> clothList { get; set; } = new List<int>();
 
@@ -43,7 +44,7 @@ namespace lll_seer_launcher.core.Dto
             this.coins = ByteConverter.BytesTo10(ByteConverter.TakeBytes(inputData, index, 4));
             index += (int)(30.75 * 4);
             this.vipLevel = ByteConverter.BytesTo10(ByteConverter.TakeBytes(inputData, index, 4));
-            //Console.WriteLine($"userId:{this.userId} regTime:{this.regTime} nicName:{this.nickName} coins:{this.coins} vipLevel:{this.vipLevel}");
+            this.petBagGreatestAmount = 6 + (this.vipLevel < 1 ? 3 : (this.vipLevel < 3 ? 4 : (this.vipLevel < 5 ? 5 : 6)));
         }
     }
    

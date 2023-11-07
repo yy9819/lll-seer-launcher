@@ -93,30 +93,20 @@ namespace lll_seer_launcher.Properties {
         /// <summary>
         ///   查找 System.Drawing.Bitmap 类型的本地化资源。
         /// </summary>
-        internal static System.Drawing.Bitmap gangyasha {
+        internal static System.Drawing.Bitmap effectIcon {
             get {
-                object obj = ResourceManager.GetObject("gangyasha", resourceCulture);
+                object obj = ResourceManager.GetObject("effectIcon", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
         
         /// <summary>
-        ///   查找 System.Byte[] 类型的本地化资源。
+        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
         /// </summary>
-        internal static byte[] pet {
+        internal static System.Drawing.Bitmap gangyasha {
             get {
-                object obj = ResourceManager.GetObject("pet", resourceCulture);
-                return ((byte[])(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   查找 System.Byte[] 类型的本地化资源。
-        /// </summary>
-        internal static byte[] skill {
-            get {
-                object obj = ResourceManager.GetObject("skill", resourceCulture);
-                return ((byte[])(obj));
+                object obj = ResourceManager.GetObject("gangyasha", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
             }
         }
     }

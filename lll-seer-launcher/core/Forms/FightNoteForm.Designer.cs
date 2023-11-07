@@ -46,6 +46,7 @@ namespace lll_seer_launcher.core.Forms
             this.otherPlayerPetHead = new System.Windows.Forms.PictureBox();
             this.loginPlayerPetHead = new System.Windows.Forms.PictureBox();
             this.petBag = new System.Windows.Forms.GroupBox();
+            this.hideFightModuleCheckBox = new System.Windows.Forms.CheckBox();
             this.autoAddPPCheckBox = new System.Windows.Forms.CheckBox();
             this.loopUseSkillCheckBox = new System.Windows.Forms.CheckBox();
             this.curePetButton = new System.Windows.Forms.Button();
@@ -63,7 +64,7 @@ namespace lll_seer_launcher.core.Forms
             this.petList = new System.Windows.Forms.ListBox();
             this.fightNoteTextBox = new System.Windows.Forms.TextBox();
             this.clearButton = new System.Windows.Forms.Button();
-            this.hideFightModuleCheckBox = new System.Windows.Forms.CheckBox();
+            this.notUseSkillButton = new System.Windows.Forms.Button();
             this.fightPreviewGroupBox.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.otherPlayerPetHead)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.loginPlayerPetHead)).BeginInit();
@@ -199,6 +200,7 @@ namespace lll_seer_launcher.core.Forms
             // 
             // petBag
             // 
+            this.petBag.Controls.Add(this.notUseSkillButton);
             this.petBag.Controls.Add(this.hideFightModuleCheckBox);
             this.petBag.Controls.Add(this.autoAddPPCheckBox);
             this.petBag.Controls.Add(this.loopUseSkillCheckBox);
@@ -221,6 +223,17 @@ namespace lll_seer_launcher.core.Forms
             this.petBag.TabIndex = 1;
             this.petBag.TabStop = false;
             this.petBag.Text = "快捷操作(双击可快速切换精灵，使用技能)";
+            // 
+            // hideFightModuleCheckBox
+            // 
+            this.hideFightModuleCheckBox.AutoSize = true;
+            this.hideFightModuleCheckBox.Location = new System.Drawing.Point(96, 124);
+            this.hideFightModuleCheckBox.Name = "hideFightModuleCheckBox";
+            this.hideFightModuleCheckBox.Size = new System.Drawing.Size(96, 16);
+            this.hideFightModuleCheckBox.TabIndex = 15;
+            this.hideFightModuleCheckBox.Text = "屏蔽对战界面";
+            this.hideFightModuleCheckBox.UseVisualStyleBackColor = true;
+            this.hideFightModuleCheckBox.CheckedChanged += new System.EventHandler(this.hideFightModuleCheckBox_CheckedChanged);
             // 
             // autoAddPPCheckBox
             // 
@@ -430,16 +443,15 @@ namespace lll_seer_launcher.core.Forms
             this.clearButton.UseVisualStyleBackColor = true;
             this.clearButton.Click += new System.EventHandler(this.clearButton_Click);
             // 
-            // hideFightModuleCheckBox
+            // notUseSkillButton
             // 
-            this.hideFightModuleCheckBox.AutoSize = true;
-            this.hideFightModuleCheckBox.Location = new System.Drawing.Point(96, 124);
-            this.hideFightModuleCheckBox.Name = "hideFightModuleCheckBox";
-            this.hideFightModuleCheckBox.Size = new System.Drawing.Size(96, 16);
-            this.hideFightModuleCheckBox.TabIndex = 15;
-            this.hideFightModuleCheckBox.Text = "屏蔽对战界面";
-            this.hideFightModuleCheckBox.UseVisualStyleBackColor = true;
-            this.hideFightModuleCheckBox.CheckedChanged += new System.EventHandler(this.hideFightModuleCheckBox_CheckedChanged);
+            this.notUseSkillButton.Location = new System.Drawing.Point(81, 142);
+            this.notUseSkillButton.Name = "notUseSkillButton";
+            this.notUseSkillButton.Size = new System.Drawing.Size(70, 30);
+            this.notUseSkillButton.TabIndex = 16;
+            this.notUseSkillButton.Text = "空过";
+            this.notUseSkillButton.UseVisualStyleBackColor = true;
+            this.notUseSkillButton.Click += new System.EventHandler(this.notUseSkillButton_Click);
             // 
             // FightNoteForm
             // 
@@ -503,5 +515,6 @@ namespace lll_seer_launcher.core.Forms
         private CheckBox autoAddPPCheckBox;
         private CheckBox loopUseSkillCheckBox;
         private CheckBox hideFightModuleCheckBox;
+        private Button notUseSkillButton;
     }
 }

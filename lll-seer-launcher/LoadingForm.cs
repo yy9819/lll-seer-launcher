@@ -72,6 +72,7 @@ namespace lll_seer_launcher
             }
             else
             {
+                if(versionConfig.notices.Count > 0) GlobalVariable.notices = versionConfig.notices;
                 InitJsonController initJsonControl = new InitJsonController();
                 this.UpdateInitState("检查装备称号是否有更新中");
                 initJsonControl.InitJson(versionConfig);
@@ -131,6 +132,29 @@ namespace lll_seer_launcher
                             Logger.Log("updateData", "精灵信息更新完成！");
                             this.UpdateInitState("精灵信息更新完成");
                         }
+
+                       
+                    }
+                    if (DBController.EffectDBController.CheckAndInitDB())
+                    {
+                        this.UpdateInitState("检查魂印信息是否有更新");
+                        if (GlobalVariable.shoudUpdateJsonDic["effectIcon"])
+                        {
+                            this.UpdateInitState("加载魂印信息中");
+                            Logger.Log("updateData", "魂印信息更新！更新魂印信息中...");
+                            initJsonControl.InitPetEffectDB();
+                            Logger.Log("updateData", "魂印信息更新完成！");
+                            this.UpdateInitState("魂印信息更新完成");
+                        }
+
+                        if (GlobalVariable.shoudUpdateJsonDic["newSe"])
+                        {
+                            this.UpdateInitState("加载特性信息中");
+                            Logger.Log("updateData", "特性信息更新！更新特性信息中...");
+                            initJsonControl.InitNewSeDB();
+                            Logger.Log("updateData", "特性信息更新完成！");
+                            this.UpdateInitState("特性信息更新完成");
+                        }
                     }
 
                     this.UpdateInitState("检查技能信息是否有更新");
@@ -144,10 +168,24 @@ namespace lll_seer_launcher
                             Logger.Log("updateData", "技能信息更新完成！");
                             this.UpdateInitState("技能信息更新完成");
                         }
+
+                        this.UpdateInitState("检查技能属性信息是否有更新");
+                        if (GlobalVariable.shoudUpdateJsonDic["skillType"])
+                        {
+                            this.UpdateInitState("加载技能属性信息中");
+                            Logger.Log("updateData", "技能属性信息更新！更新技能属性信息中...");
+                            initJsonControl.InitTypeDB();
+                            Logger.Log("updateData", "技能属性信息更新完成！");
+                            this.UpdateInitState("技能属性信息更新完成");
+                        }
                     }
+                    
                 }
                 else
                 {
+                    DBController.PetDBController.CheckAndInitDB();
+                    DBController.EffectDBController.CheckAndInitDB();
+                    DBController.SkillDBController.CheckAndInitDB();
                     LoadingFormCallBack callBack = delegate ()
                     {
                         this.Hide();

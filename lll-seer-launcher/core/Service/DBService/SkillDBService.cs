@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Data.Sqlite;
 using System.IO;
@@ -15,6 +16,20 @@ namespace lll_seer_launcher.core.Service.DBService
     {
         private static string skillDBPath = dbPath + dbMap["skillDB"];
         private static SqliteConnection db;
+        private static Dictionary<string, CreateTableSql> tableDic = new Dictionary<string, CreateTableSql>()
+        {
+            { "skill" , new CreateTableSql("skill", "技能信息表", "CREATE TABLE skill (id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                                "skill_name CHAR(32) NOT NULL," +
+                                "skill_id INT UNIQUE NOT NULL," +
+                                "skill_type INT NOT NULL," +
+                                "skill_power INT NOT NULL," +
+                                "skill_maxpp INT NOT NULL," +
+                                "skill_accuracy INT NOT NULL);")},
+            { "skilltype" , new CreateTableSql("skilltype", "属性表", "CREATE TABLE skilltype (id INTEGER PRIMARY KEY AUTOINCREMENT,"+
+                                "type_id INT UNIQUE NOT NULL," +
+                                "type_name CHAR(32) NOT NULL);")},
+
+        };
         public static bool CheckAndInitDB()
         {
             try
@@ -27,39 +42,14 @@ namespace lll_seer_launcher.core.Service.DBService
                     File.Create(skillDBPath).Close();
                     Logger.Log("CreateDB", "数据库文件创建完成！");
                     Logger.Log("CreateDBTableStart", "开始创建数据库table");
-                    using (db = new SqliteConnection($"Filename={skillDBPath}"))
-                    {
-                        db.Open();
-                        createTableSql[] createTableCmds = new createTableSql[1]
-                        {
-                                new createTableSql("skill", "技能信息表", "CREATE TABLE skill (id INTEGER PRIMARY KEY AUTOINCREMENT," +
-                                "skill_name CHAR(32) NOT NULL," +
-                                "skill_id INT UNIQUE NOT NULL," +
-                                "skill_type INT NOT NULL," +
-                                "skill_power INT NOT NULL," +
-                                "skill_maxpp INT NOT NULL," +
-                                "skill_accuracy INT NOT NULL);"),
-                        };
-                        foreach (var cmd in createTableCmds)
-                        {
-                            try
-                            {
-                                Logger.Log("CrateTableStart", $"正在创建--{cmd.dbTableName}--");
-                                SqliteCommand createTableCmd = new SqliteCommand(cmd.sqlString, db);
-                                createTableCmd.ExecuteNonQuery();
-                                Logger.Log("CrateTableEnd", $"创建--{cmd.dbTableCheneseName}--成功!");
-                            }
-                            catch (Exception ex)
-                            {
-                                Logger.Error($"创建{cmd.dbTableCheneseName}时出错！errorMessage：{ex.Message}");
-                                return false;
-                            }
-                        }
-                    }
                 }
-                else
+                using (db = new SqliteConnection($"Filename={skillDBPath}"))
                 {
-                    db = new SqliteConnection($"Filename={skillDBPath}");
+                    db.Open();
+                    foreach (var key in tableDic.Keys)
+                    {
+                        if (!TableExists(db, key)) if (!CrateTable(db, tableDic[key])) return false;
+                    }
                 }
                 Logger.Log("DBInit", "初始化技能数据库完成!!!");
             }
@@ -69,6 +59,7 @@ namespace lll_seer_launcher.core.Service.DBService
             }
             return true;
         }
+        #region
         public static void SkillTableTransactionInsertData(List<Move> insertDatas)
         {
             using (db)
@@ -167,6 +158,7 @@ namespace lll_seer_launcher.core.Service.DBService
         }
         public static string SkillTableSearchSkillNameBySkillId(int skillId)
         {
+            if(skillId <= 0) return skillId.ToString();
             try
             {
                 using (db)
@@ -183,13 +175,68 @@ namespace lll_seer_launcher.core.Service.DBService
                         skillName = reader.GetString(0);
                     }
                     return skillName;
-
                 }
             }
-            catch (Exception ex)
+            catch
             {
-                Logger.Error($"数据库技能数据信息查询失败！ errorMessage：{ex.Message}");
+                //Logger.Error($"数据库技能数据信息查询失败！ errorMessage：{ex.Message}");
                 return $"{skillId}";
+            }
+        }
+    #endregion
+
+        public static void TypeTableTransactionInsertData(List<TypeItem> insertDatas)
+        {
+            using (db)
+            {
+                db.Open();
+                using (SqliteTransaction transaction = db.BeginTransaction())
+                {
+                    using (SqliteCommand command = db.CreateCommand())
+                    {
+                        command.Transaction = transaction;
+
+                        command.CommandText = "INSERT OR REPLACE INTO skilltype (type_id,type_name) " +
+                        "VALUES(@type_id,@type_name);";
+
+                        command.Parameters.Add(new SqliteParameter("@type_id", DBNull.Value));
+                        command.Parameters.Add(new SqliteParameter("@type_name", DBNull.Value));
+                        foreach (var skill in insertDatas)
+                        {
+                            command.Parameters["@type_id"].Value = skill.id;
+                            command.Parameters["@type_name"].Value = skill.name;
+                            command.ExecuteNonQuery();
+                        }
+                    }
+
+                    transaction.Commit();
+                }
+            }
+        }
+        public static string GetTypeName(int typeId)
+        {
+            try
+            {
+                using (db)
+                {
+                    db.Open();
+                    string selectSql = "SELECT type_name " +
+                        "FROM skilltype WHERE type_id = @type_id;";
+                    SqliteCommand selectCmd = new SqliteCommand(selectSql, db);
+                    selectCmd.Parameters.Add(new SqliteParameter("@type_id", $"{typeId}"));
+                    SqliteDataReader reader = selectCmd.ExecuteReader();
+                    string typeName = $"{typeId}";
+                    while (reader.Read())
+                    {
+                        typeName = reader.GetString(0);
+                    }
+                    return typeName;
+                }
+            }
+            catch
+            {
+                //Logger.Error($"数据库技能数据信息查询失败！ errorMessage：{ex.Message}");
+                return typeId.ToString();
             }
         }
     }

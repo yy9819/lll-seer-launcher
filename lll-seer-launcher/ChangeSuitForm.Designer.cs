@@ -237,6 +237,8 @@
             // 
             // planDataGridView
             // 
+            this.planDataGridView.AllowUserToResizeColumns = false;
+            this.planDataGridView.AllowUserToResizeRows = false;
             this.planDataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.planDataGridView.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.name,

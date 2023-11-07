@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using lll_seer_launcher.core.Service.DBService;
 using lll_seer_launcher.core.Dto;
+using lll_seer_launcher.core.Dto.PetDto;
 using lll_seer_launcher.core.Dto.JSON;
 using lll_seer_launcher.core.Utils;
 
@@ -170,6 +171,10 @@ namespace lll_seer_launcher.core.Controller
             {
                 return PetDBService.PetTableGetRealId(petId);
             }
+            public static int GetPetType(int petId)
+            {
+                return PetDBService.GetPetType(petId);
+            }
             /*==========================================方案明细表============================================*/
             public static int AddPlan(PetSkinsReplacePlan planInfo)
             {
@@ -191,6 +196,23 @@ namespace lll_seer_launcher.core.Controller
             {
                 return PetDBService.PetSkinsTableGetRealId(petId);
             }
+            /*==========================================背包方案明细表============================================*/
+            public static int AddPetBagPlan(PetBagPlan petBagPlan)
+            {
+                return PetDBService.InsertPetBagPlan(petBagPlan);
+            }
+            public static int DeletePetBagPlan(int planId)
+            {
+                return PetDBService.DeletePetBagPlan(planId);
+            }
+            public static int UpdatePetBagPlan(PetBagPlan petBagPlan)
+            {
+                return PetDBService.UpdatePetBagPlan(petBagPlan);
+            }
+            public static List<PetBagPlan> SearchPetPlan(string planName)
+            {
+                return PetDBService.SearchPetBagPlanByPlanName(planName);
+            }
         }
 
         public static class SkillDBController
@@ -210,6 +232,40 @@ namespace lll_seer_launcher.core.Controller
             public static string SearchName(int skillId)
             {
                 return SkillDBService.SkillTableSearchSkillNameBySkillId(skillId);
+            }
+
+            public static void TypeTableTransactionInsertData(List<TypeItem> types)
+            {
+                SkillDBService.TypeTableTransactionInsertData(types);
+            }
+            public static string GetTypeName(int typeId)
+            {
+                return SkillDBService.GetTypeName(typeId);
+            }
+        }
+
+        public static class EffectDBController
+        {
+            public static bool CheckAndInitDB()
+            {
+                return EffectDBService.CheckAndInitDB();
+            }
+            public static void PetEffectTableTransactionInsertData(List<PetEffect> insertData)
+            {
+                EffectDBService.PetEffectTableTransactionInsertData(insertData);
+            }
+            public static string GetPetEffect(int effectId)
+            {
+                return EffectDBService.PetEffectTableGetTips(effectId);
+            }
+
+            public static void PetNewSeTableTransactionInsertData(List<NewSeIdx> insertData)
+            {
+                EffectDBService.PetNewSeTableTransactionInsertData(insertData);
+            }
+            public static NewSeIdx GetNewSeInfo(int eid,string args)
+            {
+                return EffectDBService.PetNewSeTableGetInfo(eid,args);
             }
         }
     }

@@ -143,12 +143,17 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="core\Controller\AnalyzeRecvDataController.cs" />
+    <Compile Include="core\Controller\AnalyzeSendDataController.cs" />
     <Compile Include="core\Controller\DBController.cs" />
     <Compile Include="core\Controller\InitJsonController.cs" />
     <Compile Include="core\Controller\FormController.cs" />
+    <Compile Include="core\Controller\PublicAnalyzeRecvDataController.cs" />
     <Compile Include="core\Controller\SendDataController.cs" />
+    <Compile Include="core\Dto\JSON\PetEffectDto.cs" />
     <Compile Include="core\Dto\JSON\PetJsonDto.cs" />
+    <Compile Include="core\Dto\JSON\PetNewSeDto.cs" />
     <Compile Include="core\Dto\JSON\SkillJsonDto.cs" />
+    <Compile Include="core\Dto\JSON\TypeDto.cs" />
     <Compile Include="core\Dto\JSON\VersionDto.cs" />
     <Compile Include="core\Dto\PetDto\AttackValueInfo.cs" />
     <Compile Include="core\Dto\CmdDic.cs" />
@@ -158,8 +163,10 @@
     <Compile Include="core\Dto\JSON\GlobalObject.cs" />
     <Compile Include="core\Dto\GlobalVariable.cs" />
     <Compile Include="core\Dto\HeadInfo.cs" />
+    <Compile Include="core\Dto\PetDto\PetBagPlan.cs" />
     <Compile Include="core\Dto\PetDto\PetEffectInfo.cs" />
     <Compile Include="core\Dto\PetDto\PetInfo.cs" />
+    <Compile Include="core\Dto\PetDto\PetListInfo.cs" />
     <Compile Include="core\Dto\UserInfo.cs" />
     <Compile Include="core\Forms\FightMapBossForm.cs">
       <SubType>Form</SubType>
@@ -173,11 +180,23 @@
     <Compile Include="core\Forms\FightNoteForm.Designer.cs">
       <DependentUpon>FightNoteForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="core\Forms\PetBag.cs">
+    <Compile Include="core\Forms\PetBagForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="core\Forms\PetBag.Designer.cs">
-      <DependentUpon>PetBag.cs</DependentUpon>
+    <Compile Include="core\Forms\PetBagForm.Designer.cs">
+      <DependentUpon>PetBagForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="core\Forms\PetStorageForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="core\Forms\PetStorageForm.Designer.cs">
+      <DependentUpon>PetStorageForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="core\Forms\ReleaseNotesForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="core\Forms\ReleaseNotesForm.Designer.cs">
+      <DependentUpon>ReleaseNotesForm.cs</DependentUpon>
     </Compile>
     <Compile Include="core\Forms\SeerTcpCaptureForm.cs">
       <SubType>Form</SubType>
@@ -189,14 +208,16 @@
     <Compile Include="core\Service\AutoFightService\AutoUseSkillService.cs" />
     <Compile Include="core\Service\AutoFightService\LowerHPService.cs" />
     <Compile Include="core\Service\DBService\DBService.cs" />
+    <Compile Include="core\Service\DBService\EffectDBService.cs" />
     <Compile Include="core\Service\DBService\PetDBService.cs" />
     <Compile Include="core\Service\DBService\SkillDBService.cs" />
     <Compile Include="core\Service\DBService\SuitAndAchieveTitleDbService.cs" />
     <Compile Include="core\Service\DecryptService.cs" />
     <Compile Include="core\Service\EncryptService.cs" />
     <Compile Include="core\Service\FightNoteService\FightNoteService.cs" />
-    <Compile Include="core\Service\GetPetInfoService.cs" />
+    <Compile Include="core\Service\PetService\GetPetInfoService.cs" />
     <Compile Include="core\Service\InitJsonServise.cs" />
+    <Compile Include="core\Service\PetService\GetPetListService.cs" />
     <Compile Include="core\Service\SendDataServise.cs" />
     <Compile Include="core\Tools\EncryptDecryptTools.cs" />
     <Compile Include="core\Utils\ByteConverter.cs" />
@@ -242,8 +263,14 @@
     <EmbeddedResource Include="core\Forms\FightNoteForm.resx">
       <DependentUpon>FightNoteForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="core\Forms\PetBag.resx">
-      <DependentUpon>PetBag.cs</DependentUpon>
+    <EmbeddedResource Include="core\Forms\PetBagForm.resx">
+      <DependentUpon>PetBagForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="core\Forms\PetStorageForm.resx">
+      <DependentUpon>PetStorageForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="core\Forms\ReleaseNotesForm.resx">
+      <DependentUpon>ReleaseNotesForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="core\Forms\SeerTcpCaptureForm.resx">
       <DependentUpon>SeerTcpCaptureForm.cs</DependentUpon>
@@ -285,13 +312,11 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\skill.swf" />
-    <None Include="Resources\pet.swf" />
+    <None Include="Resources\effectIcon.png" />
     <None Include="Resources\8.png" />
     <None Include="Resources\214.png" />
     <Content Include="Resources\bibiIcon.ico" />
     <None Include="Resources\bibiLoading.gif" />
-    <Content Include="Resources\bibiloading.swf" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.8">
@@ -304,25 +329,6 @@
       <ProductName>.NET Framework 3.5 SP1</ProductName>
       <Install>false</Install>
     </BootstrapperPackage>
-  </ItemGroup>
-  <ItemGroup>
-    <COMReference Include="AxShockwaveFlashObjects">
-      <Guid>{D27CDB6B-AE6D-11CF-96B8-444553540000}</Guid>
-      <VersionMajor>1</VersionMajor>
-      <VersionMinor>0</VersionMinor>
-      <Lcid>0</Lcid>
-      <WrapperTool>aximp</WrapperTool>
-      <Isolated>False</Isolated>
-    </COMReference>
-    <COMReference Include="ShockwaveFlashObjects">
-      <Guid>{D27CDB6B-AE6D-11CF-96B8-444553540000}</Guid>
-      <VersionMajor>1</VersionMajor>
-      <VersionMinor>0</VersionMinor>
-      <Lcid>0</Lcid>
-      <WrapperTool>tlbimp</WrapperTool>
-      <Isolated>False</Isolated>
-      <EmbedInteropTypes>True</EmbedInteropTypes>
-    </COMReference>
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Connected Services\" />
