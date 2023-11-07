@@ -12,9 +12,9 @@ namespace lll_seer_launcher.core.Service.AutoFightService
     {
         public static void OnUseSkill(AttackValueInfo attackValueInfo)
         {
-            if(attackValueInfo.remainHP > 0 && attackValueInfo.skillList.TryGetValue(GlobalVariable.gameConfigFlag.autoUseSkillId,out List<int> skill))
+            if(attackValueInfo.remainHP > 0 && attackValueInfo.skillArray.TryGetValue(GlobalVariable.gameConfigFlag.autoUseSkillId,out SkillInfo skill))
             {
-                if(skill[1] <= 1 && GlobalVariable.gameConfigFlag.autoUseSkillAddPPFlg)
+                if(skill.skillPP < 1 && GlobalVariable.gameConfigFlag.autoUseSkillAddPPFlg)
                 {
                     GlobalVariable.sendDataController.SendDataByCmdIdAndIntList(CmdId.USE_PET_ITEM, new int[3]
                     {
@@ -23,7 +23,7 @@ namespace lll_seer_launcher.core.Service.AutoFightService
                 }
                 else
                 {
-                    GlobalVariable.sendDataController.SendDataByCmdIdAndIntList(CmdId.USE_SKILL, new int[1] { skill[0]});
+                    GlobalVariable.sendDataController.SendDataByCmdIdAndIntList(CmdId.USE_SKILL, new int[1] { skill.skillId});
                 }
             }
             else

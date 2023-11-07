@@ -4,6 +4,7 @@ using System.Windows.Forms;
 using System.Threading;
 using System.Threading.Tasks;
 using lll_seer_launcher.core.Service;
+using lll_seer_launcher.core.Service.PetService;
 using lll_seer_launcher.core.Service.AutoFightService;
 using lll_seer_launcher.core.Service.FightNoteService;
 using lll_seer_launcher.core.Dto;
@@ -38,19 +39,22 @@ namespace lll_seer_launcher.core.Controller
                 { CmdId.FIRE_ACT_NOTICE , (param) =>  AnlyzeCopyFireNOTICE(param)},
                 /*==========================================精灵相关解析============================================*/
                 { CmdId.GET_PET_INFO_BY_ONCE , (param) =>  AnlyzeGetPetInfoByOnce(param)},
+                { CmdId.GET_PET_INFO , (param) =>  AnlyzeGetPetInfo(param)},
+                { CmdId.GET_PET_LIST , (param) =>  AnlyzeGetPetList(param)},
+                { CmdId.GET_LOVE_PET_LIST , (param) =>  AnlyzeGetLovePetList(param)},
                 /*==========================================战斗相关解析============================================*/
                 //{ CmdId.MIBAO_FIGHT , (param) =>  AnlyzeMibaoFight(param)},
                 { CmdId.NOTE_READY_TO_FIGHT , (param) =>  AnlyzeNoteReadyToFight(param)},
                 { CmdId.READY_TO_FIGHT , (param) =>  AnlyzeReadyToFight(param)},
                 { CmdId.NOTE_START_FIGHT, (param) =>  AnlyzeNoteStartFight(param)},
                 { CmdId.NOTE_USE_SKILL , (param) =>  AnlyzeNoteUseSkill(param)},
+                { CmdId.USE_PET_ITEM , (param) =>  AnlyzeUsePetItem(param)},
                 { CmdId.CHANGE_PET , (param) =>  AnlyzeChangePet(param)},
                 { CmdId.FIGHT_OVER , (param) =>  AnlyzeOnFightOver(param)},
+                { CmdId.PET_CURE_FREE , (param) =>  AnlyzeOnPetCureFree(param)},
                 //{ CmdId. , (param) =>  AnlyzeReadyToFight(param)},
             };
         }
-
-        private static readonly object lockObject = new object();
 
         /// <summary>
         /// 封包解析controller
@@ -65,14 +69,8 @@ namespace lll_seer_launcher.core.Controller
             {
                 Thread methodThread = new Thread(() => { method(recvDataHeadInfo); });
                 methodThread.Start();
-                //Console.WriteLine($"Start method for value {recvDataHeadInfo.cmdId}");
-            }
-            else
-            {
-                //Console.WriteLine($"No method defined for value {recvDataHeadInfo.cmdId}");
             }
         }
-
         /// <summary>
         /// 称号封包解析controller
         /// </summary>
@@ -109,79 +107,15 @@ namespace lll_seer_launcher.core.Controller
         /// <param name="recvDataHeadInfo"></param>
         private void AnlyzeMapPlayerList(HeadInfo recvDataHeadInfo)
         {
-            try
-            {
-                //获取当前地图内玩家总数
-                int playerCount = ByteConverter.BytesTo10(ByteConverter.TakeBytes(recvDataHeadInfo.decryptData, 0, 4));
-                if (playerCount > 0)
-                {
-                    //对当前地图内的玩家进行火焰统计
-                    int index = 4;
-                    for (int i = 0; i < playerCount; i++)
-                    {
-                        UserInfo userInfo = new UserInfo();
-                        index = userInfo.SetUserInfoForFireType(index, recvDataHeadInfo.decryptData);
-                        if (userInfo.userId != GlobalVariable.loginUserInfo.userId)
-                        {
-                            //绿火→放入字典存储
-                            if (userInfo.fireBuffType > 0 && (userInfo.fireBuffType == 5 || userInfo.fireBuffType == 6))
-                            {
-                                if (GlobalVariable.fireBuffCopyObj.greenFireBuffDic.ContainsKey(userInfo.userId))
-                                {
-                                    GlobalVariable.fireBuffCopyObj.greenFireBuffDic[userInfo.userId] = userInfo.fireBuffType;
-                                }
-                                else
-                                {
-                                    GlobalVariable.fireBuffCopyObj.greenFireBuffDic.Add(userInfo.userId, userInfo.fireBuffType);
-                                }
-                            }
-                            //其他火焰，如当前按下了借火菜单按钮，根据需要借的火类型进行借火判断
-                            else if (userInfo.fireBuffType > 0 && userInfo.fireBuffType == GlobalVariable.fireBuffCopyObj.copyFireBuffType)
-                            {
-                                GlobalVariable.sendDataController.SendDataByCmdIdAndIntList(CmdId.FIRE_ACT_COPY, new int[1] { userInfo.userId });
-                                GlobalVariable.fireBuffCopyObj.copyFireBuffType = 0;
-                                //GlobalVariable.fireBuffCopyObj.mins = fireBuff == 5 ? 10 : 30;
-                                Logger.Log("copyFire", "快速借火--蓝火/金火/紫火");
-                            }
-                        }
-                        //Console.WriteLine($"userId:{userId}  fireBuff:{fireBuff}");
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.ToString());
-            }
-            finally
-            {
-                if (GlobalVariable.fireBuffCopyObj.copyFireBuffType != 0)
-                {
-                    MessageBox.Show("亲爱的小赛尔，" +
-                        "\n当前地图暂无对应火可借，" +
-                        "\n请尝试前往人多的地图进行借火!");
-                    GlobalVariable.fireBuffCopyObj.copyFireBuffType = 0;
-                }
-            }
+            AnalyzeRecvDataService.AnalyzeMapPlayerList(recvDataHeadInfo);
         }
+        /// <summary>
+        /// 当用户进入地图时的解析
+        /// </summary>
+        /// <param name="recvDataHeadInfo"></param>
         private void AnlyzeEnterMap(HeadInfo recvDataHeadInfo)
         {
-            UserInfo userInfo = new UserInfo();
-            userInfo.SetUserInfoForFireType(0, recvDataHeadInfo.decryptData);
-            if (userInfo.userId != GlobalVariable.loginUserInfo.userId)
-            {
-                //绿火→放入字典存储
-                if (userInfo.fireBuffType > 0 && (userInfo.fireBuffType == 5 || userInfo.fireBuffType == 6))
-                {
-                    if (GlobalVariable.fireBuffCopyObj.greenFireBuffDic.ContainsKey(userInfo.userId))
-                    {
-                        GlobalVariable.fireBuffCopyObj.greenFireBuffDic[userInfo.userId] = userInfo.fireBuffType;
-                    }
-                    else
-                    {
-                        GlobalVariable.fireBuffCopyObj.greenFireBuffDic.Add(userInfo.userId, userInfo.fireBuffType);
-                    }
-                }
-            }
+            AnalyzeRecvDataService.AnalyzeOnEnterMap(recvDataHeadInfo);
         }
         /// <summary>
         /// 对火焰获得信息进行解析
@@ -189,23 +123,7 @@ namespace lll_seer_launcher.core.Controller
         /// <param name="recvDataHeadInfo"></param>
         private void AnlyzeCopyFireNOTICE(HeadInfo recvDataHeadInfo)
         {
-            //获取火焰类型
-            int type = ByteConverter.BytesTo10(ByteConverter.TakeBytes(recvDataHeadInfo.decryptData, 4, 1));
-            //获取当前包的用户id
-            int userId = ByteConverter.BytesTo10(ByteConverter.TakeBytes(recvDataHeadInfo.decryptData, 0, 4));
-            //如果是当前登录用户，则进行倒计时
-            if(userId == GlobalVariable.loginUserInfo.userId)
-            {
-                //判断当前是否有正在倒计时的火焰
-                if(GlobalVariable.fireCountThread != null) GlobalVariable.fireCountThread.Abort();
-                //启动一个线程进行火焰倒计时
-                GlobalVariable.fireCountThread = new Thread(() =>
-                {
-                    GlobalVariable.mainForm.StartCountFireBuff(type > 5 ? 30 : 10);
-                });
-                GlobalVariable.fireCountThread.Start();
-                
-            }
+            AnalyzeRecvDataService.AnalyzeOnCopyFire(recvDataHeadInfo);
         }
         /// <summary>
         /// 解析指定玩家的角色信息
@@ -214,40 +132,8 @@ namespace lll_seer_launcher.core.Controller
         /// <param name="recvDataHeadInfo"></param>
         private void AnlyzeSimpleInfo(HeadInfo recvDataHeadInfo)
         {
-            int index = 0;
-            int userId = ByteConverter.BytesTo10(ByteConverter.TakeBytes(recvDataHeadInfo.decryptData, index, 4));
-            if (userId != GlobalVariable.loginUserInfo.userId)
-            {
-                index += 73;
-                //获取当前装备的cloth数量并计算火焰对应的位置
-                index += ByteConverter.BytesTo10(ByteConverter.TakeBytes(recvDataHeadInfo.decryptData, index, 4)) * 8 + 8;
-                //获取当前玩家的火焰类型
-                int fireBuff = ByteConverter.BytesTo10(ByteConverter.TakeBytes(recvDataHeadInfo.decryptData, index++, 1));
-                int loginTime = ByteConverter.BytesTo10(ByteConverter.TakeBytes(recvDataHeadInfo.decryptData, index, 4));
-                index += 4;
-                int lastOfflineTime = ByteConverter.BytesTo10(ByteConverter.TakeBytes(recvDataHeadInfo.decryptData, index, 4));
-                //如果当前正在进行借绿火，且判断当前玩家是否为需要借火的目标
-                if (GlobalVariable.fireBuffCopyObj.copyGreenBuff[0] && GlobalVariable.fireBuffCopyObj.copyGreenBuffUserId == userId)
-                {
-                    //如果装备的是绿火，则设置当前的借火flag里的第三个flag（是否为绿火为真）
-                    //且判断是否在线
-                    if(loginTime > lastOfflineTime && (fireBuff == 5 || fireBuff == 6))
-                    {
-                        GlobalVariable.fireBuffCopyObj.copyGreenBuff[2] = true;
-                        Logger.Log("copyFire","快速借火--绿火");
-                    }
-                    //将借火flag里的第二个flag设为false，告诉借火循环查询目标用户信息完毕
-                    GlobalVariable.fireBuffCopyObj.copyGreenBuff[1] = false;
-                }
-                //如果未在借绿火且此玩家装备火焰效果为绿火则加入绿火玩家dic里
-                else if(!GlobalVariable.fireBuffCopyObj.greenFireBuffDic.ContainsKey(userId) && (fireBuff == 5 || fireBuff == 6))
-                {
-                    GlobalVariable.fireBuffCopyObj.greenFireBuffDic.Add(userId, fireBuff);
-                }
-            }
-
+            AnalyzeRecvDataService.AnalyzeSimpeInfo(recvDataHeadInfo);
         }
-
 
         /// <summary>
         /// 解析当前背包内的精灵
@@ -255,7 +141,7 @@ namespace lll_seer_launcher.core.Controller
         /// <param name="recvDataHeadInfo"></param>
         private void AnlyzeGetPetInfoByOnce(HeadInfo recvDataHeadInfo)
         {
-            lock (lockObject)
+            lock (GlobalVariable.lockObjs["petBag"])
             {
                 GetPetInfoService.OnGetPetInfoByOnce(recvDataHeadInfo);
                 if (GlobalVariable.gameConfigFlag.lowerHpFlag)
@@ -264,19 +150,39 @@ namespace lll_seer_launcher.core.Controller
                 }
             }
         }
+
+        private void AnlyzeGetPetInfo(HeadInfo recvDataHeadInfo)
+        {
+            lock (GlobalVariable.lockObjs["petInfoDic"])
+            {
+                GetPetInfoService.OnGetPetInfo(recvDataHeadInfo);
+            }
+        }
+
+        private void AnlyzeGetPetList(HeadInfo recvDataHeadInfo)
+        {
+            lock (GlobalVariable.lockObjs["petList"])
+            {
+                GetPetListService.OnGetPetList(recvDataHeadInfo);
+            }
+        }
+        private void AnlyzeGetLovePetList(HeadInfo recvDataHeadInfo)
+        {
+            lock (GlobalVariable.lockObjs["petList"])
+            {
+                GetPetListService.OnGetLovePetList(recvDataHeadInfo);
+            }
+        }
         private void AnlyzeMibaoFight(HeadInfo recvDataHeadInfo)
         {
             if (GlobalVariable.gameConfigFlag.lowerHpFlag)
             {
                 LowerHPService.OnMibaoFight();
             }
-            //else if (GlobalVariable.gameConfigFlag.shouldDisableRecv)
-            //{
-            //    GlobalVariable.sendDataController.SendDataByCmdIdAndIntList(CmdId.READY_TO_FIGHT, new int[0]);
-            //}
         }
         private void AnlyzeNoteReadyToFight(HeadInfo recvDataHeadInfo)
         {
+            GlobalVariable.gameConfigFlag.inFight = true;
             if (GlobalVariable.gameConfigFlag.lowerHpFlag)
             {
                 LowerHPService.OnMibaoFight();
@@ -298,12 +204,6 @@ namespace lll_seer_launcher.core.Controller
             GlobalVariable.fightTurn = 0;
             Dictionary<string,FightPetInfo> fightPlayers = FightNoteService.OnNoteStartFight(recvDataHeadInfo);
             GlobalVariable.mainForm.SetPetFightNote(fightPlayers);
-            //foreach(var item in fightPlayers["loginPlayer"].petBagMarkArr.Keys)
-            //{
-            //    Console.WriteLine(item);
-            //}
-            //Console.WriteLine($"loginPlayer:{fightPlayers["loginPlayer"].userId}-{fightPlayers["loginPlayer"].petName}" +
-            //    $" otherPlayer:{fightPlayers["otherPlayer"].userId}-{fightPlayers["otherPlayer"].petName}");
         }
         private void AnlyzeChangePet(HeadInfo recvDataHeadInfo)
         {
@@ -312,8 +212,6 @@ namespace lll_seer_launcher.core.Controller
                 ChangePetInfo changePetInfo = FightNoteService.OnChangePet(recvDataHeadInfo);
                 GlobalVariable.mainForm.OnChangePet(changePetInfo);
                 if (GlobalVariable.gameConfigFlag.autoUseSkillFlg) AutoUseSkillService.OnChangePet(changePetInfo);
-                //Console.WriteLine($"loginPlayer:{changePetInfo.userId}-{changePetInfo.petName}");
-                //    $" otherPlayer:{fightPlayers["otherPlayer"].userId}-{fightPlayers["otherPlayer"].petName}");
             }
         }
         private void AnlyzeNoteUseSkill(HeadInfo recvDataHeadInfo)
@@ -325,13 +223,31 @@ namespace lll_seer_launcher.core.Controller
             if (GlobalVariable.gameConfigFlag.autoUseSkillFlg && players["otherPlayer"].remainHP != 0) AutoUseSkillService.OnUseSkill(players["loginPlayer"]);
             //Console.WriteLine($"fristPlayerInfo:{fristPlayerInfo.userId}  secondPlayerInfo:{secondPlayerInfo.userId}");
         }
+        private void AnlyzeUsePetItem(HeadInfo recvDataHeadInfo)
+        {
+            if (GlobalVariable.gameConfigFlag.autoUseSkillFlg && recvDataHeadInfo.decryptData.Length == 0)
+            {
+                GlobalVariable.sendDataController.SendDataByCmdIdAndIntList(CmdId.ITEM_BUY, new int[2] 
+                    { 
+                        300016,
+                        999
+                    });
+                GlobalVariable.sendDataController.SendDataByCmdIdAndIntList(CmdId.USE_PET_ITEM, new int[3]
+                    {
+                        GlobalVariable.gameConfigFlag.autoUseSkillPetCatchTime,300017,0
+                    });
+            }
+            //Console.WriteLine($"fristPlayerInfo:{fristPlayerInfo.userId}  secondPlayerInfo:{secondPlayerInfo.userId}");
+        }
         private void AnlyzeOnFightOver(HeadInfo recvDataHeadInfo)
         {
+            GlobalVariable.gameConfigFlag.inFight = false;
             if (GlobalVariable.gameConfigFlag.lowerHpFlag)
             {
                 LowerHPService.OnFightOver();
-            }else if (GlobalVariable.gameConfigFlag.autoChargeFlag  && GlobalVariable.loginUserInfo.vipLevel == 0
-                 && GlobalVariable.gameConfigFlag.autoChargeFlag)
+            }else if ((GlobalVariable.gameConfigFlag.autoChargeFlag && GlobalVariable.loginUserInfo.vipLevel == 0)||
+                    (GlobalVariable.gameConfigFlag.shouldDisableRecv && 
+                    (GlobalVariable.gameConfigFlag.autoChargeFlag || !GlobalVariable.gameConfigFlag.disableVipAutoChargeFlag)))
             {
                 GlobalVariable.sendDataController.SendDataByCmdIdAndIntList(CmdId.PET_CURE_FREE, new int[0]);
             }
@@ -342,6 +258,14 @@ namespace lll_seer_launcher.core.Controller
             }
 
             GlobalVariable.mainForm.InitFightNote();
+        }
+
+        private void AnlyzeOnPetCureFree(HeadInfo recvDataHeadInfo)
+        {
+            if (GlobalVariable.gameConfigFlag.shouldDisableRecv)
+            {
+                GlobalVariable.sendDataController.SendDataByCmdIdAndIntList(CmdId.GET_PET_INFO_BY_ONCE,new int[0]);
+            }
         }
     }
 }

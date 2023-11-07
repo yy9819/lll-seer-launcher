@@ -17,14 +17,19 @@ namespace lll_seer_launcher.core.Service.AutoFightService
         {
             if (GlobalVariable.pets.Count > 0)
             {
+                GlobalVariable.lowerHpPets.Clear();
+                foreach (var pet in GlobalVariable.pets.Values)
+                {
+                    GlobalVariable.lowerHpPets.Add(pet);
+                }
                 GlobalVariable.mainForm.SetLowerHpStatus("精灵列表读取成功，开始压血！");
                 GlobalVariable.gameConfigFlag.lowerHpPetLen = 0;
-                while (GlobalVariable.pets.Count > GlobalVariable.gameConfigFlag.lowerHpPetLen)
+                while (GlobalVariable.lowerHpPets.Count > GlobalVariable.gameConfigFlag.lowerHpPetLen)
                 {
-                    if (GlobalVariable.pets[GlobalVariable.gameConfigFlag.lowerHpPetLen].hp > 0) break;
+                    if (GlobalVariable.lowerHpPets[GlobalVariable.gameConfigFlag.lowerHpPetLen].hp > 0) break;
                     GlobalVariable.gameConfigFlag.lowerHpPetLen++;
                 }
-                if (GlobalVariable.pets.Count > GlobalVariable.gameConfigFlag.lowerHpPetLen)
+                if (GlobalVariable.lowerHpPets.Count > GlobalVariable.gameConfigFlag.lowerHpPetLen)
                 {
                     GlobalVariable.sendDataController.SendDataByCmdIdAndIntList(CmdId.MIBAO_FIGHT, new int[1] { 8692 });
                 }
@@ -35,7 +40,7 @@ namespace lll_seer_launcher.core.Service.AutoFightService
                         GlobalVariable.gameConfigFlag.lowerHpFlag = false;
                         GlobalVariable.sendDataController.SendDataByCmdIdAndIntList(CmdId.ITEM_BUY, new int[2] { 300016, GlobalVariable.pets.Count });
                         GlobalVariable.sendDataController.SendDataByCmdIdAndIntList(CmdId.ITEM_BUY, new int[2] { 300011, GlobalVariable.pets.Count });
-                        foreach (var pet in GlobalVariable.pets)
+                        foreach (var pet in GlobalVariable.pets.Values)
                         {
                             GlobalVariable.sendDataController.SendDataByCmdIdAndIntList(CmdId.USE_PET_ITEM_OUT_OF_FIGHT,
                                 new int[2] { pet.catchTime, 300011 });
@@ -78,7 +83,7 @@ namespace lll_seer_launcher.core.Service.AutoFightService
                 GlobalVariable.gameConfigFlag.lowerHpFlag = false;
                 GlobalVariable.sendDataController.SendDataByCmdIdAndIntList(CmdId.ITEM_BUY, new int[2] { 300016, GlobalVariable.pets.Count });
                 GlobalVariable.sendDataController.SendDataByCmdIdAndIntList(CmdId.ITEM_BUY, new int[2] { 300011, GlobalVariable.pets.Count });
-                foreach (var pet in GlobalVariable.pets)
+                foreach (var pet in GlobalVariable.pets.Values)
                 {
                     GlobalVariable.sendDataController.SendDataByCmdIdAndIntList(CmdId.USE_PET_ITEM_OUT_OF_FIGHT,
                         new int[2] { pet.catchTime, 300011 });
@@ -101,18 +106,18 @@ namespace lll_seer_launcher.core.Service.AutoFightService
                     new int[1] { 0 });
             }
             // 如已阵亡，则判断是否存在未阵亡精灵
-            else if (GlobalVariable.pets.Count > ++GlobalVariable.gameConfigFlag.lowerHpPetLen)
+            else if (GlobalVariable.lowerHpPets.Count > ++GlobalVariable.gameConfigFlag.lowerHpPetLen)
             {
-                while (GlobalVariable.pets.Count > GlobalVariable.gameConfigFlag.lowerHpPetLen)
+                while (GlobalVariable.lowerHpPets.Count > GlobalVariable.gameConfigFlag.lowerHpPetLen)
                 {
-                    if (GlobalVariable.pets[GlobalVariable.gameConfigFlag.lowerHpPetLen].hp > 0) break;
+                    if (GlobalVariable.lowerHpPets[GlobalVariable.gameConfigFlag.lowerHpPetLen].hp > 0) break;
                     GlobalVariable.gameConfigFlag.lowerHpPetLen++;
                 }
-                if (GlobalVariable.pets.Count > GlobalVariable.gameConfigFlag.lowerHpPetLen)
+                if (GlobalVariable.lowerHpPets.Count > GlobalVariable.gameConfigFlag.lowerHpPetLen)
                 {
                     GlobalVariable.mainForm.SetLowerHpStatus($"正在进行第{GlobalVariable.gameConfigFlag.lowerHpPetLen + 1}只精灵的压血");
                     GlobalVariable.sendDataController.SendDataByCmdIdAndIntList(CmdId.CHANGE_PET,
-                    new int[1] { GlobalVariable.pets[GlobalVariable.gameConfigFlag.lowerHpPetLen].catchTime });
+                    new int[1] { GlobalVariable.lowerHpPets[GlobalVariable.gameConfigFlag.lowerHpPetLen].catchTime });
                     Thread.Sleep(100);
                     GlobalVariable.sendDataController.SendDataByCmdIdAndIntList(CmdId.USE_SKILL,
                         new int[1] { 0 });

@@ -32,10 +32,21 @@ namespace lll_seer_launcher.core.Controller
         {
             return InitJsonService.InitPetDB(GlobalVariable.jsonPathDic["pet"]);
         }
-       
+        public bool InitPetEffectDB()
+        {
+            return InitJsonService.InitPetEffectDB(GlobalVariable.jsonPathDic["effectIcon"]);
+        }
+        public bool InitNewSeDB()
+        {
+            return InitJsonService.InitNewSeDB(GlobalVariable.jsonPathDic["newSe"]);
+        }
         public bool InitSkillDB()
         {
             return InitJsonService.InitSkillDB(GlobalVariable.jsonPathDic["skill"]);
+        }
+        public bool InitTypeDB()
+        {
+            return InitJsonService.InitTypeDB(GlobalVariable.jsonPathDic["skillType"]);
         }
     }
 }

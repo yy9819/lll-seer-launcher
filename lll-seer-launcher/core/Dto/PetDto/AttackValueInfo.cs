@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using lll_seer_launcher.core.Utils;
+using lll_seer_launcher.core.Controller;
 
 namespace lll_seer_launcher.core.Dto.PetDto
 {
@@ -38,7 +39,7 @@ namespace lll_seer_launcher.core.Dto.PetDto
         /// <summary>
         /// 技能
         /// </summary>
-        public Dictionary<int, List<int>> skillList = new Dictionary<int, List<int>>();
+        public Dictionary<int, SkillInfo> skillArray { get; set; } = new Dictionary<int, SkillInfo>();
         /// <summary>
         /// 异常状态
         /// </summary>
@@ -135,10 +136,15 @@ namespace lll_seer_launcher.core.Dto.PetDto
             for (int i = 0; i < skillNum; i++)
             {
                 int skillId = ByteConverter.BytesTo10(ByteConverter.TakeBytes(inputData, index, 4));
-                index += 4;
-                int skillPP = ByteConverter.BytesTo10(ByteConverter.TakeBytes(inputData, index, 4));
-                index += 4;
-                this.skillList.Add(skillId,new List<int>(2) { skillId, skillPP });
+                if (!this.skillArray.ContainsKey(skillId))
+                {
+                    SkillInfo skillInfo = new SkillInfo();
+                    skillInfo.skillId = skillId;
+                    skillInfo.skillName = DBController.SkillDBController.SearchName(skillId);
+                    skillInfo.skillPP = ByteConverter.BytesTo10(ByteConverter.TakeBytes(inputData, index + 4, 4));
+                    this.skillArray.Add(skillId, skillInfo);
+                }
+                index += 8;
             }
 
             //是否暴击

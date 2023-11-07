@@ -38,20 +38,20 @@ namespace lll_seer_launcher.core.Dto.PetDto
             }
             if (argList[0] == 0 && argList[1] == 0 && argList[2] == 0 &&  argList[3] == 0 &&  argList[4] == 0 &&  argList[5] == 0)
             {
-                this.args = $"{arg1}-{0}";
+                this.args = $"{arg1} {0}";
             }
             else
             {
                 this.args = arg1.ToString();
                 int i = 6;
-                while (i>=0)
+                while (i >= 0)
                 {
                     if (argList[i] > 0)
                     {
                         int j = 0;
-                        while (j < i)
+                        while (j <= i)
                         {
-                            this.args += $"-{args[j]}";
+                            this.args += $" {argList[j]}";
                             j++;
                         }
                         break;
@@ -61,7 +61,7 @@ namespace lll_seer_launcher.core.Dto.PetDto
             }
             for (int i = 0; i < 5; i++)
             {
-                this.args6 += $"{argList[i]}-";
+                this.args6 += $"{argList[i]} ";
             }
             this.args6 += arg1.ToString();
             if (this.effectId == 171)

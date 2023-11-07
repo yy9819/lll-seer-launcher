@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.IO;
 using System.Threading.Tasks;
 using System.Runtime.InteropServices;
 using System.Diagnostics;
@@ -32,8 +33,8 @@ namespace lll_seer_launcher.core.Controller
         [DllImport("winmm.dll")]
         private static extern int waveOutSetVolume(IntPtr hVolume, uint dwVolume);
 
-        [DllImport("wininet.dll", SetLastError = true, CharSet = CharSet.Auto)]
-        public static extern bool DeleteUrlCacheEntry(string lpszUrlName);
+        [DllImport("shell32.dll")]
+        private static extern IntPtr ShellExecute(IntPtr hwnd, string lpOperation, string lpFile, string lpParameters, string lpDirectory, ShowCommands nShowCmd);
 
         private const int WM_APPCOMMAND = 0x0319;
         private const int APPCOMMAND_VOLUME_MUTE = 0x80000;
@@ -43,6 +44,25 @@ namespace lll_seer_launcher.core.Controller
         private const int WS_EX_TOOLWINDOW = 0x00000080;
         private const uint WM_LBUTTONDOWN = 0x201;
         private const uint WM_LBUTTONUP = 0x202;
+
+        private enum ShowCommands : int
+        {
+            SW_HIDE = 0,
+            SW_SHOWNORMAL = 1,
+            SW_NORMAL = 1,
+            SW_SHOWMINIMIZED = 2,
+            SW_SHOWMAXIMIZED = 3,
+            SW_MAXIMIZE = 3,
+            SW_SHOWNOACTIVATE = 4,
+            SW_SHOW = 5,
+            SW_MINIMIZE = 6,
+            SW_SHOWMINNOACTIVE = 7,
+            SW_SHOWNA = 8,
+            SW_RESTORE = 9,
+            SW_SHOWDEFAULT = 10,
+            SW_FORCEMINIMIZE = 11,
+            SW_MAX = 11
+        }
 
         [StructLayout(LayoutKind.Sequential)]
         private struct RECT
@@ -156,16 +176,7 @@ namespace lll_seer_launcher.core.Controller
 
         public static void ClearIECache()
         {
-            try
-            {
-                // Clear the IE cache for all users
-                DeleteUrlCacheEntry("about:blank");
-                Logger.Log("clearCache","IE缓存清理成功!");
-            }
-            catch (Exception ex)
-            {
-                Logger.Error($"errorMessage:{ex.Message}");
-            }
+            ShellExecute(IntPtr.Zero, "open", "rundll32.exe", " InetCpl.cpl,ClearMyTracksByProcess 8", "", ShowCommands.SW_HIDE);
         }
     }
 }

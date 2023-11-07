@@ -13,7 +13,7 @@ namespace lll_seer_launcher.core.Dto
         public string glassesjson { get; set; }
         public string achievetitlejson { get; set; }
         public string downloadurl { get; set; }
-
+        public List<string> notices { get; set; } = new List<string>();
     }
     #region
     public class VersionJsonObject

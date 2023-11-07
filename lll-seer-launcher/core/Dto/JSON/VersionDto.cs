@@ -36,5 +36,13 @@ namespace lll_seer_launcher.core.Dto.JSON
 
         [JsonProperty("items.json")]
         public string itemsJson { get; set; }
+
+        [JsonProperty("effectIcon.json")]
+        public string effectIconJson { get; set; }
+
+        [JsonProperty("new_se.json")]
+        public string newSeJson { get; set; }
+        [JsonProperty("skillTypes.json")]
+        public string skillType { get; set; }
     }
 }

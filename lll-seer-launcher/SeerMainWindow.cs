@@ -33,6 +33,9 @@ namespace lll_seer_launcher
         private FightMapBossForm fightMapBossForm = new FightMapBossForm();
         private SeerTcpCaptureForm seerTcpCaptureForm = new SeerTcpCaptureForm();
         private FightNoteForm fightNoteForm = new FightNoteForm();
+        private PetBagForm petBagForm = new PetBagForm();
+        private PetStorageForm petStorageForm = new PetStorageForm();
+        private ReleaseNotesForm releaseNotesForm = new ReleaseNotesForm();
         private string iniFilePath = Directory.GetCurrentDirectory() + "\\bin\\ini\\";
         //private FiddlerController fiddlerController = new FiddlerController();
         //private Process fiddlerProcess;
@@ -51,9 +54,8 @@ namespace lll_seer_launcher
 
             //});
             //initJsonThread.Start();
-
-            Thread getUsedMemory = new Thread(GetUsedMemorySize);
-            getUsedMemory.Start();
+            new Thread(ShowNotices).Start();
+            new Thread(GetUsedMemorySize).Start();
 
             this.InitIniFile();
 
@@ -150,6 +152,8 @@ namespace lll_seer_launcher
         }
         private void SeerWebBrowser_Navigating(object sender, WebBrowserNavigatingEventArgs e)
         {
+            GlobalVariable.loginUserInfo = new UserInfo();
+            GlobalVariable.analyzeRecvDataController.RemoveAllEventListener();
             if (GlobalVariable.isLogin) GlobalVariable.isLogin = false;
             if(GlobalVariable.isLoginSend) GlobalVariable.isLoginSend = false;
             this.messageEncryptControl.SetKey("!crAckmE4nOthIng:-)");
@@ -183,10 +187,7 @@ namespace lll_seer_launcher
                 this.sendPkgInfo = this.messageEncryptControl.GetHeadInfo(encryptBytes);
                 new Task(() =>
                 {
-                    if(CmdId.BATTERY_DORMANT_SWITCH == this.sendPkgInfo.cmdId)
-                    {
-                        this.SetBatteryStatus($"当前电池{(ByteConverter.BytesTo10(this.sendPkgInfo.decryptData) == 0 ? "关闭":"开启")}中");
-                    }
+                    GlobalVariable.analyzeSendDataController.RunAnalyzeSendDataMethod(this.sendPkgInfo);
                     this.InsertTCPData(sendPkgInfo, true);
                 }).Start();
                 this.sendPkgInfo = this.messageEncryptControl.PackHeadInfo(this.sendPkgInfo);
@@ -225,6 +226,7 @@ namespace lll_seer_launcher
 
         private void SeerMainWindow_Destroyed(object sender, EventArgs e)
         {
+            if (!this.releaseNotesForm.IsDisposed) this.releaseNotesForm.Dispose();
             for (int i = 0 ; i > this.hook.Length - 1; i++)
             {
                 if(this.hook[i] != null) this.hook[i].Uninstall();
@@ -357,32 +359,44 @@ namespace lll_seer_launcher
 
         private void greenBuffToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            // 如果正在借火，则防止反复点击
             if (GlobalVariable.fireBuffCopyObj.copyGreenBuff[0]) return;
             new Thread(() =>
             {
+                //查看当前绿火玩家数是否大于0
                 if (GlobalVariable.fireBuffCopyObj.greenFireBuffDic.Count > 0)
                 {
+                    // 将借绿火状态设为真
                     GlobalVariable.fireBuffCopyObj.copyGreenBuff[0] = true;
+                    // 遍历当前绿火玩家的信息
                     foreach (var item in GlobalVariable.fireBuffCopyObj.greenFireBuffDic.ToList())
                     {
+                        // 设置正在查询绿火玩家信息
                         GlobalVariable.fireBuffCopyObj.copyGreenBuff[1] = true;
+                        // 设置正在查询的绿火玩家的ID
                         GlobalVariable.fireBuffCopyObj.copyGreenBuffUserId = item.Key;
+                        // 发送查询封包
                         GlobalVariable.sendDataController.SendDataByCmdIdAndIntList(CmdId.GET_SIM_USERINFO, new int[1] { item.Key });
+                        // 判断是否查询成功
                         while (GlobalVariable.fireBuffCopyObj.copyGreenBuff[1] || GlobalVariable.stopThread)
                         {
                             Thread.Sleep(100);
                         }
+                        // 判断查询玩家是否携带绿火
                         if (GlobalVariable.fireBuffCopyObj.copyGreenBuff[2])
                         {
+                            // 携带绿火发送蹭火封包
                             GlobalVariable.sendDataController.SendDataByCmdIdAndIntList(CmdId.FIRE_ACT_COPY, new int[1] { item.Key });
                             GlobalVariable.fireBuffCopyObj.copyGreenBuff[0] = GlobalVariable.fireBuffCopyObj.copyGreenBuff[1] = GlobalVariable.fireBuffCopyObj.copyGreenBuff[2] = false;
                             break;
                         }
                         else
                         {
+                            // 未携带则移除该玩家
                             GlobalVariable.fireBuffCopyObj.greenFireBuffDic.Remove(item.Key);
                         }
                     }
+                    // 
                     if (GlobalVariable.fireBuffCopyObj.copyGreenBuff[0])
                     {
                         GlobalVariable.fireBuffCopyObj.copyGreenBuff[1] = true;
@@ -404,7 +418,7 @@ namespace lll_seer_launcher
 
         public void lowerHpToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (!GlobalVariable.isLogin) return;
+            if (!GlobalVariable.isLogin || GlobalVariable.gameConfigFlag.inFight) return;
             core.Utils.Logger.Log("LowerHP","用户按下了压血");
             if (!this.disableVipAutoChargeToolStripMenuItem.Checked) disableVipAutoChargeToolStripMenuItem_Click(sender, e);
             if (this.autoChargeToolStripMenuItem.Checked) autoChargeToolStripMenuItem_Click(sender, e);
@@ -517,6 +531,24 @@ namespace lll_seer_launcher
                     catch { }
                 }
             }
+        }
+
+        public void openPetStorageToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            this.petStorageForm.Hide();
+            this.petStorageForm.Show();
+        }
+
+        public void showPetBagToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            this.petBagForm.Hide();
+            this.petBagForm.Show();
+        }
+
+        private void releaseNotesToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            this.releaseNotesForm.Hide();
+            this.releaseNotesForm.Show();
         }
     }
 }

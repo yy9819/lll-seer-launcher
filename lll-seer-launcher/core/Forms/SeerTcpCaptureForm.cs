@@ -15,8 +15,15 @@ namespace lll_seer_launcher.core.Forms
         {
             //CmdId.FIRE_ACT_COPY,
             CmdId.PEOPLE_WALK,
-            CmdId.JAMES_ARMOR_QUERY_ABIBLITY,
             CmdId.LOAD_PERCENT,
+            CmdId.DAILY_TIMERS,
+            CmdId.ACTIVEACHIEVE,
+            CmdId.ALARM_CHECK,
+            CmdId.ALARM_INFORM,
+            CmdId.JAMES_ARMOR_QUERY_ABIBLITY,
+            CmdId.NONO_FOLLOW_OR_HOOM,
+            CmdId.USER_FOREVER_VALUE,
+            CmdId.SYSTEM_TIME_CHECK
         };
         public SeerTcpCaptureForm()
         {
@@ -25,7 +32,10 @@ namespace lll_seer_launcher.core.Forms
 
         private void SeerTcpCaptureForm_Load(object sender, EventArgs e)
         {
-
+            foreach(int cmdId in blackList)
+            {
+                this.disableCmdIdTextBox.Text += $"{(this.disableCmdIdTextBox.Text == "" ? "" : ",")}{cmdId}";
+            }
         }
 
         private void SeerTcpCaptureForm_Closing(object sender, FormClosingEventArgs e)
@@ -125,6 +135,86 @@ namespace lll_seer_launcher.core.Forms
                     MessageBox.Show("亲爱的小赛尔~接受包不可以发送哟~");
                 }
             }catch 
+            {
+                //MessageBox.Show("");
+            }
+        }
+
+        
+
+        private void disableCmdIdTextBox_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (e.KeyChar == '.' || (!char.IsDigit(e.KeyChar) && e.KeyChar != (char)Keys.Back && e.KeyChar != (char)Keys.Delete && e.KeyChar != ','))
+            {
+                e.Handled = true;
+            }
+        }
+
+        private void setDisableCmdIdButton_Click(object sender, EventArgs e)
+        {
+            string[] cmdIdList = this.disableCmdIdTextBox.Text.Split(',');
+            this.blackList.Clear();
+            foreach (string cmdId in cmdIdList)
+            {
+                if(cmdId != "")
+                {
+                    if(!this.blackList.Contains(Convert.ToInt32(cmdId)))this.blackList.Add(Convert.ToInt32(cmdId));
+                }
+            }
+        }
+
+        private void disableToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            int index = GetSelectIndex();
+            try
+            {
+                int cmdId = Convert.ToInt32(this.tcpDataGridView.Rows[index].Cells["cmdId"].Value);
+                if (!this.blackList.Contains(Convert.ToInt32(cmdId)))
+                {
+                    this.blackList.Add(Convert.ToInt32(cmdId));
+                    this.disableCmdIdTextBox.Text += $",{cmdId}";
+                }
+            }
+            catch { }
+        }
+
+        private void sendDataButton_Click(object sender, EventArgs e)
+        {
+            string[] dataList = this.sendDataTextBox.Text.Split('\n');
+            foreach (string data in dataList)
+            {
+                string[] tmp = data.Split('|');
+                if(tmp.Length >= 3 && tmp[0].ToLower() == "send")
+                {
+                    try
+                    {
+                        GlobalVariable.sendDataController.SendDataByCmdIdAndHexString(Convert.ToInt32(tmp[1]),
+                            tmp[2].Replace("-",""));
+                    }
+                    catch { }
+                }
+            }
+        }
+
+        private void addDataToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            int index = this.GetSelectIndex();
+            try
+            {
+                string type = Convert.ToString(this.tcpDataGridView.Rows[index].Cells["type"].Value);
+                if (type == "Send")
+                {
+                    int cmdId = Convert.ToInt32(this.tcpDataGridView.Rows[index].Cells["cmdId"].Value);
+                    string body = Convert.ToString(this.tcpDataGridView.Rows[index].Cells["data"].Value);
+                    this.sendDataTextBox.Text += $"{type}|{cmdId}|{body}\n";
+                    MessageBox.Show("添加成功!");
+                }
+                else
+                {
+                    MessageBox.Show("亲爱的小赛尔~接受包不可以发送哟~");
+                }
+            }
+            catch
             {
                 //MessageBox.Show("");
             }

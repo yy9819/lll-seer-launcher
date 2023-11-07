@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Data.Sqlite;
 using System.IO;
 using lll_seer_launcher.core.Utils;
 using lll_seer_launcher.core.Dto;
+using lll_seer_launcher.core.Dto.PetDto;
 using lll_seer_launcher.core.Dto.JSON;
 
 namespace lll_seer_launcher.core.Service.DBService
@@ -25,8 +27,8 @@ namespace lll_seer_launcher.core.Service.DBService
                                 "pet_skins_id INT UNIQUE NOT NULL,pet_skins_realid INT);")},
             { "petskinsreplaceplan" , new CreateTableSql("petskinsreplaceplan", "精灵皮肤替换方案表", "CREATE TABLE petskinsreplaceplan (id INTEGER PRIMARY KEY AUTOINCREMENT," +
                                 "pet_name CHAR(32) NOT NULL,pet_id INT UNIQUE NOT NULL,pet_skins_name CHAR(32) NOT NULL,pet_skins_id INT NOT NULL);")},
-            { "petbagplan" , new CreateTableSql("petbagplan", "精灵背包方案表", "CREATE TABLE petbagplan (id INTEGER PRIMARY KEY AUTOINCREMENT," +
-                                "plan_name CHAR(32) ,pet_name_list TEXT NOT NULL,pet_id_list TEXT NOT NULL,pet_catchtime_list TEXT NOT NULL);")},
+            { "petbagplans" , new CreateTableSql("petbagplans", "精灵背包方案表", "CREATE TABLE petbagplans (id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                                "plan_name CHAR(32) ,user_id INT NOT NULL,fight_pets_name TEXT,fight_pets_catchtime TEXT,await_pets_name TEXT,await_pets_catchtime TEXT);")},
 
         };
         public static bool CheckAndInitDB()
@@ -300,7 +302,6 @@ namespace lll_seer_launcher.core.Service.DBService
                         petName = reader.GetString(0);
                     }
                     return petName;
-
                 }
             }
             catch (Exception ex)
@@ -335,6 +336,32 @@ namespace lll_seer_launcher.core.Service.DBService
             {
                 Logger.Error($"数据库精灵数据信息查询失败！ errorMessage：{ex.Message}");
                 return petId;
+            }
+        }
+        public static int GetPetType(int petId)
+        {
+            try
+            {
+                using (db)
+                {
+                    db.Open();
+                    string selectSql = "SELECT pet_type " +
+                        "FROM pet WHERE pet_id = @petId;";
+                    SqliteCommand selectCmd = new SqliteCommand(selectSql, db);
+                    selectCmd.Parameters.Add(new SqliteParameter("@petId", $"{petId}"));
+                    SqliteDataReader reader = selectCmd.ExecuteReader();
+                    int petType = 0;
+                    while (reader.Read())
+                    {
+                        petType = reader.GetInt32(0);
+                    }
+                    return petType;
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Error($"数据库精灵数据信息查询失败！ errorMessage：{ex.Message}");
+                return 0;
             }
         }
         #endregion
@@ -580,6 +607,111 @@ namespace lll_seer_launcher.core.Service.DBService
             {
                 Logger.Error($"数据库精灵皮肤替换方案数据信息查询失败！ errorMessage：{ex.Message}");
                 return null;
+            }
+        }
+        #endregion
+        #region
+        public static int InsertPetBagPlan(PetBagPlan planInfo)
+        {
+            try
+            {
+                using (db)
+                {
+                    db.Open();
+                    string insertSql = "INSERT INTO petbagplans (plan_name,user_id,fight_pets_name,fight_pets_catchtime,await_pets_name,await_pets_catchtime)" +
+                        " VALUES(@plan_name,@user_id,@fight_pets_name,@fight_pets_catchtime,@await_pets_name,@await_pets_catchtime);";
+                    SqliteCommand insertCmd = new SqliteCommand(insertSql, db);
+                    insertCmd.Parameters.Add(new SqliteParameter("@plan_name", $"{planInfo.planName}"));
+                    insertCmd.Parameters.Add(new SqliteParameter("@fight_pets_name", $"{planInfo.fightPetsName}"));
+                    insertCmd.Parameters.Add(new SqliteParameter("@fight_pets_catchtime", $"{planInfo.fightPetsCatchTime}"));
+                    insertCmd.Parameters.Add(new SqliteParameter("@await_pets_name", $"{planInfo.awaitPetsName}"));
+                    insertCmd.Parameters.Add(new SqliteParameter("@await_pets_catchtime", $"{planInfo.awaitPetsCatchTime}"));
+                    insertCmd.Parameters.Add(new SqliteParameter("@user_id", $"{GlobalVariable.loginUserInfo.userId}"));
+                    int value = insertCmd.ExecuteNonQuery();
+                    return value;
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Error($"数据库精灵背包方案数据信息插入失败！ errorMessage：{ex.Message}");
+                return 0;
+            }
+        }
+        public static int UpdatePetBagPlan(PetBagPlan updateData)
+        {
+            try
+            {
+                using (db)
+                {
+                    db.Open();
+                    string updateSql = "UPDATE petbagplans SET plan_name = @plan_name ,id = @id " +
+                        "WHERE id = @id;";
+                    SqliteCommand updateCmd = new SqliteCommand(updateSql, db);
+                    updateCmd.Parameters.Add(new SqliteParameter("@id", updateData.planId));
+                    updateCmd.Parameters.Add(new SqliteParameter("@plan_name", updateData.planName));
+                    int value = updateCmd.ExecuteNonQuery();
+                    return value;
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Error($"数据库精灵背包方案数据信息更新失败！ errorMessage：{ex.Message}");
+                return 0;
+            }
+        }
+        public static int DeletePetBagPlan(int planId)
+        {
+            try
+            {
+                using (db)
+                {
+                    db.Open();
+                    string deleteSql = "DELETE FROM petbagplans WHERE id = @id;";
+                    SqliteCommand deleteCmd = new SqliteCommand(deleteSql, db);
+                    deleteCmd.Parameters.Add(new SqliteParameter("@id", planId));
+                    int value = deleteCmd.ExecuteNonQuery();
+                    return value;
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Error($"数据库精灵背包方案数据信息删除失败！ errorMessage：{ex.Message}");
+                return -1;
+            }
+        }
+        public static List<PetBagPlan> SearchPetBagPlanByPlanName(string planName)
+        {
+            try
+            {
+                using (db)
+                {
+                    db.Open();
+                    string selectSql = "SELECT id,plan_name,user_id,fight_pets_name,fight_pets_catchtime,await_pets_name,await_pets_catchtime" +
+                        " FROM petbagplans WHERE plan_name LIKE @plan_name AND user_id = @user_id;";
+                    SqliteCommand selectCmd = new SqliteCommand(selectSql, db);
+                    selectCmd.Parameters.Add(new SqliteParameter("@plan_name", $"%{planName}%"));
+                    selectCmd.Parameters.Add(new SqliteParameter("@user_id", $"{GlobalVariable.loginUserInfo.userId}"));
+                    SqliteDataReader reader = selectCmd.ExecuteReader();
+                    List<PetBagPlan> result = new List<PetBagPlan>();
+                    while (reader.Read())
+                    {
+                        PetBagPlan plan = new PetBagPlan();
+                        plan.planId = reader.GetInt32(0);
+                        plan.planName = reader.GetString(1);
+                        plan.userId = reader.GetInt32(2);
+                        plan.fightPetsName = reader.GetString(3);
+                        plan.fightPetsCatchTime = reader.GetString(4);
+                        plan.awaitPetsName = reader.GetString(5);
+                        plan.awaitPetsCatchTime = reader.GetString(6);
+                        result.Add(plan);
+                    }
+                    return result;
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Error($"数据库精灵背包方案数据信息查询失败！ errorMessage：{ex.Message}");
+                return new List<PetBagPlan>();
             }
         }
         #endregion

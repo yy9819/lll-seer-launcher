@@ -14,6 +14,7 @@ namespace lll_seer_launcher.core.Service.DBService
                 { "suitDB","suit.db" }, 
                 { "petDB","pet.db" },
                 { "skillDB","skill.db" },
+                { "effectDB","effect.db" },
             };
         protected class CreateTableSql
         {

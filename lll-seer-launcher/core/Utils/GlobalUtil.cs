@@ -63,6 +63,12 @@ namespace lll_seer_launcher.core.Utils
             string[] stringList = intListString.Split(',');
             return stringList.Select(int.Parse).ToList();
         }
+
+        public static long GetKey()
+        {
+            return (long)(DateTime.UtcNow - new DateTime(1970, 1, 1)).TotalSeconds  - new Random().Next(200, 1000);
+        }
+
         public static bool StartFiddler()
         {
             if (FormController.FindWindow(GlobalVariable.seerFiddlerTitle) == IntPtr.Zero)
@@ -113,7 +119,10 @@ namespace lll_seer_launcher.core.Utils
         }
         public string GetHeadPath(int petId)
         {
-            petId = DBController.PetDBController.GetPetRealId(petId);
+            lock (GlobalVariable.lockObjs["getRealId"])
+            {
+                petId = DBController.PetDBController.GetPetRealId(petId);
+            }
             CheckHeadFile(petId);
             return $"{petHeadDirectoryPath}{petId}.png";
         }

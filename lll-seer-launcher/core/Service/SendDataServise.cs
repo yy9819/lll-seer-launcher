@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading;
+using System.Threading.Tasks;
 using lll_seer_launcher.core.Utils;
 using lll_seer_launcher.core.Controller;
 using lll_seer_launcher.core.Dto;
+using lll_seer_launcher.core.Dto.PetDto;
 
 namespace lll_seer_launcher.core.Service
 {
@@ -118,6 +119,60 @@ namespace lll_seer_launcher.core.Service
             }
 
             return dataBytes;
+        }
+    }
+
+    class AnalyzeSendDataService
+    {
+        public static void OnSwitchBattery(HeadInfo sendData)
+        {
+            GlobalVariable.mainForm.SetBatteryStatus($"当前电池{(ByteConverter.BytesTo10(sendData.decryptData) == 0 ? "关闭" : "开启")}中");
+        }
+
+        public static void OnPetTakeOut(HeadInfo sendData)
+        {
+            lock (GlobalVariable.lockObjs["petList"])
+            {
+                int catchTime = ByteConverter.BytesTo10(ByteConverter.TakeBytes(sendData.decryptData, 0, 4));
+                int flag = ByteConverter.BytesTo10(ByteConverter.TakeBytes(sendData.decryptData, 4, 4));
+                if (GlobalVariable.petCatchTimeDic.TryGetValue(catchTime, out PetInfo pet))
+                {
+                    PetListInfo petListInfo = new PetListInfo();
+                    petListInfo.catchTime = catchTime;
+                    petListInfo.petId = pet.petId;
+                    petListInfo.level = pet.level;
+                    petListInfo.petName = pet.petName;
+                    petListInfo.inBag = flag == 1 || flag == 2;
+                    long key = GlobalUtil.GetKey();
+                    GlobalVariable.analyzeRecvDataController.SetRecvEventListener(CmdId.PET_RELEASE, (HeadInfo recvData) =>
+                    {
+                        GlobalVariable.analyzeRecvDataController.RemoveRecvEventListener(CmdId.PET_RELEASE,key);
+                        if (recvData.decryptData.Length <= 0) return;
+                        if (GlobalVariable.petList[GlobalVariable.loginUserInfo.userId].ContainsKey(pet.petId))
+                        {
+                            if (!GlobalVariable.petList[GlobalVariable.loginUserInfo.userId][pet.petId].ContainsKey(catchTime))
+                            {
+
+                                GlobalVariable.petList[GlobalVariable.loginUserInfo.userId][pet.petId].Add(catchTime, petListInfo);
+                            }
+                            else
+                            {
+                                GlobalVariable.petList[GlobalVariable.loginUserInfo.userId][pet.petId][catchTime] = petListInfo;
+                            }
+                        }
+                        else
+                        {
+                            GlobalVariable.petList[GlobalVariable.loginUserInfo.userId].Add(
+                                petListInfo.petId, new Dictionary<int, PetListInfo>() { { pet.catchTime, petListInfo } });
+                        }
+                        //if (!petListInfo.inBag)
+                        //{
+                        //    if (GlobalVariable.pets.ContainsKey(pet.catchTime)) GlobalVariable.pets.Remove(pet.catchTime);
+                        //    if (GlobalVariable.awaitPets.ContainsKey(pet.catchTime)) GlobalVariable.pets.Remove(pet.catchTime);
+                        //}
+                    },key);
+                }
+            }
         }
     }
 }

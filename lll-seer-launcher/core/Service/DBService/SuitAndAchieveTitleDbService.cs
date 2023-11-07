@@ -82,7 +82,7 @@ namespace lll_seer_launcher.core.Service.DBService
                         foreach (AchieveTitleInfo item in insertData)
                         {
                             command.Parameters["@title_name"].Value = item.title;
-                            command.Parameters["@title_abtext_text"].Value = item.desc8;
+                            command.Parameters["@title_abtext_text"].Value = item.abtext;
                             command.Parameters["@title_id"].Value = item.id;
                             command.ExecuteNonQuery();
                         }
