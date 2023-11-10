@@ -53,6 +53,7 @@
             this.deletePlanButton = new System.Windows.Forms.Button();
             this.setPetButton = new System.Windows.Forms.Button();
             this.setSkinsButton = new System.Windows.Forms.Button();
+            this.deletePetCacheButton = new System.Windows.Forms.Button();
             this.planGroupBox.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.planDataGridView)).BeginInit();
             this.searchGroupBox.SuspendLayout();
@@ -69,7 +70,6 @@
             this.petSwfPreviewWebBrowser.ScrollBarsEnabled = false;
             this.petSwfPreviewWebBrowser.Size = new System.Drawing.Size(288, 180);
             this.petSwfPreviewWebBrowser.TabIndex = 0;
-            this.petSwfPreviewWebBrowser.Url = new System.Uri("https://seer.61.com/resource/fightResource/pet/swf/5000.swf", System.UriKind.Absolute);
             // 
             // planGroupBox
             // 
@@ -313,11 +313,22 @@
             this.setSkinsButton.UseVisualStyleBackColor = true;
             this.setSkinsButton.Click += new System.EventHandler(this.setSkinsButton_Click);
             // 
+            // deletePetCacheButton
+            // 
+            this.deletePetCacheButton.Location = new System.Drawing.Point(390, 12);
+            this.deletePetCacheButton.Name = "deletePetCacheButton";
+            this.deletePetCacheButton.Size = new System.Drawing.Size(64, 42);
+            this.deletePetCacheButton.TabIndex = 9;
+            this.deletePetCacheButton.Text = "清理精灵缓存文件";
+            this.deletePetCacheButton.UseVisualStyleBackColor = true;
+            this.deletePetCacheButton.Click += new System.EventHandler(this.deletePetCacheButton_Click);
+            // 
             // EditPetResourceForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(769, 478);
+            this.Controls.Add(this.deletePetCacheButton);
             this.Controls.Add(this.setSkinsButton);
             this.Controls.Add(this.setPetButton);
             this.Controls.Add(this.deletePlanButton);
@@ -372,5 +383,6 @@
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.DataGridViewTextBoxColumn searchPetId;
         private System.Windows.Forms.DataGridViewTextBoxColumn searchPetName;
+        private System.Windows.Forms.Button deletePetCacheButton;
     }
 }

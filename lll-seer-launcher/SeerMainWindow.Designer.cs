@@ -49,6 +49,7 @@ namespace lll_seer_launcher
             this.gameReloadMenu = new System.Windows.Forms.ToolStripMenuItem();
             this.muteGameToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.batteryDormantSwitchToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.autoClickToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.openTcpCaptureFormToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.clearIECacheToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.clearCacheToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -78,6 +79,7 @@ namespace lll_seer_launcher
             this.disableVipAutoChargeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutMeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.releaseNotesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.getScreenShotToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.mainFormStatusStrip.SuspendLayout();
             this.mainFormMenuStrip.SuspendLayout();
             this.SuspendLayout();
@@ -170,6 +172,7 @@ namespace lll_seer_launcher
             this.gameReloadMenu,
             this.muteGameToolStripMenuItem,
             this.batteryDormantSwitchToolStripMenuItem,
+            this.autoClickToolStripMenuItem,
             this.openTcpCaptureFormToolStripMenuItem,
             this.clearIECacheToolStripMenuItem,
             this.clearCacheToolStripMenuItem});
@@ -197,6 +200,14 @@ namespace lll_seer_launcher
             this.batteryDormantSwitchToolStripMenuItem.Size = new System.Drawing.Size(242, 22);
             this.batteryDormantSwitchToolStripMenuItem.Text = "关闭电池";
             this.batteryDormantSwitchToolStripMenuItem.Click += new System.EventHandler(this.batteryDormantSwitchToolStripMenuItem_Click);
+            // 
+            // autoClickToolStripMenuItem
+            // 
+            this.autoClickToolStripMenuItem.Name = "autoClickToolStripMenuItem";
+            this.autoClickToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F8;
+            this.autoClickToolStripMenuItem.Size = new System.Drawing.Size(242, 22);
+            this.autoClickToolStripMenuItem.Text = "自动确认";
+            this.autoClickToolStripMenuItem.Click += new System.EventHandler(this.autoClickToolStripMenuItem_Click);
             // 
             // openTcpCaptureFormToolStripMenuItem
             // 
@@ -226,7 +237,8 @@ namespace lll_seer_launcher
             this.fightMapBossToolStripMenuItem,
             this.showFightNoteFormToolStripMenuItem,
             this.showPetBagToolStripMenuItem,
-            this.openPetStorageToolStripMenuItem});
+            this.openPetStorageToolStripMenuItem,
+            this.getScreenShotToolStripMenuItem});
             this.seerUtilsToolStripMenuItem.Name = "seerUtilsToolStripMenuItem";
             this.seerUtilsToolStripMenuItem.Size = new System.Drawing.Size(56, 21);
             this.seerUtilsToolStripMenuItem.Text = "小助手";
@@ -419,9 +431,17 @@ namespace lll_seer_launcher
             // releaseNotesToolStripMenuItem
             // 
             this.releaseNotesToolStripMenuItem.Name = "releaseNotesToolStripMenuItem";
-            this.releaseNotesToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.releaseNotesToolStripMenuItem.Size = new System.Drawing.Size(124, 22);
             this.releaseNotesToolStripMenuItem.Text = "更新日志";
             this.releaseNotesToolStripMenuItem.Click += new System.EventHandler(this.releaseNotesToolStripMenuItem_Click);
+            // 
+            // getScreenShotToolStripMenuItem
+            // 
+            this.getScreenShotToolStripMenuItem.Name = "getScreenShotToolStripMenuItem";
+            this.getScreenShotToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Alt | System.Windows.Forms.Keys.C)));
+            this.getScreenShotToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.getScreenShotToolStripMenuItem.Text = "截图";
+            this.getScreenShotToolStripMenuItem.Click += new System.EventHandler(this.getScreenShotToolStripMenuItem_Click);
             // 
             // seerMainWindow
             // 
@@ -450,11 +470,28 @@ namespace lll_seer_launcher
         }
 
         #endregion
-        private delegate void GetUsedMemoryCallBack();
-        private delegate void StartCountFireBuffCallBack();
+        private delegate void SetStatusCallBack();
+        private void AutoClick()
+        {
+            
+            while (!GlobalVariable.stopThread)
+            {
+                IntPtr foregroundWindow = FormController.GetForegroundWindow();
+                if (foregroundWindow != IntPtr.Zero)
+                {
+                    IntPtr nextWindow = FormController.GetWindow(foregroundWindow, FormController.GW_HWNDNEXT);
+                    if(nextWindow != IntPtr.Zero)
+                    {
+                        if (GlobalVariable.autoClick) AutoClickScriptController.AutoClick();
+                    }
+                }
+                Thread.Sleep(500);
+            }
+        }
 
         private void GetUsedMemorySize()
         {
+            SetStatusCallBack callBack;
             Process currentProcess = Process.GetCurrentProcess();
             while (!GlobalVariable.stopThread)
             {
@@ -463,7 +500,7 @@ namespace lll_seer_launcher
                 {
                     if (!this.IsDisposed && !this.Disposing)
                     {
-                        GetUsedMemoryCallBack callBack = delegate ()
+                        callBack = delegate ()
                         {
                             this.usedRamToolStripStatusLabel.Text = $"运行内存：{currentProcess.PrivateMemorySize64 / 1024 / 1024}MB";
                             this.loginUserIdToolStripStatusLabel.Text = $"当前登录账号：{GlobalVariable.loginUserInfo.userId}";
@@ -482,11 +519,17 @@ namespace lll_seer_launcher
 
         private void ShowNotices()
         {
+            SetStatusCallBack callBack;
             while (!GlobalVariable.stopThread)
             {
                 foreach(var Notice in GlobalVariable.notices)
                 {
-                    this.launcherNameToolStripStatusLabel.Text = Notice.ToString();
+                    callBack = delegate ()
+                    {
+                        this.launcherNameToolStripStatusLabel.Text = Notice.ToString();
+                    };
+                    this.Invoke((callBack));
+                    
                     Thread.Sleep(20000);
                 }
             }
@@ -495,7 +538,7 @@ namespace lll_seer_launcher
         public void StartCountFireBuff(int mins)
         {
             int totalTime = mins * 60;
-            StartCountFireBuffCallBack callBack;
+            SetStatusCallBack callBack;
             try
             {
                 while (totalTime > 0)
@@ -573,6 +616,8 @@ namespace lll_seer_launcher
         private System.Windows.Forms.ToolStripMenuItem showPetBagToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem aboutMeToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem releaseNotesToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem autoClickToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem getScreenShotToolStripMenuItem;
     }
 }
 
