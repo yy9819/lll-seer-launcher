@@ -163,7 +163,7 @@ namespace lll_seer_launcher.core.Forms
         }
         private void OnAwaitPetSelected(object sender,EventArgs e)
         {
-            if (this.awaitPetListView.SelectedItems.Count <= 0) return;
+            if (this.awaitPetListView.SelectedItems.Count <= 0 || !GlobalVariable.isLogin) return;
             //获取所选择的备战精灵信息
             PetInfo targetPet = this.awaitPets[GlobalVariable.loginUserInfo.userId][this.awaitPetListView.SelectedIndices[0]];
             //设置精灵信息
@@ -172,7 +172,7 @@ namespace lll_seer_launcher.core.Forms
         }
         private void OnFightPetSelected(object sender,EventArgs e)
         {
-            if (this.fightPetListView.SelectedItems.Count <= 0) return;
+            if (this.fightPetListView.SelectedItems.Count <= 0 || !GlobalVariable.isLogin) return;
             //获取所选择的出战精灵信息
             PetInfo targetPet = this.fightPets[GlobalVariable.loginUserInfo.userId][this.fightPetListView.SelectedIndices[0]];
             //设置精灵信息

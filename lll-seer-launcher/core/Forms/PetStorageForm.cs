@@ -71,6 +71,10 @@ namespace lll_seer_launcher.core.Forms
                                             GlobalVariable.petList[GlobalVariable.loginUserInfo.userId][petId][pet.catchTime].inBag = true;
                                             continue;
                                         }
+                                        if (pet.level == 0 && GlobalVariable.petCatchTimeDic.ContainsKey(pet.catchTime))
+                                        {
+                                            pet.level = GlobalVariable.petCatchTimeDic[pet.catchTime].level;
+                                        }
                                         this.petListDataGridView.Rows.Add(
                                             pet.petId,
                                             petName,
@@ -90,6 +94,10 @@ namespace lll_seer_launcher.core.Forms
                                     {
                                         GlobalVariable.petList[GlobalVariable.loginUserInfo.userId][targetId][pet.catchTime].inBag = true;
                                         continue;
+                                    }
+                                    if (pet.level == 0 && GlobalVariable.petCatchTimeDic.ContainsKey(pet.catchTime))
+                                    {
+                                        pet.level = GlobalVariable.petCatchTimeDic[pet.catchTime].level;
                                     }
                                     this.petListDataGridView.Rows.Add(
                                         pet.petId,

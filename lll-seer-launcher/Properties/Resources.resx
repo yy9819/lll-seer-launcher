@@ -130,7 +130,25 @@
   <data name="gangyasha" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\8.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="_1" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\bin\Debug\cache\1.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="_2" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\bin\Debug\cache\2.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="_214" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\214.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="_3" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\bin\Debug\cache\3.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="_4" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\bin\Debug\cache\4.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="_5" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\bin\Debug\cache\5.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="_6" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\bin\Debug\cache\6.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
 </root>

@@ -15,6 +15,7 @@ namespace lll_seer_launcher.core.Dto
         public const string seerFiddlerTitle = "seerFiddler";
         public static bool loadingComplate = false;
         public static bool successfullyInit = true;
+        public static bool autoClick = false;
         public static List<string> notices = new List<string>() { "交流群：306605758"};
         #endregion
         #region

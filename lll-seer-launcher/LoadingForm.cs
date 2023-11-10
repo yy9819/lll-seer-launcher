@@ -28,6 +28,7 @@ namespace lll_seer_launcher
         {
             new Thread(() => 
             {
+                Logger.CheckLogRotation();
                 bool result = InitData();
                 LoadingFormCallBack callBack = delegate ()
                 {

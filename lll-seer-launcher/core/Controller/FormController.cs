@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.IO;
-using System.Threading.Tasks;
+using System.Windows.Forms;
 using System.Runtime.InteropServices;
 using System.Diagnostics;
 using lll_seer_launcher.core.Dto;
@@ -13,6 +9,11 @@ namespace lll_seer_launcher.core.Controller
 {
     public class FormController
     {
+        [DllImport("user32.dll")]
+        public static extern IntPtr GetForegroundWindow();
+
+        [DllImport("user32.dll")]
+        public static extern IntPtr GetWindow(IntPtr hWnd, uint uCmd);
         [DllImport("user32.dll")]
         private static extern int SendMessage(IntPtr hWnd, int Msg, int wParam, [MarshalAs(UnmanagedType.LPStr)] string text);
         [DllImport("user32.dll")]
@@ -35,6 +36,9 @@ namespace lll_seer_launcher.core.Controller
 
         [DllImport("shell32.dll")]
         private static extern IntPtr ShellExecute(IntPtr hwnd, string lpOperation, string lpFile, string lpParameters, string lpDirectory, ShowCommands nShowCmd);
+        [DllImport("user32.dll")]
+        public static extern bool EnumDisplaySettings(string lpszDeviceName, int iModeNum, ref DEVMODE lpDevMode);
+
 
         private const int WM_APPCOMMAND = 0x0319;
         private const int APPCOMMAND_VOLUME_MUTE = 0x80000;
@@ -44,7 +48,8 @@ namespace lll_seer_launcher.core.Controller
         private const int WS_EX_TOOLWINDOW = 0x00000080;
         private const uint WM_LBUTTONDOWN = 0x201;
         private const uint WM_LBUTTONUP = 0x202;
-
+        public const uint GW_HWNDNEXT = 2;
+        public const int LWA_ALPHA = 2;
         private enum ShowCommands : int
         {
             SW_HIDE = 0,
@@ -72,10 +77,45 @@ namespace lll_seer_launcher.core.Controller
             public int right;
             public int bottom;
         }
-        public static void ProgramInit()
+        [StructLayout(LayoutKind.Sequential)]
+        public struct DEVMODE
         {
-
+            private const int CCHDEVICENAME = 0x20;
+            private const int CCHFORMNAME = 0x20;
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 0x20)]
+            public string dmDeviceName;
+            public short dmSpecVersion;
+            public short dmDriverVersion;
+            public short dmSize;
+            public short dmDriverExtra;
+            public int dmFields;
+            public int dmPositionX;
+            public int dmPositionY;
+            public ScreenOrientation dmDisplayOrientation;
+            public int dmDisplayFixedOutput;
+            public short dmColor;
+            public short dmDuplex;
+            public short dmYResolution;
+            public short dmTTOption;
+            public short dmCollate;
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 0x20)]
+            public string dmFormName;
+            public short dmLogPixels;
+            public int dmBitsPerPel;
+            public int dmPelsWidth;
+            public int dmPelsHeight;
+            public int dmDisplayFlags;
+            public int dmDisplayFrequency;
+            public int dmICMMethod;
+            public int dmICMIntent;
+            public int dmMediaType;
+            public int dmDitherType;
+            public int dmReserved1;
+            public int dmReserved2;
+            public int dmPanningWidth;
+            public int dmPanningHeight;
         }
+
         /// <summary>
         /// 设置指定窗口不出现在alt tab里
         /// </summary>
@@ -172,7 +212,14 @@ namespace lll_seer_launcher.core.Controller
             }
         }
 
-        
+        public static float GetScreenScale(Screen screen)
+        {
+            DEVMODE dm = new DEVMODE();
+            dm.dmSize = (short)Marshal.SizeOf(typeof(DEVMODE));
+            EnumDisplaySettings(screen.DeviceName, -1, ref dm);
+
+            return (float)Math.Round(Decimal.Divide(dm.dmPelsWidth, screen.Bounds.Width), 2);
+        }
 
         public static void ClearIECache()
         {

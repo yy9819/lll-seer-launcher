@@ -37,6 +37,7 @@ namespace lll_seer_launcher
         private PetStorageForm petStorageForm = new PetStorageForm();
         private ReleaseNotesForm releaseNotesForm = new ReleaseNotesForm();
         private string iniFilePath = Directory.GetCurrentDirectory() + "\\bin\\ini\\";
+        private List<Thread> threads = new List<Thread>();
         //private FiddlerController fiddlerController = new FiddlerController();
         //private Process fiddlerProcess;
         public seerMainWindow()
@@ -44,21 +45,15 @@ namespace lll_seer_launcher
             InitializeComponent();
             this.IsMdiContainer = true;
             GlobalVariable.mainForm = this;
+            AutoClickScriptController.Init();
         }
 
         private void SeerMainWindow_Load(object sender, EventArgs e)
         {
-            
-            //Thread initJsonThread = new Thread(() =>
-            //{
-
-            //});
-            //initJsonThread.Start();
-            new Thread(ShowNotices).Start();
-            new Thread(GetUsedMemorySize).Start();
-
             this.InitIniFile();
-
+            this.threads.Add(new Thread(ShowNotices));
+            this.threads.Add(new Thread(GetUsedMemorySize));
+            foreach (var thread in threads) thread.Start();
             this.messageEncryptControl = new MessageEncryptDecryptController();
             this.sendFunction = SendHandle;
             this.sendFunctionPtr = Marshal.GetFunctionPointerForDelegate(sendFunction);
@@ -144,6 +139,19 @@ namespace lll_seer_launcher
                 this.disableVipAutoChargeToolStripMenuItem.Checked  = result == "1";
             }
             GlobalVariable.gameConfigFlag.disableVipAutoChargeFlag = this.disableVipAutoChargeToolStripMenuItem.Checked;
+
+            result = iniFile.Read("config", "autoClick");
+            if (result == null  || (result != "0" && result != "1"))
+            {
+                iniFile.Write("config", "autoClick", "1");
+                this.autoClickToolStripMenuItem.Checked = true;
+            }
+            else
+            {
+                this.autoClickToolStripMenuItem.Checked  = result == "1";
+            }
+            GlobalVariable.autoClick = this.autoClickToolStripMenuItem.Checked;
+            this.threads.Add(new Thread(AutoClick));
             //GlobalVariable.gameConfigFlag.shouldDisableRecv = this.testToolStripMenuItem.Checked;
         }
 
@@ -232,6 +240,7 @@ namespace lll_seer_launcher
                 if(this.hook[i] != null) this.hook[i].Uninstall();
             }
             GlobalVariable.stopThread = true;
+            foreach (var thread in threads) thread.Abort();
             //this.fiddlerProcess.Dispose();
             core.Utils.Logger.Log("CloseProgram", "关闭登录器。");
         }
@@ -549,6 +558,17 @@ namespace lll_seer_launcher
         {
             this.releaseNotesForm.Hide();
             this.releaseNotesForm.Show();
+        }
+
+        private void autoClickToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            this.autoClickToolStripMenuItem.Checked = GlobalVariable.autoClick = !this.autoClickToolStripMenuItem.Checked;
+            new IniFile(this.iniFilePath + "config.ini").Write("config", "autoClick", this.autoClickToolStripMenuItem.Checked ? "1" : "0");
+        }
+
+        private void getScreenShotToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            AutoClickScriptController.GetCupture();
         }
     }
 }

@@ -36,7 +36,25 @@ namespace lll_seer_launcher.core.Utils
             });
             writeLogThread.Start();
         }
-
+        public static void CheckLogRotation()
+        {
+            string directoryPath = Directory.GetCurrentDirectory() + "\\log\\";
+            string[] logPath = Directory.GetFiles(directoryPath, "*.log", SearchOption.AllDirectories);
+            foreach (string fileName in logPath)
+            {
+                string logCreatedDate = fileName.Substring(fileName.IndexOf("og.") + 3 , 10);
+                try
+                {
+                    int value = (int)(DateTime.Now - DateTime.ParseExact(logCreatedDate, "yyyy-MM-dd",System.Globalization.CultureInfo.InvariantCulture)).TotalDays;
+                    if(value > 31)
+                    {
+                        File.Delete(fileName);
+                        Logger.Log("DeleteLogFile",$"日志:{fileName},创建日期超过1个月,已被自动清理.");
+                    }
+                }
+                catch { }
+            }
+        }
         public static void Log(string title,string msg)
         {
             logger.Write(title,msg);

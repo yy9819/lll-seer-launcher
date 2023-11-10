@@ -44,6 +44,8 @@ namespace lll_seer_launcher.core.Dto
             this.coins = ByteConverter.BytesTo10(ByteConverter.TakeBytes(inputData, index, 4));
             index += (int)(30.75 * 4);
             this.vipLevel = ByteConverter.BytesTo10(ByteConverter.TakeBytes(inputData, index, 4));
+            int vipValue = ByteConverter.BytesTo10(ByteConverter.TakeBytes(inputData, index + 4, 4));
+            if(vipValue != vipLevel) this.vipLevel = vipValue;
             this.petBagGreatestAmount = 6 + (this.vipLevel < 1 ? 3 : (this.vipLevel < 3 ? 4 : (this.vipLevel < 5 ? 5 : 6)));
         }
     }

@@ -52,54 +52,47 @@ namespace lll_seer_launcher.core.Service
         public static bool LoadTaomeeJson()
         {
             string serverVersionJson = GlobalUtil.GetJsonString(taomeeJsonVersionLink);
-            if(serverVersionJson == "")
+            if(serverVersionJson == "") return false;
+            string localTaomeeVersionJsonPath = folderPath + "localtaomeeversionjson.json";
+            try
             {
-                return false;
-            }
-            else
-            {
-                string localTaomeeVersionJsonPath = folderPath + "localtaomeeversionjson.json";
-                try
+                TaomeeVersionDto taomeeServerJsonInfo = JsonConvert.DeserializeObject<TaomeeVersionDto>(serverVersionJson);
+                if (File.Exists(localTaomeeVersionJsonPath))
                 {
-                    TaomeeVersionDto taomeeServerJsonInfo = JsonConvert.DeserializeObject<TaomeeVersionDto>(serverVersionJson);
-                    if (File.Exists(localTaomeeVersionJsonPath))
-                    {
-                        string localJsonString = File.ReadAllText(localTaomeeVersionJsonPath);
-                        TaomeeVersionDto localJsonInfo = JsonConvert.DeserializeObject<TaomeeVersionDto>(localJsonString);
+                    string localJsonString = File.ReadAllText(localTaomeeVersionJsonPath);
+                    TaomeeVersionDto localJsonInfo = JsonConvert.DeserializeObject<TaomeeVersionDto>(localJsonString);
 
-                        GlobalVariable.shoudUpdateJsonDic.Add("pet", !(taomeeServerJsonInfo.files.resource.config.xml.monstersJson == localJsonInfo.files.resource.config.xml.monstersJson));
-                        GlobalVariable.shoudUpdateJsonDic.Add("skill", !(taomeeServerJsonInfo.files.resource.config.xml.movesJson == localJsonInfo.files.resource.config.xml.movesJson));
-                        GlobalVariable.shoudUpdateJsonDic.Add("effectIcon", !(taomeeServerJsonInfo.files.resource.config.xml.effectIconJson == localJsonInfo.files.resource.config.xml.effectIconJson));
-                        GlobalVariable.shoudUpdateJsonDic.Add("newSe", !(taomeeServerJsonInfo.files.resource.config.xml.newSeJson == localJsonInfo.files.resource.config.xml.newSeJson));
-                        GlobalVariable.shoudUpdateJsonDic.Add("skillType", !(taomeeServerJsonInfo.files.resource.config.xml.skillType == localJsonInfo.files.resource.config.xml.skillType));
-                    }
-                    else
-                    {
-                        GlobalVariable.shoudUpdateJsonDic.Add("pet", true);
-                        GlobalVariable.shoudUpdateJsonDic.Add("skill", true);
-                        GlobalVariable.shoudUpdateJsonDic.Add("effectIcon", true);
-                        GlobalVariable.shoudUpdateJsonDic.Add("newSe", true);
-                        GlobalVariable.shoudUpdateJsonDic.Add("skillType", true);
-                    }
-                    GlobalVariable.jsonPathDic.Add("pet", taomeeServerJsonInfo.files.resource.config.xml.monstersJson);
-                    GlobalVariable.jsonPathDic.Add("skill", taomeeServerJsonInfo.files.resource.config.xml.movesJson);
-                    GlobalVariable.jsonPathDic.Add("effectIcon", taomeeServerJsonInfo.files.resource.config.xml.effectIconJson);
-                    GlobalVariable.jsonPathDic.Add("newSe", taomeeServerJsonInfo.files.resource.config.xml.newSeJson);
-                    GlobalVariable.jsonPathDic.Add("skillType", taomeeServerJsonInfo.files.resource.config.xml.skillType);
-
-                    string data = "{\"files\":{\"resource\":{\"config\":{\"xml\":{" + 
-                        $"\"monsters.json\":\"{taomeeServerJsonInfo.files.resource.config.xml.monstersJson}\"," +
-                        $"\"moves.json\":\"{taomeeServerJsonInfo.files.resource.config.xml.movesJson}\","+
-                        $"\"effectIcon.json\":\"{taomeeServerJsonInfo.files.resource.config.xml.effectIconJson}\","+
-                        $"\"new_se.json\":\"{taomeeServerJsonInfo.files.resource.config.xml.newSeJson}\","+
-                        $"\"skillTypes.json\":\"{taomeeServerJsonInfo.files.resource.config.xml.skillType}\""+
-                        "}}}}}";
-                    File.WriteAllText(localTaomeeVersionJsonPath, data);
+                    GlobalVariable.shoudUpdateJsonDic.Add("pet", !(taomeeServerJsonInfo.files.resource.config.xml.monstersJson == localJsonInfo.files.resource.config.xml.monstersJson));
+                    GlobalVariable.shoudUpdateJsonDic.Add("skill", !(taomeeServerJsonInfo.files.resource.config.xml.movesJson == localJsonInfo.files.resource.config.xml.movesJson));
+                    GlobalVariable.shoudUpdateJsonDic.Add("effectIcon", !(taomeeServerJsonInfo.files.resource.config.xml.effectIconJson == localJsonInfo.files.resource.config.xml.effectIconJson));
+                    GlobalVariable.shoudUpdateJsonDic.Add("newSe", !(taomeeServerJsonInfo.files.resource.config.xml.newSeJson == localJsonInfo.files.resource.config.xml.newSeJson));
+                    GlobalVariable.shoudUpdateJsonDic.Add("skillType", !(taomeeServerJsonInfo.files.resource.config.xml.skillType == localJsonInfo.files.resource.config.xml.skillType));
                 }
-                catch { }
-                return true;
+                else
+                {
+                    GlobalVariable.shoudUpdateJsonDic.Add("pet", true);
+                    GlobalVariable.shoudUpdateJsonDic.Add("skill", true);
+                    GlobalVariable.shoudUpdateJsonDic.Add("effectIcon", true);
+                    GlobalVariable.shoudUpdateJsonDic.Add("newSe", true);
+                    GlobalVariable.shoudUpdateJsonDic.Add("skillType", true);
+                }
+                GlobalVariable.jsonPathDic.Add("pet", taomeeServerJsonInfo.files.resource.config.xml.monstersJson);
+                GlobalVariable.jsonPathDic.Add("skill", taomeeServerJsonInfo.files.resource.config.xml.movesJson);
+                GlobalVariable.jsonPathDic.Add("effectIcon", taomeeServerJsonInfo.files.resource.config.xml.effectIconJson);
+                GlobalVariable.jsonPathDic.Add("newSe", taomeeServerJsonInfo.files.resource.config.xml.newSeJson);
+                GlobalVariable.jsonPathDic.Add("skillType", taomeeServerJsonInfo.files.resource.config.xml.skillType);
+
+                string data = "{\"files\":{\"resource\":{\"config\":{\"xml\":{" +
+                    $"\"monsters.json\":\"{taomeeServerJsonInfo.files.resource.config.xml.monstersJson}\"," +
+                    $"\"moves.json\":\"{taomeeServerJsonInfo.files.resource.config.xml.movesJson}\","+
+                    $"\"effectIcon.json\":\"{taomeeServerJsonInfo.files.resource.config.xml.effectIconJson}\","+
+                    $"\"new_se.json\":\"{taomeeServerJsonInfo.files.resource.config.xml.newSeJson}\","+
+                    $"\"skillTypes.json\":\"{taomeeServerJsonInfo.files.resource.config.xml.skillType}\""+
+                    "}}}}}";
+                File.WriteAllText(localTaomeeVersionJsonPath, data);
             }
-            
+            catch { }
+            return true;
         }
 
         public static bool InitAchieveTitleDictionary()
@@ -153,23 +146,16 @@ namespace lll_seer_launcher.core.Service
             string jsonString = GlobalUtil.GetJsonString(link);
             try
             {
-                if (jsonString != "")
+                if (jsonString == "") return false;
+                GlassesJsonObject info = JsonConvert.DeserializeObject<GlassesJsonObject>(jsonString);
+                Dictionary<int, GlassesInfo> glassesDic = new Dictionary<int, GlassesInfo>();
+                foreach (var item in info.data)
                 {
-
-                    GlassesJsonObject info = JsonConvert.DeserializeObject<GlassesJsonObject>(jsonString);
-                    Dictionary<int, GlassesInfo> glassesDic = new Dictionary<int, GlassesInfo>();
-                    foreach (var item in info.data)
-                    {
-                        glassesDic.Add(item.glassesId, item);
-                    }
-                    GlobalVariable.glassesDictionary = glassesDic;
-                    Logger.Log("jsonFileInit", "目镜json加载完成。");
-                    return true;
+                    glassesDic.Add(item.glassesId, item);
                 }
-                else
-                {
-                    return false;
-                }
+                GlobalVariable.glassesDictionary = glassesDic;
+                Logger.Log("jsonFileInit", "目镜json加载完成。");
+                return true;
             }
             catch (Exception ex)
             {
@@ -184,17 +170,11 @@ namespace lll_seer_launcher.core.Service
             try
             {
                 string jsonString = GlobalUtil.GetJsonString(link);
-                if (jsonString != "")
-                {
-                    PetJsonDto info = JsonConvert.DeserializeObject<PetJsonDto>(jsonString);
-                    DBController.PetDBController.PetTableTransactionInsertData(info.monsters.monster);
-                    Logger.Log("jsonFileInit", "精灵json加载完成。");
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
+                if (jsonString == "") return false;
+                PetJsonDto info = JsonConvert.DeserializeObject<PetJsonDto>(jsonString);
+                DBController.PetDBController.PetTableTransactionInsertData(info.monsters.monster);
+                Logger.Log("jsonFileInit", "精灵json加载完成。");
+                return true;
             }
             catch (Exception ex)
             {
@@ -209,17 +189,11 @@ namespace lll_seer_launcher.core.Service
             try
             {
                 string jsonString = GlobalUtil.GetJsonString(link);
-                if (jsonString != "")
-                {
-                    PetEffectDto info = JsonConvert.DeserializeObject<PetEffectDto>(jsonString);
-                    DBController.EffectDBController.PetEffectTableTransactionInsertData(info.root.effect);
-                    Logger.Log("jsonFileInit", "魂印json加载完成。");
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
+                if (jsonString == "") return false;
+                PetEffectDto info = JsonConvert.DeserializeObject<PetEffectDto>(jsonString);
+                DBController.EffectDBController.PetEffectTableTransactionInsertData(info.root.effect);
+                Logger.Log("jsonFileInit", "魂印json加载完成。");
+                return true;
             }
             catch (Exception ex)
             {
@@ -234,17 +208,11 @@ namespace lll_seer_launcher.core.Service
             try
             {
                 string jsonString = GlobalUtil.GetJsonString(link);
-                if (jsonString != "")
-                {
-                    PetNewSeDto info = JsonConvert.DeserializeObject<PetNewSeDto>(jsonString);
-                    DBController.EffectDBController.PetNewSeTableTransactionInsertData(info.newSe.newSeIdx);
-                    Logger.Log("jsonFileInit", "特性json加载完成。");
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
+                if (jsonString == "") return false;
+                PetNewSeDto info = JsonConvert.DeserializeObject<PetNewSeDto>(jsonString);
+                DBController.EffectDBController.PetNewSeTableTransactionInsertData(info.newSe.newSeIdx);
+                Logger.Log("jsonFileInit", "特性json加载完成。");
+                return true;
             }
             catch (Exception ex)
             {
@@ -259,17 +227,11 @@ namespace lll_seer_launcher.core.Service
             try
             {
                 string jsonString = GlobalUtil.GetJsonString(link);
-                if(jsonString != "")
-                {
-                    SkillJsonDto info = JsonConvert.DeserializeObject<SkillJsonDto>(jsonString);
-                    DBController.SkillDBController.SkillTableTransactionInsertData(info.movesTbl.moves.move);
-                    Logger.Log("jsonFileInit", "技能json加载完成。");
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
+                if(jsonString == "") return false;
+                SkillJsonDto info = JsonConvert.DeserializeObject<SkillJsonDto>(jsonString);
+                DBController.SkillDBController.SkillTableTransactionInsertData(info.movesTbl.moves.move);
+                Logger.Log("jsonFileInit", "技能json加载完成。");
+                return true;
             }
             catch (Exception ex)
             {
@@ -284,17 +246,11 @@ namespace lll_seer_launcher.core.Service
             try
             {
                 string jsonString = GlobalUtil.GetJsonString(link);
-                if (jsonString != "")
-                {
-                    TypeDto info = JsonConvert.DeserializeObject<TypeDto>(jsonString);
-                    DBController.SkillDBController.TypeTableTransactionInsertData(info.root.item);
-                    Logger.Log("jsonFileInit", "技能属性json加载完成。");
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
+                if (jsonString == "") return false;
+                TypeDto info = JsonConvert.DeserializeObject<TypeDto>(jsonString);
+                DBController.SkillDBController.TypeTableTransactionInsertData(info.root.item);
+                Logger.Log("jsonFileInit", "技能属性json加载完成。");
+                return true;
             }
             catch (Exception ex)
             {
