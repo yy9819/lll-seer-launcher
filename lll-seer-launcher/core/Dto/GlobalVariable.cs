@@ -161,6 +161,8 @@ namespace lll_seer_launcher.core.Dto
         /// </summary>
         public static bool isLogin { get; set; }
 
+        public static bool isRunningScript { get; set; } = false ;
+
         public static bool isLoginSend { get; set; }
 
         /// <summary>
@@ -204,6 +206,7 @@ namespace lll_seer_launcher.core.Dto
         /*=============================================json相关用全局变量================================================*/
         public static Dictionary<string, bool> shoudUpdateJsonDic { get; set; } = new Dictionary<string, bool>();
         public static Dictionary<string,string> jsonPathDic { get; set; } = new Dictionary<string, string>();
+        public const string securityCode = "lalalaScript";
         #endregion
     }
 }

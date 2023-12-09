@@ -47,6 +47,7 @@ namespace lll_seer_launcher.core.Service
         /// <param name="hexDataString"></param>
         public void SendDataByCmdIdAndHexString(int cmdId,string hexDataString)
         {
+            hexDataString = hexDataString.Replace("-", "").Replace(" ","").Replace("　", "");
             int dataLen = 17 + hexDataString.Length / 2;
             byte[] dataBytes = new byte[dataLen];
             byte[] body = ByteConverter.HexToBytes(hexDataString);

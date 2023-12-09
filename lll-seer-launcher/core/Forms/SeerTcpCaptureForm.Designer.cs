@@ -39,6 +39,7 @@
             this.clearToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.copyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.sendDataToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.addDataToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.disableToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.startCaptureCheckBox = new System.Windows.Forms.CheckBox();
             this.dataTextBox = new System.Windows.Forms.TextBox();
@@ -50,7 +51,6 @@
             this.sendDataTabPage = new System.Windows.Forms.TabPage();
             this.sendDataButton = new System.Windows.Forms.Button();
             this.sendDataTextBox = new System.Windows.Forms.TextBox();
-            this.addDataToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.tcpDataGridView)).BeginInit();
             this.contextMenuStrip1.SuspendLayout();
             this.tabControl.SuspendLayout();
@@ -138,6 +138,13 @@
             this.sendDataToolStripMenuItem.Size = new System.Drawing.Size(100, 22);
             this.sendDataToolStripMenuItem.Text = "发送";
             this.sendDataToolStripMenuItem.Click += new System.EventHandler(this.sendDataToolStripMenuItem_Click);
+            // 
+            // addDataToolStripMenuItem
+            // 
+            this.addDataToolStripMenuItem.Name = "addDataToolStripMenuItem";
+            this.addDataToolStripMenuItem.Size = new System.Drawing.Size(100, 22);
+            this.addDataToolStripMenuItem.Text = "添加";
+            this.addDataToolStripMenuItem.Click += new System.EventHandler(this.addDataToolStripMenuItem_Click);
             // 
             // disableToolStripMenuItem
             // 
@@ -240,9 +247,9 @@
             // 
             // sendDataButton
             // 
-            this.sendDataButton.Location = new System.Drawing.Point(613, 34);
+            this.sendDataButton.Location = new System.Drawing.Point(613, 46);
             this.sendDataButton.Name = "sendDataButton";
-            this.sendDataButton.Size = new System.Drawing.Size(157, 90);
+            this.sendDataButton.Size = new System.Drawing.Size(157, 103);
             this.sendDataButton.TabIndex = 3;
             this.sendDataButton.Text = "发送\r\n\r\n例:(回车分割)\r\nsend|1001|00-00-00-00\r\nsend|1002|00-00-00-00\r\n";
             this.sendDataButton.UseVisualStyleBackColor = true;
@@ -258,13 +265,6 @@
             this.sendDataTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.sendDataTextBox.Size = new System.Drawing.Size(603, 143);
             this.sendDataTextBox.TabIndex = 2;
-            // 
-            // addDataToolStripMenuItem
-            // 
-            this.addDataToolStripMenuItem.Name = "addDataToolStripMenuItem";
-            this.addDataToolStripMenuItem.Size = new System.Drawing.Size(100, 22);
-            this.addDataToolStripMenuItem.Text = "添加";
-            this.addDataToolStripMenuItem.Click += new System.EventHandler(this.addDataToolStripMenuItem_Click);
             // 
             // SeerTcpCaptureForm
             // 
