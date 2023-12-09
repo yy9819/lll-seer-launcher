@@ -170,6 +170,15 @@ namespace lll_seer_launcher
                             this.UpdateInitState("技能信息更新完成");
                         }
 
+                        if (GlobalVariable.shoudUpdateJsonDic["move_stones"])
+                        {
+                            this.UpdateInitState("加载技能石信息中");
+                            Logger.Log("updateData", "技能石信息更新！更新技能石信息中...");
+                            initJsonControl.InitSkillDBOfMoveStones();
+                            Logger.Log("updateData", "技能石信息更新完成！");
+                            this.UpdateInitState("技能石信息更新完成");
+                        }
+
                         this.UpdateInitState("检查技能属性信息是否有更新");
                         if (GlobalVariable.shoudUpdateJsonDic["skillType"])
                         {

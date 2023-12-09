@@ -31,18 +31,21 @@ namespace lll_seer_launcher.core.Service
                     GlobalVariable.shoudUpdateJsonDic.Add("suit", !(serverJsonInfo.suitjson == localJsonInfo.suitjson));
                     GlobalVariable.shoudUpdateJsonDic.Add("glasses", !(serverJsonInfo.glassesjson == localJsonInfo.glassesjson));
                     GlobalVariable.shoudUpdateJsonDic.Add("achieveTitle", !(serverJsonInfo.achievetitlejson == localJsonInfo.achievetitlejson));
+                    GlobalVariable.shoudUpdateJsonDic.Add("move_stones", !(serverJsonInfo.movestonesjson == localJsonInfo.movestonesjson));
                 }
                 else
                 {
                     GlobalVariable.shoudUpdateJsonDic.Add("suit", true);
                     GlobalVariable.shoudUpdateJsonDic.Add("glasses", true);
                     GlobalVariable.shoudUpdateJsonDic.Add("achieveTitle", true);
+                    GlobalVariable.shoudUpdateJsonDic.Add("move_stones", true);
                 }
                 var data = new
                 {
                     suitjson = serverJsonInfo.suitjson,
                     glassesjson = serverJsonInfo.glassesjson,
                     achievetitlejson = serverJsonInfo.achievetitlejson,
+                    movestonesjson = serverJsonInfo.movestonesjson,
                 };
                 File.WriteAllText(loaclVersionPath, JsonConvert.SerializeObject(data));
             }
@@ -250,6 +253,29 @@ namespace lll_seer_launcher.core.Service
                 TypeDto info = JsonConvert.DeserializeObject<TypeDto>(jsonString);
                 DBController.SkillDBController.TypeTableTransactionInsertData(info.root.item);
                 Logger.Log("jsonFileInit", "技能属性json加载完成。");
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Logger.Error($"技能属性json加载失败！！！errorMessage:{ex.Message}");
+                return false;
+            }
+        }
+
+        public static bool InitMoveStones()
+        {
+            string link = jsonLink + "move_stones.json";
+            try
+            {
+                string jsonString = GlobalUtil.GetJsonString(link);
+                if (jsonString == "") return false;
+                MoveStonesJsonDto info = JsonConvert.DeserializeObject<MoveStonesJsonDto>(jsonString);
+                for(int i = 0; i < info.moveStones.moveStone.Count; i++)
+                {
+                    info.moveStones.moveStone[i].id += 200000;
+                }
+                DBController.SkillDBController.SkillTableTransactionInsertData(info.moveStones.moveStone);
+                Logger.Log("jsonFileInit", "技能json加载完成。");
                 return true;
             }
             catch (Exception ex)

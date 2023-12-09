@@ -28,7 +28,7 @@ namespace lll_seer_launcher
         {
             int index = this.GetPreviewDataGridViewSelectIndex();
             int petId = Convert.ToInt32(this.previewDataGridView.Rows[index].Cells["searchPetId"].Value);
-            petId = petId < 1400000 ? DBController.PetDBController.GetPetRealId(petId) : DBController.PetDBController.GetPetSkinsRealId(petId);
+            petId = PetRealIdDic.GetPetRealId(petId);
             if (petId > 0)
             {
                 this.petSwfPreviewWebBrowser.Navigate($"https://seer.61.com/resource/fightResource/pet/swf/{petId}.swf");
