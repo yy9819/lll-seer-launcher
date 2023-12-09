@@ -198,6 +198,7 @@
     <Compile Include="core\Dto\JSON\PetEffectDto.cs" />
     <Compile Include="core\Dto\JSON\PetJsonDto.cs" />
     <Compile Include="core\Dto\JSON\PetNewSeDto.cs" />
+    <Compile Include="core\Dto\JSON\ScriptJsonDto.cs" />
     <Compile Include="core\Dto\JSON\SkillJsonDto.cs" />
     <Compile Include="core\Dto\JSON\TypeDto.cs" />
     <Compile Include="core\Dto\JSON\VersionDto.cs" />
@@ -243,6 +244,12 @@
     </Compile>
     <Compile Include="core\Forms\ReleaseNotesForm.Designer.cs">
       <DependentUpon>ReleaseNotesForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="core\Forms\ScriptEditForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="core\Forms\ScriptEditForm.Designer.cs">
+      <DependentUpon>ScriptEditForm.cs</DependentUpon>
     </Compile>
     <Compile Include="core\Forms\SeerTcpCaptureForm.cs">
       <SubType>Form</SubType>
@@ -324,6 +331,9 @@
     <EmbeddedResource Include="core\Forms\ReleaseNotesForm.resx">
       <DependentUpon>ReleaseNotesForm.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="core\Forms\ScriptEditForm.resx">
+      <DependentUpon>ScriptEditForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="core\Forms\SeerTcpCaptureForm.resx">
       <DependentUpon>SeerTcpCaptureForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -362,6 +372,10 @@
     <None Include="Resources\effectIcon.png" />
     <None Include="Resources\8.png" />
     <None Include="Resources\214.png" />
+    <None Include="bin\Debug\bin\img\1.bmp" />
+    <None Include="bin\Debug\bin\img\2.bmp" />
+    <None Include="bin\Debug\bin\img\3.bmp" />
+    <None Include="bin\Debug\bin\img\4.bmp" />
     <Content Include="License-LGPL.txt" />
     <Content Include="Resources\bibiIcon.ico" />
     <None Include="Resources\bibiLoading.gif" />

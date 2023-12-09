@@ -69,16 +69,14 @@ namespace lll_seer_launcher.core.Service
         }
         public static void Init()
         {
-            string path = Directory.GetCurrentDirectory() + "\\bin\\img";
-            if (!Directory.Exists(path) || Directory.GetFiles(path,"*.bmp", SearchOption.TopDirectoryOnly).Length < 6)
+            string path = Directory.GetCurrentDirectory() + "\\bin\\img\\autoclick";
+            if (!Directory.Exists(path) || Directory.GetFiles(path, "*.bmp", SearchOption.TopDirectoryOnly).Length < 4)
             {
                 Directory.CreateDirectory(path);
                 Properties.Resources._1.Save($"{path}\\1.bmp");
                 Properties.Resources._2.Save($"{path}\\2.bmp");
                 Properties.Resources._3.Save($"{path}\\3.bmp");
                 Properties.Resources._4.Save($"{path}\\4.bmp");
-                Properties.Resources._5.Save($"{path}\\5.bmp");
-                Properties.Resources._6.Save($"{path}\\6.bmp");
             }
             string[] bmpPath = Directory.GetFiles(path,"*.bmp",SearchOption.TopDirectoryOnly);
             mainFormhWnd = GlobalVariable.mainForm.Handle;
@@ -87,6 +85,7 @@ namespace lll_seer_launcher.core.Service
             {
                 Image<Bgr, byte> template = new Image<Bgr, byte>(bmp); // Image A
                 bmps.Add(template);
+                if (bmps.Count >= 6) break;
             }
         }
 
@@ -124,7 +123,6 @@ namespace lll_seer_launcher.core.Service
                     }
                 }
             }
-
         }
         private static void LeftClick(int left,int top)
         {
