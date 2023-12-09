@@ -44,6 +44,10 @@ namespace lll_seer_launcher.core.Controller
         {
             return InitJsonService.InitSkillDB(GlobalVariable.jsonPathDic["skill"]);
         }
+        public bool InitSkillDBOfMoveStones()
+        {
+            return InitJsonService.InitMoveStones();
+        }
         public bool InitTypeDB()
         {
             return InitJsonService.InitTypeDB(GlobalVariable.jsonPathDic["skillType"]);

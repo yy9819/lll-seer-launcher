@@ -202,12 +202,12 @@ namespace lll_seer_launcher.core.Forms
 
             this.abilityLabel.Text =
                 $"性格:{petInfo.nature}\n\n" +
-                $"攻击:{petInfo.attack} \n\n" +
-                $"防御:{petInfo.defence} \n\n" +
-                $"特攻:{petInfo.spAttack} \n\n" +
-                $"特防:{petInfo.spDefence} \n\n" +
-                $"速度:{petInfo.speed} \n\n" +
-                $"体力:{petInfo.hp}/{petInfo.maxHp} \n \n";
+                $"攻击:{petInfo.attack}{(petInfo.evAttack > 0 ? $"({petInfo.evAttack})" : "")} \n\n" +
+                $"防御:{petInfo.defence}{(petInfo.evDefence > 0 ? $"({petInfo.evDefence})" : "")} \n\n" +
+                $"特攻:{petInfo.spAttack}{(petInfo.evSpAttack > 0 ? $"({petInfo.evSpAttack})" : "")} \n\n" +
+                $"特防:{petInfo.spDefence}{(petInfo.evSpDefence > 0 ? $"({petInfo.evSpDefence})" : "")} \n\n" +
+                $"速度:{petInfo.speed}{(petInfo.evSpeed > 0 ? $"({petInfo.evSpeed})" : "")} \n\n" +
+                $"体力:{petInfo.hp}/{petInfo.maxHp} {(petInfo.evHp > 0 ? $"({petInfo.evHp})" : "")}\n \n";
             //设置精灵技能
             this.skillLabel.Text = "技能:\n\n";
             foreach (var skill in petInfo.skillArray.Values)

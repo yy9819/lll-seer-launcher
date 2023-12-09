@@ -47,7 +47,7 @@ namespace lll_seer_launcher.core.Dto.PetDto
             this.catchTime = ByteConverter.BytesTo10(ByteConverter.TakeBytes(inputData, index, 4));
             index += 4;
 
-            this.petName =  DBController.PetDBController.SearchPetNameByPetId(this.petId);
+            this.petName =  PetNameDic.GetPetName(this.petId);
             index += 16;
 
             this.level = ByteConverter.BytesTo10(ByteConverter.TakeBytes(inputData, index, 4));

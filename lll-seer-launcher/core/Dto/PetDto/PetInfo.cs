@@ -191,7 +191,7 @@ namespace lll_seer_launcher.core.Dto.PetDto
         {
             this.petId = ByteConverter.BytesTo10(ByteConverter.TakeBytes(inputData, index, 4));
             index += 4;
-            this.petName = DBController.PetDBController.SearchPetNameByPetId(petId);
+            this.petName = PetNameDic.GetPetName(this.petId);
 
             index += 16;
 
@@ -206,7 +206,7 @@ namespace lll_seer_launcher.core.Dto.PetDto
             index += 4;
             //设置属性
             this.abilityType = ByteConverter.BytesTo10(ByteConverter.TakeBytes(inputData, index, 4));
-            this.type = DBController.SkillDBController.GetTypeName(DBController.PetDBController.GetPetType(this.petId));
+            this.type = PetTypeDic.GetPetType(this.petId);
             index += 4;
             //设置等级
             this.level = ByteConverter.BytesTo10(ByteConverter.TakeBytes(inputData, index, 4));
@@ -266,7 +266,7 @@ namespace lll_seer_launcher.core.Dto.PetDto
                 {
                     SkillInfo skillInfo = new SkillInfo();
                     skillInfo.skillId = skillId;
-                    skillInfo.skillName = DBController.SkillDBController.SearchName(skillId);
+                    skillInfo.skillName = SkillNameDic.GetSkillName(skillId);
                     skillInfo.skillPP = ByteConverter.BytesTo10(ByteConverter.TakeBytes(inputData, index + 4, 4));
                     this.skillArray.Add(skillId, skillInfo);
                 }
@@ -313,5 +313,71 @@ namespace lll_seer_launcher.core.Dto.PetDto
         public int skillId { get; set; }
         public string skillName { get; set; }
         public int skillPP { get; set; }
+    }
+
+    public static class PetNameDic
+    {
+        private static Dictionary<int,string> petNameDic = new Dictionary<int,string>();
+        private static object lockObj = new object();
+        public static string GetPetName(int petId)
+        {
+            lock (lockObj)
+            {
+                if (PetNameDic.petNameDic.TryGetValue(petId , out string petName ))
+                {
+                    return petName;
+                }
+                else
+                {
+                    petName =  DBController.PetDBController.SearchPetNameByPetId(petId);
+                    PetNameDic.petNameDic.Add(petId, petName);
+                    return petName;
+                }
+            }
+        }
+    }
+
+    public static class PetTypeDic
+    {
+        private static Dictionary<int, string> petTypeDic = new Dictionary<int, string>();
+        private static object lockObj = new object();
+        public static string GetPetType(int petId)
+        {
+            lock (lockObj)
+            {
+                if (PetTypeDic.petTypeDic.TryGetValue(petId, out string petType))
+                {
+                    return petType;
+                }
+                else
+                {
+                    petType = DBController.SkillDBController.GetTypeName(DBController.PetDBController.GetPetType(petId));
+                    PetTypeDic.petTypeDic.Add(petId, petType);
+                    return petType;
+                }
+            }
+        }
+    }
+
+    public static class SkillNameDic
+    {
+        private static Dictionary<int,string> skillNameDic = new Dictionary<int, String>();
+        private static object lockObj = new object();
+        public static string GetSkillName(int skillId)
+        {
+            lock (lockObj)
+            {
+                if (SkillNameDic.skillNameDic.TryGetValue(skillId, out string skillName))
+                {
+                    return skillName;
+                }
+                else
+                {
+                    skillName = DBController.SkillDBController.SearchName(skillId);
+                    SkillNameDic.skillNameDic.Add(skillId, skillName);
+                    return skillName;
+                }
+            }
+        }
     }
 }

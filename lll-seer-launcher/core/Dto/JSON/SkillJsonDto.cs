@@ -27,4 +27,13 @@ namespace lll_seer_launcher.core.Dto.JSON
         public int maxPP { get; set; }
         public int accuracy { get; set; }
     }
+
+    public class MoveStonesJsonDto
+    {
+        public MoveStones moveStones { get; set; }
+    }
+    public class MoveStones
+    {
+        public List<Move> moveStone { get; set; }
+    }
 }

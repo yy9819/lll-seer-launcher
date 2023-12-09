@@ -140,7 +140,7 @@ namespace lll_seer_launcher.core.Dto.PetDto
                 {
                     SkillInfo skillInfo = new SkillInfo();
                     skillInfo.skillId = skillId;
-                    skillInfo.skillName = DBController.SkillDBController.SearchName(skillId);
+                    skillInfo.skillName = SkillNameDic.GetSkillName(skillId);
                     skillInfo.skillPP = ByteConverter.BytesTo10(ByteConverter.TakeBytes(inputData, index + 4, 4));
                     this.skillArray.Add(skillId, skillInfo);
                 }
@@ -224,6 +224,7 @@ namespace lll_seer_launcher.core.Dto.PetDto
             index += 4;
 
             this.maxHpSelf = ByteConverter.BytesTo10(ByteConverter.TakeBytes(inputData, index, 4));
+            if (this.maxHpSelf == 0) this.maxHpSelf = this.maxHP;
             index += 4;
             this.maxHpOther = ByteConverter.BytesTo10(ByteConverter.TakeBytes(inputData, index, 4));
             index += 4;
