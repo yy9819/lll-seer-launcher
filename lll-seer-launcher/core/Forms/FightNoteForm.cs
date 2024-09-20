@@ -176,10 +176,24 @@ namespace lll_seer_launcher.core.Forms
                                 {
                                     this.skillListBox.Items[j++] = $"{loginPlayer.skillArray[skill].skillName}|{loginPlayer.skillArray[skill].skillPP}";
                                 }
-                                break;
+                                return;
                             }
                         }
-                        
+                        if (this.skillListBox.Items.Count < 1)
+                        {
+                            this.skillList.Clear();
+                            this.skillListBox.Items.Clear();
+                            foreach (var skill in loginPlayer.skillArray.Keys)
+                            {
+                                this.skillList.Add(skill);
+                                this.skillListBox.Items.Add($"{loginPlayer.skillArray[skill].skillName}|{loginPlayer.skillArray[skill].skillPP}");
+                            }
+                        }
+                        //int j = 0;
+                        //foreach (var skill in loginPlayer.skillArray.Keys)
+                        //{
+                        //    this.skillListBox.Items[j++] = $"{loginPlayer.skillArray[skill].skillName}|{loginPlayer.skillArray[skill].skillPP}";
+                        //}
                     }
                     catch { }
                 };
@@ -255,9 +269,24 @@ namespace lll_seer_launcher.core.Forms
                     this.petList.Items.Clear();
 
                     if (GlobalVariable.pets.TryGetValue(this.fightPetCatchTime, out PetInfo petInfo)) { }
+                    else if(GlobalVariable.awaitPets.TryGetValue(this.fightPetCatchTime, out petInfo)) { }
                     else
                     {
-                        petInfo = GlobalVariable.awaitPets[this.fightPetCatchTime];
+                        petInfo = new PetInfo();
+                        petInfo.petId = loginPlayer.petId;
+                        petInfo.petName = loginPlayer.petName;
+                        petInfo.hp = loginPlayer.hp;
+                        petInfo.level = loginPlayer.level;
+                        //loginPlayer
+                        //foreach(int skillId in loginPlayer.skillRunawayMarks)
+                        //{
+                        //    SkillInfo skillInfo = new SkillInfo();
+                        //    skillInfo.skillId = skillId;
+                        //    skillInfo.skillName = "";
+                        //    skillInfo.skillPP = 0;
+                        //    if(!petInfo.skillArray.ContainsKey(skillId)) petInfo.skillArray.Add(skillId, skillInfo);
+                        //}
+                        //petInfo.skillArray = loginPlayer.;
                     }
                     this.fightPetInfo.Add(petInfo);
                     this.petList.Items.Add(petInfo.petName);

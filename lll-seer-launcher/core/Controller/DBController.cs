@@ -30,6 +30,7 @@ namespace lll_seer_launcher.core.Controller
                 {
                     achieveTitleInfo.Add(info);
                 }
+                SuitAndAchieveTitleDbService.AchieveTitleTableReset();
                 SuitAndAchieveTitleDbService.AchieveTitleTableTransactionInsertData(achieveTitleInfo);
                 Logger.Log("InitTableData", "称号表更新完成!");
             }

@@ -58,10 +58,30 @@ namespace lll_seer_launcher.core.Service.DBService
             }
             return true;
         }
-        
+
 
         #region
         /*==========================================称号数据表操作============================================*/
+        public static int AchieveTitleTableReset()
+        {
+            try
+            {
+                using (db)
+                {
+                    db.Open();
+                    string deleteSql = "DELETE FROM achieve_title;";
+                    SqliteCommand deleteCmd = new SqliteCommand(deleteSql, db);
+                    int result = deleteCmd.ExecuteNonQuery();
+
+                    return result;
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Error($"数据库称号信息初始化失败！ errorMessage：{ex.Message}");
+                return -1;
+            }
+        }
         public static void AchieveTitleTableTransactionInsertData(List<AchieveTitleInfo> insertData)
         {
             using (db)

@@ -704,7 +704,7 @@ namespace lll_seer_launcher
                         AutoClickScriptController.AutoClick();
                     }
                 }
-                Thread.Sleep(500);
+                Thread.Sleep(100);
             }
         }
 

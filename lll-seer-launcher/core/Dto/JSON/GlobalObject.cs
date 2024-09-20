@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace lll_seer_launcher.core.Dto
 {
@@ -33,17 +34,33 @@ namespace lll_seer_launcher.core.Dto
     /// </summary>
     public class AchieveTitleJsonObject
     {
-        public string date { get; set; }
-        public List<AchieveTitleInfo> data { get; set; }
+        public AchievementType achievementRules { get; set; }
+    }
+    public class AchievementType
+    {
+        public List<AchievementRule> type { get; set; }
+    }
+    public class AchievementRule
+    {
+        public List<Branches> branches { get; set; }
+    }
+    public class Branches
+    {
+        public List<RuleDto> branch { get; set; }
+    }
+    public class RuleDto
+    {
+        public List<AchieveTitleInfo> rule { get; set; }
     }
     /// <summary>
     /// 称号对象
     /// </summary>
     public class AchieveTitleInfo
     {
+        [JsonProperty("SpeNameBonus")]
         public int id { get; set; } = 0;
         public string title { get; set; } = string.Empty;
-        public string desc8 { get; set; } = string.Empty;
+        public string desc { get; set; } = string.Empty;
         public string abtext { get; set; } = string.Empty;
     }
     #endregion

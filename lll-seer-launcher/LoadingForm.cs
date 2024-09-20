@@ -75,52 +75,7 @@ namespace lll_seer_launcher
             {
                 if(versionConfig.notices.Count > 0) GlobalVariable.notices = versionConfig.notices;
                 InitJsonController initJsonControl = new InitJsonController();
-                this.UpdateInitState("检查装备称号是否有更新中");
-                initJsonControl.InitJson(versionConfig);
-                if (DBController.SuitAndAchieveTitleDBController.CheckAndInitDB())
-                {
-                    if (GlobalVariable.shoudUpdateJsonDic["suit"])
-                    {
-                        this.UpdateInitState("加载装备信息中");
-                        Logger.Log("updateData", "装备信息更新！更新装备信息中...");
-                        initJsonControl.InitSuitDictionary();
-                        DBController.SuitAndAchieveTitleDBController.InitSuitTable();
-                        Logger.Log("updateData", "装备信息更新完成！");
-                    }
-                    else
-                    {
-                        DBController.SuitAndAchieveTitleDBController.SetSuitTitleDic();
-                    }
-
-                    if (GlobalVariable.shoudUpdateJsonDic["glasses"])
-                    {
-                        this.UpdateInitState("加载目镜信息中");
-                        Logger.Log("updateData", "目镜信息更新！更新目镜信息中...");
-                        initJsonControl.InitGlassesDictionary();
-                        DBController.SuitAndAchieveTitleDBController.InitGlassesTable();
-                        Logger.Log("updateData", "目镜信息更新完成！");
-                    }
-                    else
-                    {
-                        DBController.SuitAndAchieveTitleDBController.SetGlassesTitleDic();
-                    }
-
-                    if (GlobalVariable.shoudUpdateJsonDic["achieveTitle"])
-                    {
-                        this.UpdateInitState("加载称号信息中");
-                        Logger.Log("updateData", "称号信息更新！更新称号信息中...");
-                        initJsonControl.InitAchieveTitleDictionary();
-                        DBController.SuitAndAchieveTitleDBController.InitAchieveTitleTable();
-                        Logger.Log("updateData", "称号信息更新完成！");
-                    }
-                    else
-                    {
-                        DBController.SuitAndAchieveTitleDBController.SetAchieveTitleDic();
-                    }
-
-                }
-
-                this.UpdateInitState("检查精灵信息是否有更新");
+                this.UpdateInitState("检查装备,称号,精灵信息\n是否有更新");
                 if (initJsonControl.InitTaomeeJson())
                 {
                     if (DBController.PetDBController.CheckAndInitDB())
@@ -133,8 +88,6 @@ namespace lll_seer_launcher
                             Logger.Log("updateData", "精灵信息更新完成！");
                             this.UpdateInitState("精灵信息更新完成");
                         }
-
-                       
                     }
                     if (DBController.EffectDBController.CheckAndInitDB())
                     {
@@ -189,7 +142,34 @@ namespace lll_seer_launcher
                             this.UpdateInitState("技能属性信息更新完成");
                         }
                     }
-                    
+                    if (DBController.SuitAndAchieveTitleDBController.CheckAndInitDB())
+                    {
+                        if (GlobalVariable.shoudUpdateJsonDic["achievements"])
+                        {
+                            this.UpdateInitState("加载称号信息中");
+                            Logger.Log("updateData", "称号信息更新！更新称号信息中...");
+                            initJsonControl.InitAchieveTitleDictionary();
+                            DBController.SuitAndAchieveTitleDBController.InitAchieveTitleTable();
+                            Logger.Log("updateData", "称号信息更新完成！");
+                        }
+                        else
+                        {
+                            DBController.SuitAndAchieveTitleDBController.SetAchieveTitleDic();
+                        }
+
+                        if (GlobalVariable.shoudUpdateJsonDic["equip"] || GlobalVariable.shoudUpdateJsonDic["suit"])
+                        {
+                            this.UpdateInitState("加载目镜信息中");
+                            Logger.Log("updateData", "目镜信息更新！更新目镜信息中...");
+                            initJsonControl.InitEquipAndSuit();
+                            Logger.Log("updateData", "目镜信息更新完成！");
+                        }
+                        else
+                        {
+                            DBController.SuitAndAchieveTitleDBController.SetGlassesTitleDic();
+                            DBController.SuitAndAchieveTitleDBController.SetSuitTitleDic();
+                        }
+                    }
                 }
                 else
                 {

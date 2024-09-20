@@ -96,7 +96,7 @@ namespace lll_seer_launcher.core.Service.DBService
                             if(insertData[index].id > 1400000)
                             {
                                 break;
-                            }else if(insertData[index].id < 1300000)
+                            }else if(insertData[index].id < 1300000 && insertData[index].learnableMoves != null)
                             {
                                 command.Parameters["@pet_name"].Value = insertData[index].defName;
                                 command.Parameters["@pet_id"].Value = insertData[index].id;

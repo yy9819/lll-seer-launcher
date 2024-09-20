@@ -88,6 +88,9 @@ namespace lll_seer_launcher.core.Dto.PetDto
         public List<int> lockedSkillArr = new List<int>();
         public SkillStateInfos skillStateInfo = new SkillStateInfos();
         public List<int> skillResultArr = new List<int>();
+        public int zhuijiId;
+        public int zhuijiHurt;
+        public bool isZhuiji = false;
         
         private Dictionary<int,string> fightEffectNameDic = new Dictionary<int, string>()
         {
@@ -282,6 +285,11 @@ namespace lll_seer_launcher.core.Dto.PetDto
                 this.skillResultArr.Add(ByteConverter.BytesTo10(ByteConverter.TakeBytes(inputData, index, 4)));
                 index += 4;
             }
+
+            this.zhuijiId = ByteConverter.BytesTo10(ByteConverter.TakeBytes(inputData, index, 4));
+            index += 4;
+            this.zhuijiHurt = ByteConverter.BytesTo10(ByteConverter.TakeBytes(inputData, index, 4));
+            index += 4;
             return index;
         }
     }

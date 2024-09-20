@@ -7,10 +7,6 @@ namespace lll_seer_launcher.core.Controller
 {
     class InitJsonController
     {
-        public void InitJson(VersionConfig versionConfig)
-        {
-            InitJsonService.LoadConfigJsonFile(versionConfig);
-        }
         public bool InitTaomeeJson()
         {
             return InitJsonService.LoadTaomeeJson();
@@ -18,15 +14,11 @@ namespace lll_seer_launcher.core.Controller
 
         public bool InitAchieveTitleDictionary()
         {
-            return InitJsonService.InitAchieveTitleDictionary();
+            return InitJsonService.InitAchieveTitleDictionary(GlobalVariable.jsonPathDic["achievements"]);
         }
-        public bool InitSuitDictionary()
+        public bool InitEquipAndSuit()
         {
-            return InitJsonService.InitSuitDictionary();
-        }
-        public bool InitGlassesDictionary()
-        {
-            return InitJsonService.InitGlassesDictionary();
+            return InitJsonService.InitEquipAndSuit(GlobalVariable.jsonPathDic["equip"], GlobalVariable.jsonPathDic["suit"]);
         }
         public bool InitPetDB()
         {
@@ -46,7 +38,7 @@ namespace lll_seer_launcher.core.Controller
         }
         public bool InitSkillDBOfMoveStones()
         {
-            return InitJsonService.InitMoveStones();
+            return InitJsonService.InitMoveStones(GlobalVariable.jsonPathDic["move_stones"]);
         }
         public bool InitTypeDB()
         {

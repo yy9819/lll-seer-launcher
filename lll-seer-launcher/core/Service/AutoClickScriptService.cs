@@ -83,9 +83,17 @@ namespace lll_seer_launcher.core.Service
             if (bmps.Count >= bmpPath.Length) return;
             foreach(string bmp in bmpPath)
             {
-                Image<Bgr, byte> template = new Image<Bgr, byte>(bmp); // Image A
-                bmps.Add(template);
-                if (bmps.Count >= 6) break;
+                try
+                {
+                    Image<Bgr, byte> template = new Image<Bgr, byte>(bmp); // Image A
+                    bmps.Add(template);
+                    if (bmps.Count >= 6) break;
+                }
+                catch
+                {
+                    continue;
+                }
+                
             }
         }
 
@@ -102,11 +110,13 @@ namespace lll_seer_launcher.core.Service
                     PrintWindow(mainFormhWnd, hdcBitmap, 0);
 
                     gfxBmp.ReleaseHdc(hdcBitmap);
+                    gfxBmp.Dispose();
                 }
                 using (Image<Bgr, byte> screenshotImage = new Image<Bgr, byte>(bmp))
                 {
                     foreach (var template in bmps)
                     {
+                        if (template.Width > screenshotImage.Width || template.Height > screenshotImage.Height) continue;
                         using (Image<Gray, float> result = screenshotImage.MatchTemplate(template, TemplateMatchingType.CcoeffNormed))
                         {
                             double[] minValues, maxValues;
@@ -122,6 +132,7 @@ namespace lll_seer_launcher.core.Service
                         }
                     }
                 }
+                bmp.Dispose();
             }
         }
         private static void LeftClick(int left,int top)
