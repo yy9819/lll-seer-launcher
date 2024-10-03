@@ -1,13 +1,10 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Diagnostics;
 using System.Windows.Forms;
 using lll_seer_launcher.core.Controller;
+using lll_seer_launcher.core.Utils;
 using lll_seer_launcher.core.Dto;
 using lll_seer_launcher.core.Dto.JSON;
 
@@ -15,6 +12,7 @@ namespace lll_seer_launcher
 {
     public partial class EditPetResourceForm : Form
     {
+        private string ieCachePath = Environment.GetFolderPath(Environment.SpecialFolder.InternetCache);
         public EditPetResourceForm()
         {
             InitializeComponent();
@@ -30,7 +28,7 @@ namespace lll_seer_launcher
         {
             int index = this.GetPreviewDataGridViewSelectIndex();
             int petId = Convert.ToInt32(this.previewDataGridView.Rows[index].Cells["searchPetId"].Value);
-            petId = petId < 1400000 ? DBController.PetDBController.GetPetRealId(petId) : DBController.PetDBController.GetPetSkinsRealId(petId);
+            petId = PetRealIdDic.GetPetRealId(petId);
             if (petId > 0)
             {
                 this.petSwfPreviewWebBrowser.Navigate($"https://seer.61.com/resource/fightResource/pet/swf/{petId}.swf");
@@ -72,6 +70,7 @@ namespace lll_seer_launcher
             this.InitPreviewDataGridView(sender, e);
             this.InitPlanGridView(sender, e);
             this.planDataGridView_Click(sender, e);
+            this.petSwfPreviewWebBrowser.Url = new System.Uri("https://seer.61.com/resource/fightResource/pet/swf/5000.swf", System.UriKind.Absolute);
         }
         private void InitPreviewDataGridView(object sender, EventArgs e)
         {
@@ -176,11 +175,14 @@ namespace lll_seer_launcher
                 int result = DBController.PetDBController.AddPlan(plan);
                 if(result != 0)
                 {
+                    this.DeleteCacheFile(new int[1] { petId });
                     this.InitPlanGridView(sender, e);
+                    Logger.Log("addPlan",$"新建皮肤替换方案{petId}-{petName}-->{petSkinsId}-{petSkinsName}");
                 }
                 else
                 {
-                    //MessageBox.Show("亲爱的小赛尔，新建方案失败！查看一下是否对相同精灵进行了替换~");
+                    Logger.Error( $"皮肤替换方案{petId}-{petName}-->{petSkinsId}-{petSkinsName}新建失败...");
+                    MessageBox.Show("亲爱的小赛尔，新建方案失败！查看一下是否对相同精灵进行了替换~");
                 }
             }
             else
@@ -188,6 +190,7 @@ namespace lll_seer_launcher
                 MessageBox.Show("亲爱的小赛尔，还有项目没有设置哟~");
             }
         }
+
 
         private void updatePlanButton_Click(object sender, EventArgs e)
         {
@@ -202,15 +205,63 @@ namespace lll_seer_launcher
                 int result = DBController.PetDBController.UpdatePlan(plan);
                 if (result != 0)
                 {
+                    this.DeleteCacheFile(new int[1] { petId });
                     this.InitPlanGridView(sender, e);
+                    Logger.Log("updatePlan", $"修改皮肤替换方案{petId}-{petName}-->{skinsId}-{petSkinsName}");
                 }
                 else
                 {
-                    //MessageBox.Show("亲爱的小赛尔，新建方案失败！查看一下是否对相同精灵进行了替换~");
+                    MessageBox.Show("亲爱的小赛尔，修改方案失败！查看一下是否对相同精灵进行了替换~");
                 }
             }
         }
+        private void DeleteCacheFile(int[] petId)
+        {
+            string command = "";
+            foreach (int id in petId)
+            {
+                command +=$"dir {this.ieCachePath}\\*{id}[*].swf /b /s & ";
+            }
+            ProcessStartInfo processStartInfo = new ProcessStartInfo
+            {
+                FileName = "cmd.exe",
+                RedirectStandardInput = true,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                UseShellExecute = false,
+                CreateNoWindow = true
+            };
 
+            // 创建一个Process对象并启动
+            using (Process process = new Process { StartInfo = processStartInfo })
+            {
+                process.Start();
+
+                // 获取Process的输入流
+                StreamWriter streamWriter = process.StandardInput;
+
+                // 写入要执行的命令
+                streamWriter.WriteLine(command);
+
+                // 关闭输入流
+                streamWriter.Close();
+
+                // 等待命令执行完毕
+                process.WaitForExit();
+
+                // 读取输出流中的结果
+                string output = process.StandardOutput.ReadToEnd();
+                string[] filePathList = output.Split('\n');
+                foreach(string filePath in filePathList)
+                {
+                    try
+                    {
+                        if (File.Exists(filePath)) File.Delete(filePath);
+                    }
+                    catch { }
+                }
+            }
+        }
         private void deletePlanButton_Click(object sender, EventArgs e)
         {
             int planIndex = this.GetPlanDataGridViewSelectIndex();
@@ -220,7 +271,9 @@ namespace lll_seer_launcher
                 int result = DBController.PetDBController.DeletePlan(petId);
                 if (result != 0)
                 {
+                    this.DeleteCacheFile(new int[1] { petId });
                     this.InitPlanGridView(sender, e);
+                    Logger.Log("deletePlan", $"删除精灵ID:{petId}的皮肤替换方案");
                 }
                 else
                 {
@@ -240,6 +293,25 @@ namespace lll_seer_launcher
             this.deletePlanButton.Enabled = index != this.planDataGridView.Rows.Count - 1;
             this.addPlanButton.Enabled = index == this.planDataGridView.Rows.Count - 1;
             this.setPetButton.Enabled = index == this.planDataGridView.Rows.Count - 1;
+        }
+
+        private void deletePetCacheButton_Click(object sender, EventArgs e)
+        {
+            DialogResult result = MessageBox.Show("是否删除皮肤方案内的被替换精灵文件缓存?", "确认框", MessageBoxButtons.OKCancel, MessageBoxIcon.Question);
+            if (result == DialogResult.OK)
+            {
+                List<PetSkinsReplacePlan> plans = DBController.PetDBController.SearchPlan("");
+                if (plans != null)
+                {
+                    List<int> petId = new List<int>();
+                    foreach (PetSkinsReplacePlan plan in plans)
+                    {
+                        petId.Add(plan.petId);
+                    }
+                    this.DeleteCacheFile(petId.ToArray());
+                    Logger.Log("deleteCache", $"手动清理精灵缓存文件");
+                }
+            }
         }
     }
 }

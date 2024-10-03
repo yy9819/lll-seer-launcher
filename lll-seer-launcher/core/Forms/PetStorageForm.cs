@@ -71,6 +71,10 @@ namespace lll_seer_launcher.core.Forms
                                             GlobalVariable.petList[GlobalVariable.loginUserInfo.userId][petId][pet.catchTime].inBag = true;
                                             continue;
                                         }
+                                        if (pet.level == 0 && GlobalVariable.petCatchTimeDic.ContainsKey(pet.catchTime))
+                                        {
+                                            pet.level = GlobalVariable.petCatchTimeDic[pet.catchTime].level;
+                                        }
                                         this.petListDataGridView.Rows.Add(
                                             pet.petId,
                                             petName,
@@ -90,6 +94,10 @@ namespace lll_seer_launcher.core.Forms
                                     {
                                         GlobalVariable.petList[GlobalVariable.loginUserInfo.userId][targetId][pet.catchTime].inBag = true;
                                         continue;
+                                    }
+                                    if (pet.level == 0 && GlobalVariable.petCatchTimeDic.ContainsKey(pet.catchTime))
+                                    {
+                                        pet.level = GlobalVariable.petCatchTimeDic[pet.catchTime].level;
                                     }
                                     this.petListDataGridView.Rows.Add(
                                         pet.petId,
@@ -195,15 +203,9 @@ namespace lll_seer_launcher.core.Forms
                 if (catchTime == petCatchTime)
                 {
                     GlobalVariable.analyzeRecvDataController.RemoveRecvEventListener(CmdId.GET_PET_INFO, key);
-                    Thread.Sleep(100);
-                    while (!GlobalVariable.petCatchTimeDic.ContainsKey(petCatchTime))
-                    {
-                        Thread.Sleep(100);
-                    }
-                    //Thread.Sleep(1000);
-                    PetInfo petInfo = GlobalVariable.petCatchTimeDic[petCatchTime];
+                    PetInfo petInfo = new PetInfo();
+                    petInfo.SetPetInfo(0,headInfo.decryptData);
                     string headPath = this.petHeadSetter.GetHeadPath(petInfo.petId);
-
                     SetFormCallback callback = delegate ()
                     {
                         Image loginPlayerPetImg;
@@ -235,12 +237,12 @@ namespace lll_seer_launcher.core.Forms
 
             this.abilityLabel.Text = 
                 $"性格:{petInfo.nature}\n\n" +
-                $"攻击:{petInfo.attack} \n\n" +
-                $"防御:{petInfo.defence} \n\n" +
-                $"特攻:{petInfo.spAttack} \n\n" +
-                $"特防:{petInfo.spDefence} \n\n" +
-                $"速度:{petInfo.speed} \n\n" +
-                $"体力:{petInfo.hp}/{petInfo.maxHp} \n \n";
+                $"攻击:{petInfo.attack}{(petInfo.evAttack > 0 ? $"({petInfo.evAttack})" : "")} \n\n" +
+                $"防御:{petInfo.defence}{(petInfo.evDefence > 0 ? $"({petInfo.evDefence})" : "")} \n\n" +
+                $"特攻:{petInfo.spAttack}{(petInfo.evSpAttack > 0 ? $"({petInfo.evSpAttack})" : "")} \n\n" +
+                $"特防:{petInfo.spDefence}{(petInfo.evSpDefence > 0 ? $"({petInfo.evSpDefence})" : "")} \n\n" +
+                $"速度:{petInfo.speed}{(petInfo.evSpeed > 0 ? $"({petInfo.evSpeed})" : "")} \n\n" +
+                $"体力:{petInfo.hp}/{petInfo.maxHp} {(petInfo.evHp > 0 ? $"({petInfo.evHp})" : "")}\n \n";
 
             this.skillLabel.Text = "技能:\n\n";
             foreach (var skill in petInfo.skillArray.Values)

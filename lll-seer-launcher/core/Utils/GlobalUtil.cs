@@ -4,12 +4,14 @@ using System.Linq;
 using System.Text;
 using System.Collections;
 using System.Runtime.InteropServices;
+using Newtonsoft.Json;
 using System.IO;
 using System.Net;
 using System.Diagnostics;
 using System.Threading;
 using lll_seer_launcher.core.Controller;
 using lll_seer_launcher.core.Dto;
+using lll_seer_launcher.core.Dto.JSON;
 
 namespace lll_seer_launcher.core.Utils
 {
@@ -68,7 +70,10 @@ namespace lll_seer_launcher.core.Utils
         {
             return (long)(DateTime.UtcNow - new DateTime(1970, 1, 1)).TotalSeconds  - new Random().Next(200, 1000);
         }
-
+        /// <summary>
+        /// 启动赛尔号fiddler
+        /// </summary>
+        /// <returns></returns>
         public static bool StartFiddler()
         {
             if (FormController.FindWindow(GlobalVariable.seerFiddlerTitle) == IntPtr.Zero)
@@ -87,7 +92,11 @@ namespace lll_seer_launcher.core.Utils
             }
             return count <= 100;
         }
-
+        /// <summary>
+        /// 获取指定JSON字符串
+        /// </summary>
+        /// <param name="link">JSON文件链接</param>
+        /// <returns></returns>
         public static string GetJsonString(string link)
         {
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(link);
@@ -109,19 +118,40 @@ namespace lll_seer_launcher.core.Utils
             return json;
         }
     }
+    public static class PetRealIdDic
+    {
+        private static Dictionary<int, int> petRealIdDic = new Dictionary<int, int>();
+        private static object lockObj = new object();
+        public static int GetPetRealId(int petId)
+        {
+            lock (lockObj)
+            {
+                if (petRealIdDic.TryGetValue(petId, out int realId))
+                {
+                    return realId;
+                }
+                else
+                {
+                    realId =  petId < 1400000 ? DBController.PetDBController.GetPetRealId(petId) : DBController.PetDBController.GetPetSkinsRealId(petId);
+                    petRealIdDic.Add(petId, realId);
+                    return realId;
+                }
+            }
+        }
+    }
     public class PetHeadSetter
     {
         private string petHeadDirectoryPath = Directory.GetCurrentDirectory() + "\\cache\\pet\\head\\";
         private const string petHeadLink = "https://seerh5.61.com/resource/assets/pet/head/@.png";
         public PetHeadSetter()
         {
-            if(!Directory.Exists(petHeadDirectoryPath))Directory.CreateDirectory(petHeadDirectoryPath);
+            if (!Directory.Exists(petHeadDirectoryPath)) Directory.CreateDirectory(petHeadDirectoryPath);
         }
         public string GetHeadPath(int petId)
         {
             lock (GlobalVariable.lockObjs["getRealId"])
             {
-                petId = DBController.PetDBController.GetPetRealId(petId);
+                petId = PetRealIdDic.GetPetRealId(petId);
             }
             CheckHeadFile(petId);
             return $"{petHeadDirectoryPath}{petId}.png";
@@ -158,6 +188,78 @@ namespace lll_seer_launcher.core.Utils
             catch { }
         }
     }
+
+    public class ScriptDecryptEncryptUtil
+    {
+        private char[] key = "lalala".ToCharArray();
+        private string TextEncrypt(string text)
+        {
+            char[] chars = text.ToCharArray();
+            for (int i = 0; i<chars.Length; i++)
+            {
+                chars[i] ^= key[i % key.Length];
+            }
+            return new string(chars);
+        }
+        private string TextDecrypt(string text)
+        {
+            char[] chars = text.ToCharArray();
+            for (int i = 0; i<chars.Length; i++)
+            {
+                chars[i] ^= key[i % key.Length];
+            }
+            return new string(chars);
+        }
+        public ScriptJsonDto ScriptDecrypt(string scriptString)
+        {
+            scriptString = this.TextDecrypt(scriptString);
+            try
+            {
+                return JsonConvert.DeserializeObject<ScriptJsonDto>(scriptString);
+            }
+            catch
+            {
+                return new ScriptJsonDto();
+            }
+        }
+        public string ScriptEncrypt(ScriptJsonDto scriptDto)
+        {
+            var data = new
+            {
+                title = scriptDto.title,
+                description = scriptDto.description,
+                scripts = scriptDto.scripts,
+                pwd = scriptDto.pwd,
+                securityCode = GlobalVariable.securityCode,
+                type = scriptDto.type,
+            };
+            return this.TextEncrypt(JsonConvert.SerializeObject(data));
+        }
+    }
+
+    public static class GetPeerName
+    {
+        [DllImport("ws2_32.dll")]
+        private static extern int getpeername(int socketHandle, ref sockaddr_in addr, ref int addrLen);
+
+        [StructLayout(LayoutKind.Sequential)]
+        private struct sockaddr_in
+        {
+            public ushort sin_family;
+            [MarshalAs(UnmanagedType.ByValArray, SizeConst = 14)]
+            public byte[] sin_zero;
+            public ushort sin_port;
+            public uint sin_addr;
+        }
+        public static bool CheckSocket(int s)
+        {
+            sockaddr_in addr = new sockaddr_in();
+            int addrLen = Marshal.SizeOf(typeof(sockaddr_in));
+            int result = getpeername(s, ref addr, ref addrLen);
+            return result == 0;
+        }
+    } 
+
     /// <summary>
     /// 对配置文件进行读写操作
     /// </summary>

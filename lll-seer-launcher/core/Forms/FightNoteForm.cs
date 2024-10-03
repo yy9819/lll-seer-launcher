@@ -94,15 +94,15 @@ namespace lll_seer_launcher.core.Forms
                     AttackValueInfo otherPlayer = playersInfo["otherPlayer"];
                     //设置伤害note
                     this.fightNoteTextBox.AppendText(
-                        $"\r\n===================第{GlobalVariable.fightTurn}回合==================\r\n" +
-                        $"[我方]使用技能[{loginPlayer.skillId}-{DBController.SkillDBController.SearchName(loginPlayer.skillId)}] " +
+                        $"\r\n*************** 第{GlobalVariable.fightTurn}回合 ***************\r\n\r\n" +
+                        $"[我方]使用技能[{loginPlayer.skillId}-{SkillNameDic.GetSkillName(loginPlayer.skillId)}] " +
                         $"{(loginPlayer.atkTimes == 0 && loginPlayer.skillId != 0 ? "攻击MISS！" : "")}" +
                         $"{(loginPlayer.isCrit == 1 ? "打出了致命一击!" : "")}" +
                         $"造成[{loginPlayer.lostHP}]点伤害{(loginPlayer.realHurtHp > 0 ? $",造成[{loginPlayer.realHurtHp}点真实伤害]":"")}" +
                         $"{(loginPlayer.gainHP > 0 ? $",回复{loginPlayer.gainHP}血" : "")}\r\n" +
                         $"{(loginPlayer.maxHP == 0 ? "我方当前出战精灵[阵亡]!\r\n" : "")}"+
 
-                        $"[对方]使用技能[{otherPlayer.skillId}-{DBController.SkillDBController.SearchName(otherPlayer.skillId)}] " +
+                        $"[对方]使用技能[{otherPlayer.skillId}-{SkillNameDic.GetSkillName(otherPlayer.skillId)}] " +
                         $"{(otherPlayer.atkTimes == 0  && otherPlayer.skillId != 0 ? "攻击MISS！" : "")}" +
                         $"{(otherPlayer.isCrit == 1 ? "打出了致命一击!" : "")}" +
                         $"造成[{otherPlayer.lostHP}]点伤害{(otherPlayer.realHurtHp > 0 ? $",造成[{otherPlayer.realHurtHp}点真实伤害]" : "")}" +
@@ -176,10 +176,24 @@ namespace lll_seer_launcher.core.Forms
                                 {
                                     this.skillListBox.Items[j++] = $"{loginPlayer.skillArray[skill].skillName}|{loginPlayer.skillArray[skill].skillPP}";
                                 }
-                                break;
+                                return;
                             }
                         }
-                        
+                        if (this.skillListBox.Items.Count < 1)
+                        {
+                            this.skillList.Clear();
+                            this.skillListBox.Items.Clear();
+                            foreach (var skill in loginPlayer.skillArray.Keys)
+                            {
+                                this.skillList.Add(skill);
+                                this.skillListBox.Items.Add($"{loginPlayer.skillArray[skill].skillName}|{loginPlayer.skillArray[skill].skillPP}");
+                            }
+                        }
+                        //int j = 0;
+                        //foreach (var skill in loginPlayer.skillArray.Keys)
+                        //{
+                        //    this.skillListBox.Items[j++] = $"{loginPlayer.skillArray[skill].skillName}|{loginPlayer.skillArray[skill].skillPP}";
+                        //}
                     }
                     catch { }
                 };
@@ -215,7 +229,7 @@ namespace lll_seer_launcher.core.Forms
                             }
                         }
                         this.fightNoteTextBox.AppendText(
-                            $"\r\n===================第{GlobalVariable.fightTurn + 1}回合==================\r\n" +
+                            $"\r\n\r\n*************** 第{GlobalVariable.fightTurn + 1}回合 ***************\r\n\r\n" +
                             $"[我方]切换精灵[{changePetInfo.petId}-{changePetInfo.petName}] "
                         );
                         this.loginPlayerPetInfo.Text = $"{changePetInfo.petId}\n{changePetInfo.petName}\n{changePetInfo.level}";
@@ -227,7 +241,7 @@ namespace lll_seer_launcher.core.Forms
                     else
                     {
                         this.fightNoteTextBox.AppendText(
-                            $"\r\n===================第{GlobalVariable.fightTurn + 1}回合==================\r\n" +
+                            $"\r\n\r\n*************** 第{GlobalVariable.fightTurn + 1}回合 ***************\r\n\r\n" +
                             $"[对方]切换精灵[{changePetInfo.petId}-{changePetInfo.petName}] "
                         );
                         this.otherPlayerPetInfo.Text = $"{changePetInfo.petId}\n{changePetInfo.petName}\n{changePetInfo.level}";
@@ -255,9 +269,24 @@ namespace lll_seer_launcher.core.Forms
                     this.petList.Items.Clear();
 
                     if (GlobalVariable.pets.TryGetValue(this.fightPetCatchTime, out PetInfo petInfo)) { }
+                    else if(GlobalVariable.awaitPets.TryGetValue(this.fightPetCatchTime, out petInfo)) { }
                     else
                     {
-                        petInfo = GlobalVariable.awaitPets[this.fightPetCatchTime];
+                        petInfo = new PetInfo();
+                        petInfo.petId = loginPlayer.petId;
+                        petInfo.petName = loginPlayer.petName;
+                        petInfo.hp = loginPlayer.hp;
+                        petInfo.level = loginPlayer.level;
+                        //loginPlayer
+                        //foreach(int skillId in loginPlayer.skillRunawayMarks)
+                        //{
+                        //    SkillInfo skillInfo = new SkillInfo();
+                        //    skillInfo.skillId = skillId;
+                        //    skillInfo.skillName = "";
+                        //    skillInfo.skillPP = 0;
+                        //    if(!petInfo.skillArray.ContainsKey(skillId)) petInfo.skillArray.Add(skillId, skillInfo);
+                        //}
+                        //petInfo.skillArray = loginPlayer.;
                     }
                     this.fightPetInfo.Add(petInfo);
                     this.petList.Items.Add(petInfo.petName);
@@ -295,7 +324,7 @@ namespace lll_seer_launcher.core.Forms
                     this.otherPlayerPetStatusLabel.Text = "";
                     //更新对战note
                     this.fightNoteTextBox.Text = 
-                        $"===================第{GlobalVariable.fightTurn}回合==================\r\n" +
+                        $"*************** 第{GlobalVariable.fightTurn}回合 ***************\r\n\r\n" +
                         $"[我方][{loginPlayer.petId}-{loginPlayer.petName}]登场！\r\n" +
                         $"[对方][{otherPlayer.petId}-{otherPlayer.petName}]登场！\r\n";
                 };
@@ -495,7 +524,8 @@ namespace lll_seer_launcher.core.Forms
             {
                 InitFormCallback callback = delegate ()
                 {
-                    this.fightNoteTextBox.Text += "\n\n===================战斗结束!==================\n\n";
+                    this.fightNoteTextBox.AppendText("\n\n*************** 战斗结束! ***************\n\n");
+                    this.fightNoteTextBox.ScrollToCaret();
                     this.autoAddPPCheckBox.Checked = this.loopUseSkillCheckBox.Checked = false;
                     this.petList.Items.Clear();
                     this.fightPetInfo.Clear();

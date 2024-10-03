@@ -206,7 +206,7 @@ namespace lll_seer_launcher.core.Forms
                 {
                     int cmdId = Convert.ToInt32(this.tcpDataGridView.Rows[index].Cells["cmdId"].Value);
                     string body = Convert.ToString(this.tcpDataGridView.Rows[index].Cells["data"].Value);
-                    this.sendDataTextBox.Text += $"{type}|{cmdId}|{body}\n";
+                    this.sendDataTextBox.AppendText($"{type}|{cmdId}|{body}\r\n");
                     MessageBox.Show("添加成功!");
                 }
                 else

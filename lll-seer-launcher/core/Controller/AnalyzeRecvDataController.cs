@@ -63,8 +63,15 @@ namespace lll_seer_launcher.core.Controller
         /// <param name="recvDataHeadInfo">封包信息</param>
         public void RunAnalyzeRecvDataMethod(HeadInfo recvDataHeadInfo)
         {
-            GlobalVariable.gameConfigFlag.disableRecv = recvDataHeadInfo.cmdId == CmdId.NOTE_READY_TO_FIGHT 
-                && (GlobalVariable.gameConfigFlag.shouldDisableRecv || GlobalVariable.gameConfigFlag.lowerHpFlag);
+            if (GlobalVariable.isRunningScript)
+            {
+                GlobalVariable.gameConfigFlag.disableRecv = recvDataHeadInfo.cmdId != CmdId.SYSTEM_TIME;
+            }
+            else
+            {
+                GlobalVariable.gameConfigFlag.disableRecv = recvDataHeadInfo.cmdId == CmdId.NOTE_READY_TO_FIGHT
+                   && (GlobalVariable.gameConfigFlag.shouldDisableRecv || GlobalVariable.gameConfigFlag.lowerHpFlag);
+            }
             if (methodDictionary.TryGetValue(recvDataHeadInfo.cmdId, out AnalyzeRecvDataMethod method))
             {
                 Thread methodThread = new Thread(() => { method(recvDataHeadInfo); });

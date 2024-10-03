@@ -88,6 +88,9 @@ namespace lll_seer_launcher.core.Dto.PetDto
         public List<int> lockedSkillArr = new List<int>();
         public SkillStateInfos skillStateInfo = new SkillStateInfos();
         public List<int> skillResultArr = new List<int>();
+        public int zhuijiId;
+        public int zhuijiHurt;
+        public bool isZhuiji = false;
         
         private Dictionary<int,string> fightEffectNameDic = new Dictionary<int, string>()
         {
@@ -140,7 +143,7 @@ namespace lll_seer_launcher.core.Dto.PetDto
                 {
                     SkillInfo skillInfo = new SkillInfo();
                     skillInfo.skillId = skillId;
-                    skillInfo.skillName = DBController.SkillDBController.SearchName(skillId);
+                    skillInfo.skillName = SkillNameDic.GetSkillName(skillId);
                     skillInfo.skillPP = ByteConverter.BytesTo10(ByteConverter.TakeBytes(inputData, index + 4, 4));
                     this.skillArray.Add(skillId, skillInfo);
                 }
@@ -224,6 +227,7 @@ namespace lll_seer_launcher.core.Dto.PetDto
             index += 4;
 
             this.maxHpSelf = ByteConverter.BytesTo10(ByteConverter.TakeBytes(inputData, index, 4));
+            if (this.maxHpSelf == 0) this.maxHpSelf = this.maxHP;
             index += 4;
             this.maxHpOther = ByteConverter.BytesTo10(ByteConverter.TakeBytes(inputData, index, 4));
             index += 4;
@@ -281,6 +285,11 @@ namespace lll_seer_launcher.core.Dto.PetDto
                 this.skillResultArr.Add(ByteConverter.BytesTo10(ByteConverter.TakeBytes(inputData, index, 4)));
                 index += 4;
             }
+
+            this.zhuijiId = ByteConverter.BytesTo10(ByteConverter.TakeBytes(inputData, index, 4));
+            index += 4;
+            this.zhuijiHurt = ByteConverter.BytesTo10(ByteConverter.TakeBytes(inputData, index, 4));
+            index += 4;
             return index;
         }
     }

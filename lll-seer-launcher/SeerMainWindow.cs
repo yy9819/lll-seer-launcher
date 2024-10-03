@@ -9,6 +9,7 @@ using lll_seer_launcher.core;
 using lll_seer_launcher.core.Controller;
 using lll_seer_launcher.core.Dto;
 using lll_seer_launcher.core.Dto.PetDto;
+using lll_seer_launcher.core.Dto.JSON;
 using lll_seer_launcher.core.Utils;
 using lll_seer_launcher.core.Forms;
 using mshtml;
@@ -36,7 +37,9 @@ namespace lll_seer_launcher
         private PetBagForm petBagForm = new PetBagForm();
         private PetStorageForm petStorageForm = new PetStorageForm();
         private ReleaseNotesForm releaseNotesForm = new ReleaseNotesForm();
+        private ScriptEditForm scriptEditForm = new ScriptEditForm();
         private string iniFilePath = Directory.GetCurrentDirectory() + "\\bin\\ini\\";
+        private List<Thread> threads = new List<Thread>();
         //private FiddlerController fiddlerController = new FiddlerController();
         //private Process fiddlerProcess;
         public seerMainWindow()
@@ -44,21 +47,15 @@ namespace lll_seer_launcher
             InitializeComponent();
             this.IsMdiContainer = true;
             GlobalVariable.mainForm = this;
+            AutoClickScriptController.Init();
         }
 
         private void SeerMainWindow_Load(object sender, EventArgs e)
         {
-            
-            //Thread initJsonThread = new Thread(() =>
-            //{
-
-            //});
-            //initJsonThread.Start();
-            new Thread(ShowNotices).Start();
-            new Thread(GetUsedMemorySize).Start();
-
             this.InitIniFile();
-
+            this.threads.Add(new Thread(ShowNotices));
+            this.threads.Add(new Thread(GetUsedMemorySize));
+            foreach (var thread in threads) thread.Start();
             this.messageEncryptControl = new MessageEncryptDecryptController();
             this.sendFunction = SendHandle;
             this.sendFunctionPtr = Marshal.GetFunctionPointerForDelegate(sendFunction);
@@ -68,6 +65,11 @@ namespace lll_seer_launcher
             this.hook[0].Install("WS2_32.DLL", "send", sendFunctionPtr);
             this.hook[1].Install("WS2_32.DLL", "recv", recvFunctionPtr);
             this.Show();
+            new Task(() =>
+            {
+                Thread.Sleep(2000);
+                this.seerWebBrowser.Url = new System.Uri("https://seer.61.com/play.shtml?micro=1", System.UriKind.Absolute);
+            }).Start();
         }
         private void InitIniFile()
         {
@@ -144,6 +146,19 @@ namespace lll_seer_launcher
                 this.disableVipAutoChargeToolStripMenuItem.Checked  = result == "1";
             }
             GlobalVariable.gameConfigFlag.disableVipAutoChargeFlag = this.disableVipAutoChargeToolStripMenuItem.Checked;
+
+            result = iniFile.Read("config", "autoClick");
+            if (result == null  || (result != "0" && result != "1"))
+            {
+                iniFile.Write("config", "autoClick", "1");
+                this.autoClickToolStripMenuItem.Checked = true;
+            }
+            else
+            {
+                this.autoClickToolStripMenuItem.Checked  = result == "1";
+            }
+            GlobalVariable.autoClick = this.autoClickToolStripMenuItem.Checked;
+            this.threads.Add(new Thread(AutoClick));
             //GlobalVariable.gameConfigFlag.shouldDisableRecv = this.testToolStripMenuItem.Checked;
         }
 
@@ -156,6 +171,7 @@ namespace lll_seer_launcher
             GlobalVariable.analyzeRecvDataController.RemoveAllEventListener();
             if (GlobalVariable.isLogin) GlobalVariable.isLogin = false;
             if(GlobalVariable.isLoginSend) GlobalVariable.isLoginSend = false;
+            GlobalVariable.gameConfigFlag.disableRecv = false;
             this.messageEncryptControl.SetKey("!crAckmE4nOthIng:-)");
             this.messageEncryptControl.InitKey();
         }
@@ -181,8 +197,8 @@ namespace lll_seer_launcher
             Marshal.Copy(dataPointer, bytes, 0, dataSize);
             if(s == GlobalVariable.gameSocket && GlobalVariable.isLogin)
             {
+                //Console.WriteLine(BitConverter.ToString(bytes));
                 byte[] decryptBytes = this.messageEncryptControl.Decrypt(bytes);
-                //Console.WriteLine(BitConverter.ToString(decryptBytes));
                 byte[] encryptBytes = ByteConverter.TakeBytes(decryptBytes, 0, decryptBytes.Length - 1);
                 this.sendPkgInfo = this.messageEncryptControl.GetHeadInfo(encryptBytes);
                 new Task(() =>
@@ -232,6 +248,7 @@ namespace lll_seer_launcher
                 if(this.hook[i] != null) this.hook[i].Uninstall();
             }
             GlobalVariable.stopThread = true;
+            foreach (var thread in threads) thread.Abort();
             //this.fiddlerProcess.Dispose();
             core.Utils.Logger.Log("CloseProgram", "关闭登录器。");
         }
@@ -549,6 +566,227 @@ namespace lll_seer_launcher
         {
             this.releaseNotesForm.Hide();
             this.releaseNotesForm.Show();
+        }
+
+        private void autoClickToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            this.autoClickToolStripMenuItem.Checked = GlobalVariable.autoClick = !this.autoClickToolStripMenuItem.Checked;
+            new IniFile(this.iniFilePath + "config.ini").Write("config", "autoClick", this.autoClickToolStripMenuItem.Checked ? "1" : "0");
+        }
+
+        private void getScreenShotToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            AutoClickScriptController.GetCupture();
+        }
+
+
+        private void startFightToolStripMenuItem_Click_1(object sender, EventArgs e)
+        {
+            if (!GlobalVariable.isLogin) return;
+            GlobalVariable.sendDataController.SendDataByCmdIdAndIntList(CmdId.READY_TO_FIGHT, new int[0]);
+        }
+
+        private void showScriptComponetToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            this.framelessGroupBox.Visible  = this.showScriptComponetToolStripMenuItem.Checked = !this.showScriptComponetToolStripMenuItem.Checked;
+            if (this.showScriptComponetToolStripMenuItem.Checked) this.InitScriptList();
+        }
+
+        private void editScriptToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            this.scriptEditForm.Hide();
+            this.scriptEditForm.Show();
+        }
+
+        private List<ScriptJsonDto> scriptList = new List<ScriptJsonDto>();
+        private List<ScriptJsonDto> sendDataScriptList = new List<ScriptJsonDto>();
+        private Dictionary<int, List<string>> scriptPath = new Dictionary<int, List<string>>() { { 1,new List<string>() } };
+        private ScriptDecryptEncryptUtil scriptDecryptEncryptUtil = new ScriptDecryptEncryptUtil();
+        private void InitScriptList()
+        {
+            string scriptPath = Directory.GetCurrentDirectory() + "\\bin\\script";
+            if( !Directory.Exists(scriptPath) ) Directory.CreateDirectory(scriptPath);
+            string[] scriptsFilePath = Directory.GetFiles(scriptPath, "*.script", SearchOption.AllDirectories);
+            this.scriptList.Clear();
+            this.scriptPath[1].Clear();
+            this.sendDataScriptCheckedListBox.Items.Clear();
+            this.sendDataScriptList.Clear();
+            foreach (string scriptFile in scriptsFilePath)
+            {
+                string tmpFile = File.ReadAllText(scriptFile);
+                ScriptJsonDto tmpScriptDto = scriptDecryptEncryptUtil.ScriptDecrypt(tmpFile);
+                if(tmpScriptDto.securityCode == GlobalVariable.securityCode)
+                {
+                    this.scriptList.Add(tmpScriptDto);
+                    if(tmpScriptDto.type == 1)
+                    {
+                        this.sendDataScriptCheckedListBox.Items.Add(tmpScriptDto.title);
+                        this.sendDataScriptList.Add(tmpScriptDto);
+                        this.scriptPath[1].Add(scriptFile);
+                    }
+                }
+            }
+        }
+
+        private void sendDataScriptCheckedListBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (this.sendDataScriptCheckedListBox.SelectedIndex < 0) return;
+            this.scriptDescTextBox.Text = this.sendDataScriptList[this.sendDataScriptCheckedListBox.SelectedIndex].description;
+        }
+
+        private void reloadScriprtsButton_Click(object sender, EventArgs e)
+        {
+            this.InitScriptList();
+        }
+        private delegate void RunScriptsCallBack();
+        private void runScriptsButton_Click(object sender, EventArgs e)
+        {
+            if (!GlobalVariable.isLogin)
+            {
+                MessageBox.Show("当前还未登录游戏！");
+                return;
+            }
+            this.scriptToolStripMenuItem.Enabled = this.sendDataScriptCheckedListBox.Enabled = this.runScriptsButton.Enabled = this.reloadScriprtsButton.Enabled
+                        = this.importScriptButton.Enabled = false;
+            this.stopScriptsButton.Enabled = GlobalVariable.isRunningScript = true;
+            new Thread(() =>
+            {
+                RunScriptsCallBack callBack;
+                foreach (int index in this.sendDataScriptCheckedListBox.CheckedIndices)
+                {
+                    
+                    callBack  = delegate ()
+                    {
+                        this.logTextBox.AppendText($"*****************************************\r\n" +
+                            $"正在执行[{this.sendDataScriptList[index].title}] \r\n");
+                        this.logTextBox.ScrollToCaret();
+                    };
+                    this.Invoke(callBack);
+                    foreach (var script in this.sendDataScriptList[index].scripts)
+                    {
+                        callBack  = delegate ()
+                        {
+                            this.logTextBox.AppendText($"\r\n 正在执行第{this.sendDataScriptList[index].scripts.IndexOf(script) + 1}/{this.sendDataScriptList[index].scripts.Count}个命令 \r\n");
+                            this.logTextBox.ScrollToCaret();
+                        };
+                        this.Invoke(callBack);
+                        for (int i = 0; i < script.times; i++)
+                        {
+                            Thread.Sleep(300);
+                            new Task(() =>
+                            {
+                                GlobalVariable.sendDataController.SendDataByCmdIdAndHexString(script.CmdId, script.Body);
+                            }).Start();
+                            callBack  = delegate ()
+                            {
+                                this.logTextBox.AppendText($"  已发送{i + 1}/{script.times}次 \r\n");
+                                this.logTextBox.ScrollToCaret();
+                            };
+                            this.Invoke(callBack);
+                        }
+                    }
+                    if (!GlobalVariable.isLogin || !this.stopScriptsButton.Enabled)
+                    {
+                        callBack  = delegate ()
+                        {
+                            this.logTextBox.AppendText("停止执行");
+                            this.logTextBox.ScrollToCaret();
+                        };
+                        this.Invoke(callBack);
+                        if (!GlobalVariable.isLogin) MessageBox.Show("检测到掉线!已自动停止执行脚本，请重新登录游戏!");
+                        break;
+                    }
+                }
+                callBack  = delegate ()
+                {
+                    Thread.Sleep(1000);
+                    this.logTextBox.AppendText("\r\n执行完成 \r\n");
+                    this.logTextBox.ScrollToCaret();
+                    this.scriptToolStripMenuItem.Enabled = this.sendDataScriptCheckedListBox.Enabled = this.runScriptsButton.Enabled = this.reloadScriprtsButton.Enabled
+                        = this.importScriptButton.Enabled = true;
+                    this.stopScriptsButton.Text = "停止执行";
+                    this.stopScriptsButton.Enabled = GlobalVariable.isRunningScript = false;
+                };
+                this.Invoke(callBack);
+            }).Start();
+            
+            
+        }
+
+        private void importScriptButton_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            openFileDialog.Filter = "脚本文件(*.script)|*.script";
+            DialogResult openFileResult = openFileDialog.ShowDialog();
+            if (openFileResult == DialogResult.OK)
+            {
+                string scriptString = File.ReadAllText(openFileDialog.FileName);
+                ScriptJsonDto scriptJsonDto = this.scriptDecryptEncryptUtil.ScriptDecrypt(scriptString);
+                if (scriptJsonDto.securityCode != GlobalVariable.securityCode || scriptJsonDto.type != 1)
+                {
+                    MessageBox.Show("脚本导入失败！\n脚本已损坏或导入了非脚本文件！");
+                    return;
+                }
+                string scriptPath = $"{Directory.GetCurrentDirectory()}\\bin\\script\\";
+                if (!Directory.Exists(scriptPath)) Directory.CreateDirectory(scriptPath);
+                if(File.Exists($"{scriptPath}{openFileDialog.FileName.Split('\\').Last()}"))                   
+                {
+                    MessageBox.Show("脚本导入失败！\n导入了已存在的同名脚本！");
+                }
+                else
+                {
+                    try
+                    {
+                        File.Copy(openFileDialog.FileName, $"{scriptPath}{openFileDialog.FileName.Split('\\').Last()}", true);
+                        this.InitScriptList();
+                    }
+                    catch (Exception ex)
+                    {
+                        core.Utils.Logger.Error($"脚本导入失败，错误信息:{ex.Message}");
+                        MessageBox.Show("导入失败!");
+                    }
+                }
+                
+            }
+        }
+
+        private void stopScriptsButton_Click(object sender, EventArgs e)
+        {
+            this.stopScriptsButton.Text = "等待当前脚本执行完毕";
+            this.stopScriptsButton.Enabled = false;
+        }
+
+        private void clearButton_Click(object sender, EventArgs e)
+        {
+            this.logTextBox.Text = "";
+        }
+
+        private void importScriptToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            this.importScriptButton_Click(sender, e);
+        }
+
+        private void reloadScriptsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            this.reloadScriprtsButton_Click(sender, e);
+        }
+
+        private void deleteScriptToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            int index = this.sendDataScriptCheckedListBox.SelectedIndex;
+            if (GlobalVariable.isRunningScript || index < 0) return;
+            try
+            {
+                File.Delete(this.scriptPath[1][index]);
+                core.Utils.Logger.Log("deleteScript", $"删除自定义脚本:{this.sendDataScriptCheckedListBox.Items[index]}");
+                this.scriptPath[1].RemoveAt(index);
+                this.sendDataScriptList.RemoveAt(index);
+                this.sendDataScriptCheckedListBox.Items.RemoveAt(index);
+            }catch (Exception ex)
+            {
+                MessageBox.Show("删除失败...");
+                core.Utils.Logger.Error( $"删除自定义脚本:{this.sendDataScriptCheckedListBox.Items[index]}时出错，errorMessage:{ex.Message}");
+            }
         }
     }
 }

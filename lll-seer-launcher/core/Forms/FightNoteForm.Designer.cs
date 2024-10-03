@@ -46,6 +46,7 @@ namespace lll_seer_launcher.core.Forms
             this.otherPlayerPetHead = new System.Windows.Forms.PictureBox();
             this.loginPlayerPetHead = new System.Windows.Forms.PictureBox();
             this.petBag = new System.Windows.Forms.GroupBox();
+            this.notUseSkillButton = new System.Windows.Forms.Button();
             this.hideFightModuleCheckBox = new System.Windows.Forms.CheckBox();
             this.autoAddPPCheckBox = new System.Windows.Forms.CheckBox();
             this.loopUseSkillCheckBox = new System.Windows.Forms.CheckBox();
@@ -64,7 +65,6 @@ namespace lll_seer_launcher.core.Forms
             this.petList = new System.Windows.Forms.ListBox();
             this.fightNoteTextBox = new System.Windows.Forms.TextBox();
             this.clearButton = new System.Windows.Forms.Button();
-            this.notUseSkillButton = new System.Windows.Forms.Button();
             this.fightPreviewGroupBox.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.otherPlayerPetHead)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.loginPlayerPetHead)).BeginInit();
@@ -223,6 +223,16 @@ namespace lll_seer_launcher.core.Forms
             this.petBag.TabIndex = 1;
             this.petBag.TabStop = false;
             this.petBag.Text = "快捷操作(双击可快速切换精灵，使用技能)";
+            // 
+            // notUseSkillButton
+            // 
+            this.notUseSkillButton.Location = new System.Drawing.Point(81, 142);
+            this.notUseSkillButton.Name = "notUseSkillButton";
+            this.notUseSkillButton.Size = new System.Drawing.Size(70, 30);
+            this.notUseSkillButton.TabIndex = 16;
+            this.notUseSkillButton.Text = "空过";
+            this.notUseSkillButton.UseVisualStyleBackColor = true;
+            this.notUseSkillButton.Click += new System.EventHandler(this.notUseSkillButton_Click);
             // 
             // hideFightModuleCheckBox
             // 
@@ -435,23 +445,13 @@ namespace lll_seer_launcher.core.Forms
             // 
             // clearButton
             // 
-            this.clearButton.Location = new System.Drawing.Point(238, 371);
+            this.clearButton.Location = new System.Drawing.Point(241, 375);
             this.clearButton.Name = "clearButton";
             this.clearButton.Size = new System.Drawing.Size(54, 24);
             this.clearButton.TabIndex = 3;
             this.clearButton.Text = "清空";
             this.clearButton.UseVisualStyleBackColor = true;
             this.clearButton.Click += new System.EventHandler(this.clearButton_Click);
-            // 
-            // notUseSkillButton
-            // 
-            this.notUseSkillButton.Location = new System.Drawing.Point(81, 142);
-            this.notUseSkillButton.Name = "notUseSkillButton";
-            this.notUseSkillButton.Size = new System.Drawing.Size(70, 30);
-            this.notUseSkillButton.TabIndex = 16;
-            this.notUseSkillButton.Text = "空过";
-            this.notUseSkillButton.UseVisualStyleBackColor = true;
-            this.notUseSkillButton.Click += new System.EventHandler(this.notUseSkillButton_Click);
             // 
             // FightNoteForm
             // 
