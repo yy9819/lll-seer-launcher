@@ -94,7 +94,7 @@ namespace lll_seer_launcher.core.Controller
             return headInfo;
         }
 
-        public HeadInfo PackHeadInfo(HeadInfo headInfo)
+        public void PackHeadInfo(HeadInfo headInfo)
         {
             byte[] encryptData = new byte[headInfo.packageLen];
             //写入包长
@@ -139,7 +139,6 @@ namespace lll_seer_launcher.core.Controller
 
             //将组包完成的数据进行加密
             headInfo.encryptData = this.Encrypt(encryptData);
-            return headInfo;
         }
 
 
