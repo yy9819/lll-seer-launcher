@@ -206,7 +206,7 @@ namespace lll_seer_launcher
                     GlobalVariable.analyzeSendDataController.RunAnalyzeSendDataMethod(this.sendPkgInfo);
                     this.InsertTCPData(sendPkgInfo, true);
                 }).Start();
-                this.sendPkgInfo = this.messageEncryptControl.PackHeadInfo(this.sendPkgInfo);
+                this.messageEncryptControl.PackHeadInfo(this.sendPkgInfo);
                 bytes = this.sendPkgInfo.encryptData;
             }
 
